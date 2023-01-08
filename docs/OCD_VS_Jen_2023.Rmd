@@ -45,13 +45,13 @@ output            : papaja::apa6_word
 library("papaja")
 r_refs("r-references.bib")
 library(tidyverse)
-library(GGally)
 library(broom)
 library(nlme)
 library(lme4)
 library(lmerTest)
 library(ggpubr)
 library(cowplot)
+library(caret) 
 
 ```
 
@@ -423,14 +423,41 @@ In contrast to our hypothesis, we didn't find an interaction between group and t
 
 Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search.
 
-*Hypothesis 6* Model comparison - search type or target-presence contribute to OC+ search time. In order to directly test the hypothesis that target-presence affects OC+ search time to a greater extent than search type we will conduct a model comparison between two multiple regression models. The first model will predict search slopes using the following predictors: search type; group; the interaction between search type and target presence; the interaction between search type and group. The first model will use the following formula: slope_estimate~ 1+group+search_type X target_presence+ search_type X group
+*Hypothesis 6* Model comparison - search type or target-presence contribute to OC+ search time. In order to directly test the hypothesis that target-presence affects OC+ search time to a greater extent than search type we will conduct a model comparison between two multiple regression models. The first model will predict search slopes using the following predictors: search type; group; the interaction between search type and target presence; the interaction between search type and group. The first model will use the following formula: 
+
+slope_estimate~ 1+group+search_type X target_presence+ search_type X group
 
 The second model will predict search slopes using the following predictors: 
 search type; group; the interaction between search type and target presence and the interaction between target presence and group. The second model will use the following formula:
+
 slope_estimate~ 1+group+ search_type X target_present+target_present X group
-These two models differ only in their last interaction effect. Thus, their complexity level (that is, the number of fitted coefficients) will be the same, which will allow us to compare these models directly. We will compare model performance using leave-one-out cross validation.  
+
+These two models differ only in their last interaction effect. Thus, their complexity level (that is, the number of fitted coefficients) will be the same, which will allow us to compare these models directly. We will compare model performance using leave-one-out cross validation. 
+
+```{r analyze_data, echo=FALSE, cache=TRUE}
+
+#specify the cross-validation method
+ctrl <- trainControl(method = "LOOCV")
+
+#first model 
+#fit a regression model and use LOOCV to evaluate performance
+m_1 <- train(estimate ~ 1+OCI_quantile+ search_type * target_present +search_type *OCI_quantile,
+               data = search_slopes_df, method = "lm", trControl = ctrl)
+
+#view summary of LOOCV               
+print(m_1)
+
+#second model 
+#fit a regression model and use LOOCV to evaluate performance
+m_2 <- train(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *OCI_quantile,
+               data = search_slopes_df, method = "lm", trControl = ctrl)
+
+#view summary of LOOCV               
+print(m_2)
 
 
+
+```
 
 # Discussion
 
