@@ -391,8 +391,6 @@ In line with our hypothesis and paradign structure, search slopes between the tw
 
 *Hypothesis 2* We will test the difference of slopes between O in C in target presence and C in O in target absence. Based on our pilot and paradigm design, we expect to find a steeper slope for O in C in target presence than C in O in target absence. To compare these slopes, we will use a one-tailed paired t-test. 
 
-
-
 `r apa_print(t.test(estimate~group, data=H2.df, paired=T))`
 
 In contrast with our hypothesis, search slopes for the easy absent search were less steep than search slopes in the hard present condition. 
@@ -414,7 +412,6 @@ In contrast to our hypothesis, we didn't find an interaction between group and t
 
 *Hypothesis 5* Difficulty of OC+ participants with inference about absence in the easy search type. We will check for the interaction between group and target presence and focus on the easy search type (C in O). We will test the hypothesis that the search slope differences between OC+ and OC- will be significantly stronger in target-absent trials. Obtaining this interaction pattern would strengthen the hypothesis that decisions about absence contribute to OC+ search times irrespective of task uncertainty (figure 4 top panel). On the other hand, an interaction between group and target presence with the same pairwise comparison pattern that is specific to the hard search (Hypothesis 4, above) will strengthen the competing hypothesis that heightened uncertainty contributes to OC+ search times (figure 4 bottom panel).  
 
-
   search_slopes_df %>% 
   filter(OCI_quantile==1| OCI_quantile==4) %>% 
   filter(search_type=='CinO') %>%
@@ -433,6 +430,8 @@ search type; group; the interaction between search type and target presence and 
 slope_estimate~ 1+group+ search_type X target_present+target_present X group
 
 These two models differ only in their last interaction effect. Thus, their complexity level (that is, the number of fitted coefficients) will be the same, which will allow us to compare these models directly. We will compare model performance using leave-one-out cross validation. 
+
+Model comparison shows that both models have the same R-sqaured value, therefor we can reject the hypothesis that target-presence affects OC+ search time to a greater extent than search type on OC+.   
 
 ```{r analyze_data, echo=FALSE, cache=TRUE}
 
@@ -454,8 +453,6 @@ m_2 <- train(estimate ~ 1+OCI_quantile+ search_type * target_present +target_pre
 
 #view summary of LOOCV               
 print(m_2)
-
-
 
 ```
 
