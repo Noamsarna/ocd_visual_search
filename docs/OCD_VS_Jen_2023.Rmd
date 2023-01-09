@@ -338,8 +338,9 @@ search_slopes_df <- search_df %>%
   # we are interested in the slope, i.e., the effect of set size.
   filter(term=='set_size25')
 
-search_slopes_df<- left_join(search_slopes_df, OCI_df %>% 
-                               select(subj_id, OCI_quantile), by='subj_id')
+search_slopes_df<- left_join(search_slopes_df, questionnaires_df %>% 
+                               select(subj_id, OCI_quantile, oci_overall, DASS_depression, DASS_anxiety),
+                             by='subj_id')
 
 
 slopes_table <-search_slopes_df %>% 
@@ -436,6 +437,9 @@ Model comparison shows that both models have the same R-sqaured value, therefor 
 
 ```{r LOOCV, echo=FALSE, cache=TRUE}
 
+#NS: I need to change this model into a MLM since each participant have more than one observation. 
+# I also need to include only the high and low OC participants. 
+
 #specify the cross-validation method
 ctrl <- trainControl(method = "LOOCV")
 
@@ -503,8 +507,86 @@ search_slopes_df_first_t <- search_df %>%
   unnest(tidy) %>%
   filter(term=='set_size25') %>% 
   filter(test_part=='first_two_trials')
+
 ```
 `r apa_print(t.test(estimate~search_type, data=search_slopes_df_with_first_t, paired=T))`
+
+Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type. This significant difference between the search slopes indicate that subjects had some sort of metacognitive knowledge allowing them to terminate the easy search faster than the hard search.  
+
+
+*Hypothesis 8*:
+Interaction between group and search time on first-trials slopes. Using a mixed-effects ANOVA, with slope as a dependent variable and group and search type as the two between- and within-subject independent variables, we will test for an interaction of group (OC+/OC-) with search type.
+
+```{r first_trials_ocd, echo=FALSE, cache=TRUE}
+
+#figure
+  search_df %>% 
+  filter(test_part=='first_two_trials') %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id, search_type, set_size, OCI_quantile) %>% 
+  summarise(mean_RT =mean(RT)) %>% 
+    group_by(search_type, set_size, OCI_quantile) %>% 
+    summarise(mean_RT =mean(mean_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=mean_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  facet_wrap(~OCI_quantile)+
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
+
+  search_slopes_df_first_t %>% 
+  aov(estimate~OCI_quantile * search_type, data = .) %>% 
+  summary(.)
+
+```
+We didn't find an interaction between search type and group on first trials slopes. 
+
+*Hypothesis 9*: Correlations between OC tendencies and search slopes. In order to strengthen the validity of our results, we will reanalyze our main hypothesis using the entire range of OC scores. That way, we will be able to investigate whether search times in absent trials varies as a function of OC tendencies. We will do so by correlating OC tendencies with search slopes in target-absent and target presence conditions.
+
+NS: This analysis is almost exactly like hypothesis 6 except that here we look on the entire sample (so we need to add the two mid quartiles groups.)
+
+*Hypothesis 10*: 
+Finally, in order to test the robustness of our results, we will add depression and anxiety scores as covariates into our model, for possible mediating effects. We will use the DASS questionnaire to measure anxiety and depression [@lovibond1995structure]. 
+
+```{r DASS_mediation, echo=FALSE, cache=TRUE}
+
+m_anx_depp <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *OCI_quantile+
+               DASS_anxiety+DASS_depression+
+               (1|subj_id),
+               data = search_slopes_df)
+
+summary(m_anx_depp)
+
+```
+*Exploratory analysis*
+Measuring the perceived difficulty of participants will serve us to compare between participants’ explicit metacognitive knowledge and their behavior. Findings a discrepancy between the perceived difficulty and task performance in the OC+ group, will indicate a dissociation and disruption between action and knowledge. On the other hand, finding a correspondence between the perceived difficulty and task performance in the OC+ group, will indicate an intact behavior monitoring and good insight. Results in the OC- group will serve as a control group.
+
+```{r explicit_dif, echo=FALSE, cache=TRUE}
+
+difficulty_rating_by_condition%>% 
+  ggplot(aes(x = reorder(difficulty_rating, mean), y = mean, fill=condition)) +
+  geom_col() +
+  theme_bw()+
+  scale_fill_manual(values = c("#bcb9c1", "#e5989b"))+
+  labs(x = "test part", title = "Perceived difficulty")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+#with OCI quantile 
+difficulty_rating_by_condition_with_oci%>% 
+  ggplot(aes(x = reorder(difficulty_rating, mean), y = mean, fill=condition)) +
+  geom_col() +
+  theme_bw()+
+  scale_fill_manual(values = c("#bcb9c1", "#e5989b"))+
+  labs(x = "test part", title = "Perceived difficulty")+
+  facet_wrap(~OCI_quantile_factor)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
 
 # Discussion
 
