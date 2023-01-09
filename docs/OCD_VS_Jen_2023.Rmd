@@ -62,11 +62,11 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 <!-- # Introduction  -->
-<!--  Previous work by Toffolo et al., (2013), using a visual search paradigm in high (OC+) and low (OC-) OC individuals, provided evidence that OC+ participants search longer in target-absent trials. This robust finding has been replicated (Toffolo et al., 2014) and extended to a clinical sample of OCD patients (Toffolo et al., 2016). In these experiments, checking behavior was operationalized by search time and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, the longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking for mild uncertainty. However, the paradigm structure used in Toffolo's experiments has conflated uncertainty with target absence. Decisions about target absence are indeed qualitatively different from target-present trials since the evidence for lack of stimuli is less salient and based on the metacognitive belief of not having missed the target (Mazor, 2021). -->
 
-<!--Nevertheless, some decisions about absence can be accompanied by low subjective uncertainty, for instance, perceiving the absence of a red dot among blue dots. Distinguishing features of inference about absence from uncertainty will be achieved by introducing such a search where absence can be more directly inferred and will allow us to probe for distinct behavior of OC+ in absent trials. -->
+Previous work by [@toffolo2013mild] , using a visual search paradigm in high (OC+) and low (OC-) OC individuals, provided evidence that OC+ participants search longer in target-absent trials. This robust finding has been replicated [@toffolo2014uncertainty] and extended to a clinical sample of OCD patients [@toffolo2016patients]. In these experiments, checking behavior was operationalized by search time and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, the longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking for mild uncertainty. However, the paradigm structure used in Toffolo's experiments has conflated uncertainty with target absence. Decisions about target absence are indeed qualitatively different from target-present trials since the evidence for lack of stimuli is less salient and based on the metacognitive belief of not having missed the target [@mazor2022efficient].
 
-# NS: I still need to attend to the refrences. 
+Nevertheless, some decisions about absence can be accompanied by low subjective uncertainty, for instance, perceiving the absence of a red dot among blue dots. Distinguishing features of inference about absence from uncertainty will be achieved by introducing such a search where absence can be more directly inferred and will allow us to probe for distinct behavior of OC+ in absent trials.
+
 
 ```{r load_data, echo=FALSE, cache=TRUE}
 
@@ -215,8 +215,8 @@ The entire experiment will take 14 minutes to complete (the median completion ti
 
 ## Material
 Visual search task 
-The experiment described in this study was adapted from Mazor & Fleming (2022), with stimuli created to replicate the ones used in the Toffolo et al. (2013) experiment. All elements (distractors and target) and their placement on the search grid were made to replicate as closely as possible the paradigm used in Toffolo et al. (2013). 
-The visual search task will consist of 4 blocks, each containing 24 trials of searching for either a closed or an open square. To make sure participants understand the task, a practice phase will be given first. The practice phase will consist of one block with six trials of visual search. Elements in both practice and main part will be white on dark grey background. Each trial will last for a maximum of 10 seconds or until a response is received. If no response is given within 10 seconds, the next trial will immediately appear. Feedback about the response (wrong/right) will be given only in the practice phase, to help participants learn the task efficiently. In the main part of the experiment, no feedback will be given, as was the case in the original paradigm (Toffolo et al. 2013). 
+The experiment described in this study was adapted from [@mazor2022efficient], with stimuli created to replicate the ones used in the [@toffolo2013mild] experiment. All elements (distractors and target) and their placement on the search grid were made to replicate as closely as possible the paradigm used in @toffolo2013mild. 
+The visual search task will consist of 4 blocks, each containing 24 trials of searching for either a closed or an open square. To make sure participants understand the task, a practice phase will be given first. The practice phase will consist of one block with six trials of visual search. Elements in both practice and main part will be white on dark grey background. Each trial will last for a maximum of 10 seconds or until a response is received. If no response is given within 10 seconds, the next trial will immediately appear. Feedback about the response (wrong/right) will be given only in the practice phase, to help participants learn the task efficiently. In the main part of the experiment, no feedback will be given, as was the case in the original paradigm [@toffolo2013mild].  
 
 ## Procedure
 Participants will first be instructed about the experiment's structure, which comprises three parts: A visual search part, questions about the visual search part, and some more general questions. Then, they will be informed about the main part of the experiment – the visual search part. Specifically, their task is to report, as accurately and quickly as possible, whether a target stimulus was present (press 'J') or absent (press 'F'). Then, practice trials will be delivered, in which the target stimulus is a rotated T, and distractors are rotated Ls. The purpose of the practice trials is to familiarize participants with the task structure. For these practice trials, the number of items will always be 4. In the practice trials, participants will be given feedback about the accuracy of their responses. The feedback will appear right after a response is given. If the response is correct, then the word “Correct!” will immediately pop on the screen, for 1 second. If the response is wrong, the word “Wrong!” will immediately pop on the screen for 5 seconds. The extended duration of the word “wrong” is intended to feel aversive and to make sure participants are paying full attention and giving accurate responses (a pilot study showed higher accuracy rates when using this method). Practice trials will be delivered in one block of 6 trials, and the main part of the experiment will start only once participants respond correctly on at least five trials.
@@ -242,11 +242,11 @@ The four questions will be (each question will be accompanied by a picture depic
 
 #need to add the figures.
 
-We focused on these four trials as this was our most intriguing hypothesis, comparing easy target-absent trials to more challenging target-present trials. After finishing this part, participants will be informed they have reached the final part of the experiment. In the last part, they will fill out the OCI-R (Foa et al., 2002) and DASS-21 (Lovibond & Lovibond, 1995) questionnaires. We inserted two attention checks questions between the regular OCI items, asking participants to select a certain answer (‘If you read this question, check the option ‘Not at all’). As part of an exploratory analysis, we added another item to the OCI asking specifically about problems with inference about absence (‘I sometimes go back and check that I didn’t do something bad unintentionally’). 
+We focused on these four trials as this was our most intriguing hypothesis, comparing easy target-absent trials to more challenging target-present trials. After finishing this part, participants will be informed they have reached the final part of the experiment. In the last part, they will fill out the OCI-R [@foa2002obsessive] and DASS-21 [@lovibond1995structure] questionnaires. We inserted two attention checks questions between the regular OCI items, asking participants to select a certain answer (‘If you read this question, check the option ‘Not at all’). As part of an exploratory analysis, we added another item to the OCI asking specifically about problems with inference about absence (‘I sometimes go back and check that I didn’t do something bad unintentionally’). 
 Upon completion, participants they will receive a message thanking them for participation and then will be redirected back to prolific with a completion code. 
 
 ###Randomization
-The order and timing of experimental events will be determined pseudo-randomly by the Mersenne Twister pseudorandom number generator, initialized to ensure registration time-locking (Mazor, Mazor, & Mukamel, 2019).
+The order and timing of experimental events will be determined pseudo-randomly by the Mersenne Twister pseudorandom number generator, initialized to ensure registration time-locking [@mazor2019novel].
 
 ##Data analysis
 
@@ -323,8 +323,6 @@ by_sub_toffolo <- toffolo_data %>%
             sd_RT = sd(RT, na.rm = T)) %>% ungroup() %>% 
   mutate(log_mRT = log(mean_RT))
 
-
-
 # Extracting slopes ------------------------------------------------------------------
 
 #Reordering set size to get the slopes for the effect of going from 9 to 25. 
@@ -342,6 +340,7 @@ search_slopes_df <- search_df %>%
 
 search_slopes_df<- left_join(search_slopes_df, OCI_df %>% 
                                select(subj_id, OCI_quantile), by='subj_id')
+
 
 slopes_table <-search_slopes_df %>% 
   group_by(OCI_quantile, search_type, target_present) %>% 
@@ -371,16 +370,6 @@ toffolo_fig <-
                position = position_dodge(0.9)) +
   theme_bw()
 
-#creating a df for second hypothesis testing 
-#NS: is there a way to leave this out or integrate it in the t.test itself? 
-
-H2.df<- search_slopes_df %>% 
-  filter(target_present==TRUE & search_type=='OinC' |target_present==FALSE & search_type=='CinO')  %>% 
-  mutate(group = case_when(search_type == 'OinC' ~ 'hard_present',
-                           search_type == 'CinO' ~ 'easy_absent'));
-                          
-H2.df %>% group_by(group) %>% summarise(mean_slope = mean(estimate))
-
 
 ```
 
@@ -390,6 +379,18 @@ In line with our hypothesis and paradign structure, search slopes between the tw
 `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))`
 
 *Hypothesis 2* We will test the difference of slopes between O in C in target presence and C in O in target absence. Based on our pilot and paradigm design, we expect to find a steeper slope for O in C in target presence than C in O in target absence. To compare these slopes, we will use a one-tailed paired t-test. 
+
+```{r h2_t-test, echo=FALSE, cache=TRUE}
+#creating a df for second hypothesis testing 
+
+H2.df<- search_slopes_df %>% 
+  filter(target_present==TRUE & search_type=='OinC' |target_present==FALSE & search_type=='CinO')  %>% 
+  mutate(group = case_when(search_type == 'OinC' ~ 'hard_present',
+                           search_type == 'CinO' ~ 'easy_absent'));
+                          
+H2.df %>% group_by(group) %>% summarise(mean_slope = mean(estimate))
+
+```
 
 `r apa_print(t.test(estimate~group, data=H2.df, paired=T))`
 
@@ -433,7 +434,7 @@ These two models differ only in their last interaction effect. Thus, their compl
 
 Model comparison shows that both models have the same R-sqaured value, therefor we can reject the hypothesis that target-presence affects OC+ search time to a greater extent than search type on OC+.   
 
-```{r analyze_data, echo=FALSE, cache=TRUE}
+```{r LOOCV, echo=FALSE, cache=TRUE}
 
 #specify the cross-validation method
 ctrl <- trainControl(method = "LOOCV")
@@ -455,6 +456,55 @@ m_2 <- train(estimate ~ 1+OCI_quantile+ search_type * target_present +target_pre
 print(m_2)
 
 ```
+
+*Hypothesis 7*: First trials analysis. Prior to the analysis, we will correct for trial and block order effects by using the following formula: 
+
+#NS:(need to add the formula) 
+#NS: Here I need your help. I went back to your code for the termination experiment but couldn't figure out how to perform this correction for trial and block order effects. 
+
+Where RTs,b,t corresponds to the reaction time of subject s in block b and trial t, and RTs to the mean RT for subject s in trials 1 and 2 of blocks 1 and 3. Then, at the whole group level we will compare the slopes of the two types of searches (O in C and C in O) to see if they are different already in the first trials, using a two-tailed paired t-test. Finding a difference between them will serve as a sign for metacognitive knowledge about the asymmetry between the two types of searches, that was in place before experiencing target-present trials. 
+
+```{r first_trials, echo=FALSE, cache=TRUE}
+#first trials figure 
+#NS: NTS - consider to change to stat summary  
+
+  search_df %>% 
+  filter(test_part=='first_two_trials') %>% 
+  group_by(subj_id, search_type, set_size) %>% 
+  summarise(mean_RT =mean(RT)) %>% 
+    group_by(search_type, set_size) %>% 
+    summarise(mean_RT =mean(mean_RT)) %>% 
+
+  ggplot(data=. , 
+       aes(x=set_size, y=mean_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  #ylim(900, 2000)+
+  scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
+
+#We can include only subjects who have a valid 4 first trials. 
+#NS: should we also reject incorrect trials? 
+
+keep_sub <-search_df %>% filter(test_part=='first_two_trials') %>% 
+  group_by(subj_id) %>%
+  count() %>% filter(n == 4) %>% pull(subj_id)
+
+search_slopes_df_first_t <- search_df %>%
+  filter(subj_id %in% keep_sub) %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id,search_type,target_present, test_part,OCI_quantile) %>%
+  nest() %>%
+  mutate(model = map(data, ~ lm(RT ~ set_size, data =.)),
+         tidy = map(model, ~ tidy(.x))) %>%
+  unnest(tidy) %>%
+  filter(term=='set_size25') %>% 
+  filter(test_part=='first_two_trials')
+```
+`r apa_print(t.test(estimate~search_type, data=search_slopes_df_with_first_t, paired=T))`
 
 # Discussion
 
