@@ -340,7 +340,8 @@ search_slopes_df <- search_df %>%
 
 search_slopes_df<- left_join(search_slopes_df, questionnaires_df %>% 
                                select(subj_id, OCI_quantile, oci_overall, DASS_depression, DASS_anxiety),
-                             by='subj_id')
+                             by='subj_id') 
+
 
 
 slopes_table <-search_slopes_df %>% 
@@ -438,23 +439,35 @@ Model comparison shows that both models have the same R-sqaured value, therefor 
 ```{r LOOCV, echo=FALSE, cache=TRUE}
 
 #NS: I need to change this model into a MLM since each participant have more than one observation. 
-# I also need to include only the high and low OC participants. 
+# Do you know how to implement it with caret? 
 
 #specify the cross-validation method
 ctrl <- trainControl(method = "LOOCV")
 
 #first model 
 #fit a regression model and use LOOCV to evaluate performance
-m_1 <- train(estimate ~ 1+OCI_quantile+ search_type * target_present +search_type *OCI_quantile,
-               data = search_slopes_df, method = "lm", trControl = ctrl)
+
+m_1 <- 
+search_slopes_df%>% 
+    filter(OCI_quantile==1|OCI_quantile==4) %>% 
+    mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+
+    train(estimate ~ 1+OCI_group+ search_type * target_present +search_type *OCI_group,
+               data =. , method = "lm", trControl = ctrl)
 
 #view summary of LOOCV               
 print(m_1)
 
 #second model 
 #fit a regression model and use LOOCV to evaluate performance
-m_2 <- train(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *OCI_quantile,
-               data = search_slopes_df, method = "lm", trControl = ctrl)
+
+m_2 <- 
+  search_slopes_df%>% 
+    filter(OCI_quantile==1|OCI_quantile==4) %>% 
+    mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  train(estimate ~ 1+OCI_group+ search_type * target_present +target_present *OCI_group,
+               data = ., method = "lm", trControl = ctrl)
 
 #view summary of LOOCV               
 print(m_2)
@@ -490,11 +503,11 @@ Where RTs,b,t corresponds to the reaction time of subject s in block b and trial
   #ylim(900, 2000)+
   scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
 
-#We can include only subjects who have a valid 4 first trials. 
 #NS: should we also reject incorrect trials? 
 
+#include only subjects who have a valid 4 first trials
 keep_sub <-search_df %>% filter(test_part=='first_two_trials') %>% 
-  group_by(subj_id) %>%
+  group_by(subj_id) %>% 
   count() %>% filter(n == 4) %>% pull(subj_id)
 
 search_slopes_df_first_t <- search_df %>%
@@ -547,7 +560,14 @@ We didn't find an interaction between search type and group on first trials slop
 
 *Hypothesis 9*: Correlations between OC tendencies and search slopes. In order to strengthen the validity of our results, we will reanalyze our main hypothesis using the entire range of OC scores. That way, we will be able to investigate whether search times in absent trials varies as a function of OC tendencies. We will do so by correlating OC tendencies with search slopes in target-absent and target presence conditions.
 
-NS: This analysis is almost exactly like hypothesis 6 except that here we look on the entire sample (so we need to add the two mid quartiles groups.)
+``` {r full_range}
+m_full_range <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *OCI_quantile+
+               (1|subj_id),
+               data = search_slopes_df)
+summary(m_full_range)
+
+```
+The interaction between OC and target presence remain not significant when analyzing the results using the entire quartile of OC.  
 
 *Hypothesis 10*: 
 Finally, in order to test the robustness of our results, we will add depression and anxiety scores as covariates into our model, for possible mediating effects. We will use the DASS questionnaire to measure anxiety and depression [@lovibond1995structure]. 
@@ -562,6 +582,7 @@ m_anx_depp <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +targe
 summary(m_anx_depp)
 
 ```
+
 *Exploratory analysis*
 Measuring the perceived difficulty of participants will serve us to compare between participants’ explicit metacognitive knowledge and their behavior. Findings a discrepancy between the perceived difficulty and task performance in the OC+ group, will indicate a dissociation and disruption between action and knowledge. On the other hand, finding a correspondence between the perceived difficulty and task performance in the OC+ group, will indicate an intact behavior monitoring and good insight. Results in the OC- group will serve as a control group.
 
