@@ -434,7 +434,7 @@ slope_estimate~ 1+group+ search_type X target_present+target_present X group
 
 These two models differ only in their last interaction effect. Thus, their complexity level (that is, the number of fitted coefficients) will be the same, which will allow us to compare these models directly. We will compare model performance using leave-one-out cross validation. 
 
-Model comparison shows that both models have the same R-sqaured value, therefor we can reject the hypothesis that target-presence affects OC+ search time to a greater extent than search type on OC+.   
+  
 
 ```{r LOOCV, echo=FALSE, cache=TRUE}
 
@@ -473,6 +473,8 @@ m_2 <-
 print(m_2)
 
 ```
+
+Model comparison shows that both models have the same R-sqaured value, therefor we can reject the hypothesis that target-presence affects OC+ search time to a greater extent than search type on OC+. 
 
 *Hypothesis 7*: First trials analysis. Prior to the analysis, we will correct for trial and block order effects by using the following formula: 
 
