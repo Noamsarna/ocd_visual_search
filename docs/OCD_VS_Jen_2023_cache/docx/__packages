@@ -1,4 +1,3 @@
-base
 tinylabels
 papaja
 tidyverse
@@ -18,3 +17,5 @@ lme4
 lmerTest
 ggpubr
 cowplot
+lattice
+caret
