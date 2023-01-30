@@ -63,6 +63,7 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 
 <!-- # Introduction  -->
 
+#test#
 Previous work by [@toffolo2013mild] , using a visual search paradigm in high (OC+) and low (OC-) OC individuals, provided evidence that OC+ participants search longer in target-absent trials. This robust finding has been replicated [@toffolo2014uncertainty] and extended to a clinical sample of OCD patients [@toffolo2016patients]. In these experiments, checking behavior was operationalized by search time and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, the longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking for mild uncertainty. However, the paradigm structure used in Toffolo's experiments has conflated uncertainty with target absence. Decisions about target absence are indeed qualitatively different from target-present trials since the evidence for lack of stimuli is less salient and based on the metacognitive belief of not having missed the target [@mazor2022efficient].
 
 Nevertheless, some decisions about absence can be accompanied by low subjective uncertainty, for instance, perceiving the absence of a red dot among blue dots. Distinguishing features of inference about absence from uncertainty will be achieved by introducing such a search where absence can be more directly inferred and will allow us to probe for distinct behavior of OC+ in absent trials.
