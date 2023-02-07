@@ -174,7 +174,6 @@ search_df <- df %>%
             by = "subj_id")
 
 #recode variables 
-#NS: NTS - this can be pipped to the part above it with mutate.
 search_df$target_present<-search_df$target_present=='TRUE'
 search_df$RT <- as.numeric(search_df$RT)
 search_df$correct <- as.numeric(as.logical(search_df$correct))
@@ -246,7 +245,6 @@ The four questions will be (each question will be accompanied by a picture depic
 3.	How difficult is detecting the absence of one open square among many closed squares 
 4.	How difficult is detecting the absence of one open square few closed squares
 
-#need to add the figures.
 
 We focused on these four trials as this was our most intriguing hypothesis, comparing easy target-absent trials to more challenging target-present trials. After finishing this part, participants will be informed they have reached the final part of the experiment. In the last part, they will fill out the OCI-R [@foa2002obsessive] and DASS-21 [@lovibond1995structure] questionnaires. We inserted two attention checks questions between the regular OCI items, asking participants to select a certain answer (‘If you read this question, check the option ‘Not at all’). As part of an exploratory analysis, we added another item to the OCI asking specifically about problems with inference about absence (‘I sometimes go back and check that I didn’t do something bad unintentionally’). 
 Upon completion, participants they will receive a message thanking them for participation and then will be redirected back to prolific with a completion code. 
@@ -355,29 +353,6 @@ slopes_table <-search_slopes_df %>%
   summarise(mean(estimate)) %>%
   filter(OCI_quantile==1 | OCI_quantile==4)
 
-# Toffolo replication plots -----------------------------------------------------
-
-toffolo_fig <-
-  by_sub_toffolo%>% 
-  filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
-  mutate(oci_type = ifelse(.$OCI_quantile == 1, "low", "high")) %>% 
-  ggplot(aes(x = oci_type, y = mean_RT,
-             fill = target_present)) +
-  stat_summary(fun.data = mean_se,
-               geom = "col",
-               alpha = 0.6,
-               position = position_dodge(0.9)) +
-  stat_summary(fun.data = mean_se,
-               geom = "errorbar",
-               width = 0.4,
-               position = position_dodge(0.9)) +
-  stat_summary(fun = mean,
-               geom = "label",
-               aes(label = round(..y..,2)),
-               color = "white", vjust = +2,
-               position = position_dodge(0.9)) +
-  theme_bw()
-
 
 ```
 
@@ -402,32 +377,51 @@ H2.df %>% group_by(group) %>% summarise(mean_slope = mean(estimate))
 
 `r apa_print(t.test(estimate~group, data=H2.df, paired=T))`
 
-In contrast with our hypothesis, search slopes for the easy absent search were less steep than search slopes in the hard present condition. 
+In line with our hypothesis, search slopes for the easy absent search were less steep than search slopes in the hard present condition. 
 
 
 *Hypothesis 3* Replication of previous findings by Toffolo et al., (2013). In order to directly replicate Toffolo's findings, we will focus on the hard search type (O in C) with the larger set size (set size =25), the same as was used in both studies (Toffolo et al., 2013, 2014). We will compare the mean RT between the two groups (OC+/OC-) in both target-present and target-absent trials. For this hypothesis, we will conduct a mixed-effects ANOVA, with mean RT as a dependent variable, group (OC+/OC-) as a between-subject variable and target presence (present/absent) as within-subject variable. We expect to find an interaction between group and target present, in which mean search times difference between OC+ and OC- will be significantly stronger in target-absent trials.
 
-#NS:how can I open the replication plot here? 
 
-knitr::include_graphics("../docs/figures/direct_replication_plot.png")
+```{r DR_h3, echo=FALSE, cache=TRUE}
+  
+  # Toffolo replication plots -----------------------------------------------------
 
-  toffolo_data %>% 
+toffolo_fig <-
+  by_sub_toffolo%>% 
+  filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
+  mutate(oci_type = ifelse(.$OCI_quantile == 1, "low", "high")) %>% 
+  ggplot(aes(x = oci_type, y = mean_RT,
+             fill = target_present)) +
+  stat_summary(fun.data = mean_se,
+               geom = "col",
+               alpha = 0.6,
+               position = position_dodge(0.9)) +
+  stat_summary(fun.data = mean_se,
+               geom = "errorbar",
+               width = 0.4,
+               position = position_dodge(0.9)) +
+  stat_summary(fun = mean,
+               geom = "label",
+               aes(label = round(..y..,2)),
+               color = "white", vjust = +2,
+               position = position_dodge(0.9)) +
+  theme_bw()
+
+test <-toffolo_data %>% 
   filter(OCI_quantile==1| OCI_quantile==4) %>% 
   aov(RT~OCI_quantile * target_present, data = .) %>% 
   summary(.)
+  
 
-In contrast to our hypothesis, we didn't find an interaction between group and target present in the direction we expected. There is a marginaly significant interaction (p=0.7) to the opposite direction, in which OC- are having longer search time in target absent trials, but not in target present trials. 
+```
+
+In contrast to our hypothesis, we didn't find an interaction between group and target present in the direction we expected `r apa_print(toffolo_data %>% filter(OCI_quantile==1| OCI_quantile==4) %>% aov(RT~OCI_quantile * target_present, data = .))`. There is a marginaly significant interaction to the opposite direction, in which OC- are having longer search time in target absent trials, but not in target present trials. 
  
 
 *Hypothesis 5* Difficulty of OC+ participants with inference about absence in the easy search type. We will check for the interaction between group and target presence and focus on the easy search type (C in O). We will test the hypothesis that the search slope differences between OC+ and OC- will be significantly stronger in target-absent trials. Obtaining this interaction pattern would strengthen the hypothesis that decisions about absence contribute to OC+ search times irrespective of task uncertainty (figure 4 top panel). On the other hand, an interaction between group and target presence with the same pairwise comparison pattern that is specific to the hard search (Hypothesis 4, above) will strengthen the competing hypothesis that heightened uncertainty contributes to OC+ search times (figure 4 bottom panel).  
 
-  search_slopes_df %>% 
-  filter(OCI_quantile==1| OCI_quantile==4) %>% 
-  filter(search_type=='CinO') %>%
-  aov(estimate ~ OCI_quantile*target_present, data=.) %>% 
-  summary(.)  
-
-Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search.
+Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search `r apa_print(search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO') %>%aov(estimate ~OCI_quantile*target_present, data=.))` 
 
 *Hypothesis 6* Model comparison - search type or target-presence contribute to OC+ search time. In order to directly test the hypothesis that target-presence affects OC+ search time to a greater extent than search type we will conduct a model comparison between two multiple regression models. The first model will predict search slopes using the following predictors: search type; group; the interaction between search type and target presence; the interaction between search type and group. The first model will use the following formula: 
 
@@ -478,14 +472,11 @@ Model comparison table shows that both models have the same AIC and BIC values s
 
 *Hypothesis 7*: First trials analysis. Prior to the analysis, we will correct for trial and block order effects by using the following formula: 
 
-#NS:(need to add the formula) 
-#NS: Here I need your help. I went back to your code for the termination experiment but couldn't figure out how to perform this correction for trial and block order effects. 
 
 Where RTs,b,t corresponds to the reaction time of subject s in block b and trial t, and RTs to the mean RT for subject s in trials 1 and 2 of blocks 1 and 3. Then, at the whole group level we will compare the slopes of the two types of searches (O in C and C in O) to see if they are different already in the first trials, using a two-tailed paired t-test. Finding a difference between them will serve as a sign for metacognitive knowledge about the asymmetry between the two types of searches, that was in place before experiencing target-present trials. 
 
 ```{r first_trials, echo=FALSE, cache=TRUE}
 #first trials figure 
-#NS: NTS - consider to change to stat summary  
 
   search_df %>% 
   filter(test_part=='first_two_trials') %>% 
@@ -505,7 +496,6 @@ Where RTs,b,t corresponds to the reaction time of subject s in block b and trial
   #ylim(900, 2000)+
   scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
 
-#NS: should we also reject incorrect trials? 
 
 #include only subjects who have a valid 4 first trials
 keep_sub <-search_df %>% filter(test_part=='first_two_trials') %>% 
@@ -526,7 +516,7 @@ search_slopes_df_first_t <- search_df %>%
 ```
 `r apa_print(t.test(estimate~search_type, data=search_slopes_df_with_first_t, paired=T))`
 
-Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type. This significant difference between the search slopes indicate that subjects had some sort of metacognitive knowledge allowing them to terminate the easy search faster than the hard search.  
+Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type. This significant difference between the search slopes indicate that subjects had some knowledge of the search assymetry already in the first trials of the task. 
 
 
 *Hypothesis 8*:
