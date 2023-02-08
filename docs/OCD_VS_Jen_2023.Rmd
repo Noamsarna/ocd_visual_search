@@ -408,12 +408,6 @@ toffolo_fig <-
                position = position_dodge(0.9)) +
   theme_bw()
 
-test <-toffolo_data %>% 
-  filter(OCI_quantile==1| OCI_quantile==4) %>% 
-  aov(RT~OCI_quantile * target_present, data = .) %>% 
-  summary(.)
-  
-
 ```
 
 In contrast to our hypothesis, we didn't find an interaction between group and target present in the direction we expected `r apa_print(toffolo_data %>% filter(OCI_quantile==1| OCI_quantile==4) %>% aov(RT~OCI_quantile * target_present, data = .))`. There is a marginaly significant interaction to the opposite direction, in which OC- are having longer search time in target absent trials, but not in target present trials. 
@@ -476,17 +470,25 @@ Model comparison table shows that both models have the same AIC and BIC values s
 Where RTs,b,t corresponds to the reaction time of subject s in block b and trial t, and RTs to the mean RT for subject s in trials 1 and 2 of blocks 1 and 3. Then, at the whole group level we will compare the slopes of the two types of searches (O in C and C in O) to see if they are different already in the first trials, using a two-tailed paired t-test. Finding a difference between them will serve as a sign for metacognitive knowledge about the asymmetry between the two types of searches, that was in place before experiencing target-present trials. 
 
 ```{r first_trials, echo=FALSE, cache=TRUE}
-#first trials figure 
+# correct trial order effects
 
-  search_df %>% 
-  filter(test_part=='first_two_trials') %>% 
-  group_by(subj_id, search_type, set_size) %>% 
-  summarise(mean_RT =mean(RT)) %>% 
-    group_by(search_type, set_size) %>% 
-    summarise(mean_RT =mean(mean_RT)) %>% 
+first_trials_df <- search_df %>%
+  filter(test_part=='first_two_trials' & correct) %>%
+  group_by(subj_id) %>%
+  filter(n()==4) %>% #include only subjects who have a valid 4 first trials
+  arrange(trial_index) %>%
+  mutate(trial_index = seq(n()), #standardizing trial order across participants
+  mean_subj_RT = mean(RT)) %>%
+  group_by(trial_index) %>%
+  mutate(mean_position_RT = mean(RT)) %>%
+  ungroup() %>%
+  mutate(corrected_RT = RT-mean_position_RT+mean_subj_RT)
 
+  first_trials_df %>% 
+  group_by(search_type, set_size) %>% 
+  summarise(median_RT =median(corrected_RT)) %>% 
   ggplot(data=. , 
-       aes(x=set_size, y=mean_RT, color=search_type, fill=search_type, linetype=search_type)) +
+       aes(x=set_size, y=median_RT, color=search_type, fill=search_type, linetype=search_type)) +
   geom_line(aes(group = search_type), size=1) +
   geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
   scale_shape_manual(values=c(4,22))+
@@ -494,29 +496,25 @@ Where RTs,b,t corresponds to the reaction time of subject s in block b and trial
   scale_color_manual(values = c('black',"#e41a1c"))+
   scale_linetype_manual(values=c("21", "solid","21"))+
   #ylim(900, 2000)+
-  scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
+  scale_x_discrete(limits = c("9", "25")) +
+  labs(title="First trials full sample", y='median RT', x='set size') +
+  geom_label(aes(label=round(median_RT,2)), color='white')
 
 
-#include only subjects who have a valid 4 first trials
-keep_sub <-search_df %>% filter(test_part=='first_two_trials') %>% 
-  group_by(subj_id) %>% 
-  count() %>% filter(n == 4) %>% pull(subj_id)
-
-search_slopes_df_first_t <- search_df %>%
-  filter(subj_id %in% keep_sub) %>% 
+search_slopes_df_first_t <- first_trials_df %>%
   filter(OCI_quantile==1|OCI_quantile==4) %>% 
   group_by(subj_id,search_type,target_present, test_part,OCI_quantile) %>%
   nest() %>%
-  mutate(model = map(data, ~ lm(RT ~ set_size, data =.)),
+  mutate(model = map(data, ~ lm(corrected_RT ~ set_size, data =.)),
          tidy = map(model, ~ tidy(.x))) %>%
   unnest(tidy) %>%
   filter(term=='set_size25') %>% 
   filter(test_part=='first_two_trials')
 
 ```
-`r apa_print(t.test(estimate~search_type, data=search_slopes_df_with_first_t, paired=T))`
 
-Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type. This significant difference between the search slopes indicate that subjects had some knowledge of the search assymetry already in the first trials of the task. 
+
+Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_with_first_t, paired=T))`. This significant difference between the search slopes indicate that subjects had some knowledge of the search assymetry already in the first trials of the task. 
 
 
 *Hypothesis 8*:
@@ -543,23 +541,21 @@ Interaction between group and search time on first-trials slopes. Using a mixed-
   scale_linetype_manual(values=c("21", "solid","21"))+
   scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
 
-  search_slopes_df_first_t %>% 
-  aov(estimate~OCI_quantile * search_type, data = .) %>% 
-  summary(.)
 
 ```
-We didn't find an interaction between search type and group on first trials slopes. 
+We didn't find an interaction between search type and group on first trials slopes `r apa_print(search_slopes_df_first_t %>%aov(estimate~OCI_quantile * search_type, data = .) %>% summary(.))`
 
 *Hypothesis 9*: Correlations between OC tendencies and search slopes. In order to strengthen the validity of our results, we will reanalyze our main hypothesis using the entire range of OC scores. That way, we will be able to investigate whether search times in absent trials varies as a function of OC tendencies. We will do so by correlating OC tendencies with search slopes in target-absent and target presence conditions.
 
 ``` {r full_range}
+
 m_full_range <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *OCI_quantile+
                (1|subj_id),
                data = search_slopes_df)
 summary(m_full_range)
 
 ```
-The interaction between OC and target presence remain not significant when analyzing the results using the entire quartile of OC.  
+The interaction between OC and target presence remain not significant when analyzing the results using the entire quartile of OC `r apa_print(summary(m_full_range))` 
 
 *Hypothesis 10*: 
 Finally, in order to test the robustness of our results, we will add depression and anxiety scores as covariates into our model, for possible mediating effects. We will use the DASS questionnaire to measure anxiety and depression [@lovibond1995structure]. 
