@@ -56,9 +56,6 @@ library(cowplot)
 library(caret)
 library(papaja)
 library(lvmisc)
-
-
-
 ```
 
 ```{r analysis-preferences}
