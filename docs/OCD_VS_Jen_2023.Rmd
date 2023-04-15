@@ -412,10 +412,8 @@ H3.df <- toffolo_data %>%
 
 ```
 
-In contrast to our hypothesis, we didn't find an interaction between group and target presence in the direction we expected `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))`. There is a marginaly significant interaction to the opposite direction, in which OC- are having longer search time in target absent trials, but not in target present trials. 
+In contrast to our hypothesis, we didn't find an interaction between group and target presence in the direction we expected `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))`. 
 
-
- 
 *Hypothesis 4* Extension of the replication mentioned above of findings by Toffolo et al., (2013). Following the previous hypothesis, we will conduct the same mixed-effects ANOVA, with group (OC+/OC-) as between-subject variable and target presence(present/absent) as within-subject variables, only this time we will focus on the search slopes (reaction time as a function of set size) as a dependent variable. We expect to find an interaction between group and target present, in which the search slope differences between OC+ and OC- will be significantly stronger in target-absent trials. 
  
 ```{r h4_anova, echo=FALSE, cache=TRUE}
@@ -427,12 +425,15 @@ H4.df<- search_slopes_df %>%
 H4.df %>% group_by(OCI_quantile, target_present) %>% summarise(mean_slope = mean(estimate))
 
 ```
-A mixed effects ANOVA was performed with group as between subjects variables and target presence as a within subject variable, with search slope as dependent variable. A mixed effects ANOVA revealed that there wasn't a statistically significant interaction between group and target presence `r apa_print(aov(estimate~OCI_quantile * target_present, data =H4.df))` 
-
+A mixed effects ANOVA was performed with group as between subjects variables and target presence as a within subject variable, with search slope as dependent variable. A mixed effects ANOVA revealed that there wasn't a statistically significant interaction between group and target presence `r apa_print(afex::aov_ez("subj_id", "estimate", H4.df, between = "OCI_quantile", within = "target_present"))` 
 
 *Hypothesis 5* Difficulty of OC+ participants with inference about absence in the easy search type. We will check for the interaction between group and target presence and focus on the easy search type (C in O). We will test the hypothesis that the search slope differences between OC+ and OC- will be significantly stronger in target-absent trials. Obtaining this interaction pattern would strengthen the hypothesis that decisions about absence contribute to OC+ search times irrespective of task uncertainty (figure 4 top panel). On the other hand, an interaction between group and target presence with the same pairwise comparison pattern that is specific to the hard search (Hypothesis 4, above) will strengthen the competing hypothesis that heightened uncertainty contributes to OC+ search times (figure 4 bottom panel).  
 
-Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search `r apa_print(search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO') %>%aov(estimate ~OCI_quantile*target_present, data=.))` 
+```{r h5_anova, echo=FALSE, cache=TRUE}
+H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
+```
+
+Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search `r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))` 
 
 *Hypothesis 6* Model comparison - search type or target-presence contribute to OC+ search time. In order to directly test the hypothesis that target-presence affects OC+ search time to a greater extent than search type we will conduct a model comparison between two multiple regression models. The first model will predict search slopes using the following predictors: search type; group; the interaction between search type and target presence; the interaction between search type and group. The first model will use the following formula: 
 
@@ -530,7 +531,7 @@ search_slopes_df_first_t <- first_trials_df %>%
 ```
 
 
-Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_with_first_t, paired=T))`. This significant difference between the search slopes indicate that subjects had some knowledge of the search assymetry already in the first trials of the task. 
+Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_first_t, paired=T))`. This significant difference between the search slopes indicate that subjects had some knowledge of the search assymetry already in the first trials of the task. 
 
 
 *Hypothesis 8*:
@@ -559,7 +560,7 @@ Interaction between group and search time on first-trials slopes. Using a mixed-
 
 
 ```
-We didn't find an interaction between search type and group on first trials slopes `r apa_print(search_slopes_df_first_t %>%aov(estimate~OCI_quantile * search_type, data = .) %>% summary(.))`
+We didn't find an interaction between search type and group on first trials slopes `r apa_print(afex::aov_ez("subj_id", "estimate", search_slopes_df_first_t, between = "OCI_quantile", within = "search_type"))`
 
 *Hypothesis 9*: Correlations between OC tendencies and search slopes. In order to strengthen the validity of our results, we will reanalyze our main hypothesis using the entire range of OC scores. That way, we will be able to investigate whether search times in absent trials varies as a function of OC tendencies. We will do so by correlating OC tendencies with search slopes in target-absent and target presence conditions.
 
