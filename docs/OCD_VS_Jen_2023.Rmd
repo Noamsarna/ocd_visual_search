@@ -431,6 +431,82 @@ A mixed effects ANOVA was performed with group as between subjects variables and
 
 ```{r h5_anova, echo=FALSE, cache=TRUE}
 H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
+
+#Plot figure that shows 
+
+#high OC
+one_fig_HOC<-
+  RT_over_participant_oci %>%
+  filter(OCI_quantile==4) %>% 
+  
+  unite('target_present_search_type', target_present,search_type, remove = F)  %>% 
+  ggplot(aes(x=set_size, 
+             y=mean_RT, 
+             color = search_type))+
+  geom_line(aes(group = target_present_search_type, linetype = target_present), size=1)+
+  geom_point(aes(shape = search_type), size=4, stroke=1.5, alpha=0.8)+
+  scale_x_discrete(limits = c("9", "25"))+
+  scale_linetype_manual(values=c("dashed","solid"))+
+  scale_color_manual(values=c('#000000','#f01616'))+
+  scale_size_manual(values=c(2, 5))+
+  scale_shape_manual(values=c(1,15))+
+  theme_bw()+
+  labs(title="OC+")+
+  var_y_lim
+
+
+#low OC
+one_fig_LOC<-
+  RT_over_participant_oci %>%
+  filter(OCI_quantile==1) %>% 
+  
+  unite('target_present_search_type', target_present,search_type, remove = F)  %>% 
+  ggplot(aes(x=set_size, 
+             y=mean_RT, 
+             color = search_type))+
+  geom_line(aes(group = target_present_search_type, linetype = target_present), size=1)+
+  geom_point(aes(shape = search_type), size=4, stroke=1.5, alpha=0.8)+
+  scale_x_discrete(limits = c("9", "25"))+
+  scale_linetype_manual(values=c("dashed","solid"))+
+  scale_color_manual(values=c('#000000','#f01616'))+
+  scale_size_manual(values=c(2, 5))+
+  scale_shape_manual(values=c(1,15))+
+  theme_bw()+
+  labs(title="OC-")+
+  var_y_lim
+
+
+#plot figures together 
+
+legend <- get_legend(
+  # create some space to the left of the legend
+  one_fig_full + theme(legend.box.margin = margin(0, 0, 0, 12))
+)
+
+#two plots together 
+prow<-
+  plot_grid(
+    
+    one_fig_HOC  +theme(legend.position="none",
+
+    ), 
+    one_fig_LOC  +theme(legend.position = 'none',
+                        axis.text.y = element_blank(),
+                        axis.ticks.y = element_blank(),
+                        axis.title.y = element_blank()),
+    align = 'vh',
+    nrow = 1,
+    labels = "AUTO",
+    label_size = 1,
+    label_x = 0, label_y = 1,
+    hjust = -0.5, vjust = -0.5)
+
+#two plots with one legend 
+plot_grid(prow+theme(text = element_text(size = 20)),
+          legend,labels = "auto",
+          label_size = 0,
+          rel_widths = c(4, .4))
+
 ```
 
 Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search `r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))` 
