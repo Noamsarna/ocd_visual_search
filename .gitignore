@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+docs/OCD_VS_Jen_2023_cache/*
+*.DS_store
+*~$
