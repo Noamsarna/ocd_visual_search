@@ -42,9 +42,6 @@ output            : papaja::apa6_word
 ---
 
 ```{r setup, include = FALSE}
-#library(groundhog)
-#pkgs <- c('tidyverse', 'broom', 'nlme', 'lme4', 'lmerTest', 'ggpubr', 'cowplot', 'caret', 'papaja')
-#groundhog.library(pkgs,'2022-04-22')
 
 library(tidyverse)
 library(broom)
@@ -433,6 +430,7 @@ A mixed effects ANOVA was performed with group as between subjects variables and
 H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
 
 #Plot figure that shows 
+var_y_lim <- ylim(750, 5000)
 
 #high OC
 one_fig_HOC<-
@@ -475,13 +473,6 @@ one_fig_LOC<-
   labs(title="OC-")+
   var_y_lim
 
-
-#plot figures together 
-
-legend <- get_legend(
-  # create some space to the left of the legend
-  one_fig_full + theme(legend.box.margin = margin(0, 0, 0, 12))
-)
 
 #two plots together 
 prow<-
@@ -701,6 +692,51 @@ m_difficulty <- difficulty_rating %>%
                data =.)
 
 summary(m_difficulty)
+
+#plotting a figure of mean RT in the same strcuture as the percieved difficulty for comparison. 
+RT_over_participant_oci %>% 
+  filter(OCI_quantile==1 |OCI_quantile ==4) %>% 
+  filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
+         search_type=='CinO' & set_size=='25' & target_present=='FALSE'|
+         search_type=='OinC' & set_size=='9' & target_present=='TRUE'|
+         search_type=='OinC' & set_size=='25' & target_present=='TRUE') %>% 
+  mutate(target_present =case_when(target_present=='TRUE' ~ 'TP',
+                                   target_present=='FALSE' ~ 'TA')) %>% 
+  unite('condition', c(search_type, set_size, target_present), remove = F) %>% 
+
+
+  ggplot(aes(x = reorder(condition, mean_RT), y = mean_RT, fill=target_present)) +
+  geom_col() +
+  theme_bw()+
+  scale_fill_manual(values = c("#bcb9c1", "#e5989b"))+
+  labs(x = "test part", title = "mean RT")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  facet_wrap(~OCI_quantile)
+
+#create a df for correlating percieved difficulty with actual search time 
+
+search_correlation <- search_summary_RT %>% 
+  filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
+           search_type=='CinO' & set_size=='25' & target_present=='FALSE'|
+           search_type=='OinC' & set_size=='9' & target_present=='TRUE'|
+           search_type=='OinC' & set_size=='25' & target_present=='TRUE') %>%  
+  mutate(target_present =case_when(target_present=='TRUE' ~ 'TP',
+                                                                                                            target_present=='FALSE' ~ 'TA')) %>% 
+  unite('difficulty_rating', c(search_type, set_size, target_present), remove = F)
+
+search_correlation <- left_join(search_correlation, difficulty_rating %>% select(-OCI_quantile))
+# by="subj_id")
+
+#plot correlation between difficulty and search time 
+search_correlation %>% 
+  filter(OCI_quantile==1 | OCI_quantile==4) %>% 
+  ggplot(aes(x = as.double(response), y = median_RT,
+             color  = as.factor(OCI_quantile))) +
+  geom_point() + geom_smooth(method = "lm", se=F) +
+  ggpubr::stat_cor() +
+  facet_wrap(~difficulty_rating) +
+  theme_bw()+
+  xlab('perceived difficulty')
 
 ```
 
