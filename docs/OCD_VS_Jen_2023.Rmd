@@ -200,6 +200,8 @@ search_df <- left_join(search_df,
 #total n after participants removal 
 df.N_total <- search_df$subj_id %>% unique() %>% length()
 
+#total n in each quartile 
+search_df %>% select(subj_id, OCI_quantile) %>% unique() %>% select(OCI_quantile) %>% table()
 
 ```
 
