@@ -53,6 +53,7 @@ library(cowplot)
 library(caret)
 library(papaja)
 library(lvmisc)
+library(wesanderson)
 ```
 
 ```{r analysis-preferences}
@@ -383,10 +384,10 @@ In line with our hypothesis, search slopes for the easy absent search were less 
   
   # Toffolo replication plots -----------------------------------------------------
 
-toffolo_fig <-
-  by_sub_toffolo%>% 
+
+by_sub_toffolo%>% 
   filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
-  mutate(oci_type = ifelse(.$OCI_quantile == 1, "low", "high")) %>% 
+  mutate(oci_type = ifelse(.$OCI_quantile == 1, "Low OC (OC-)", "High OC (OC+)")) %>% 
   ggplot(aes(x = oci_type, y = mean_RT,
              fill = target_present)) +
   stat_summary(fun.data = mean_se,
@@ -402,7 +403,16 @@ toffolo_fig <-
                aes(label = round(..y..,2)),
                color = "white", vjust = +2,
                position = position_dodge(0.9)) +
-  theme_bw()
+  theme_bw()+
+  theme(axis.title.x=element_blank(),
+        text = element_text(size = 15))+
+  ylab('Mean RT (ms)')+
+  guides(fill = guide_legend(title = "Response",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Target Absent', 'Target Present'),values = wes_palette("Royal1"))
+  
+  
+#ggsave(filename = "toffolo_rep.png",width = 8, height = 6, dpi = 1000)  
+
 
 H3.df <- toffolo_data %>% 
   filter(OCI_quantile==1| OCI_quantile==4) %>%
