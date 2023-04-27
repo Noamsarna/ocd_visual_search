@@ -705,7 +705,7 @@ m_difficulty <- difficulty_rating %>%
 
 summary(m_difficulty)
 
-#plotting a figure of mean RT in the same strcuture as the percieved difficulty for comparison. 
+#plotting a figure of mean RT in the same structure as the perceived difficulty for comparison. 
 RT_over_participant_oci %>% 
   filter(OCI_quantile==1 |OCI_quantile ==4) %>% 
   filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
@@ -725,7 +725,7 @@ RT_over_participant_oci %>%
   theme(plot.title = element_text(hjust = 0.5)) +
   facet_wrap(~OCI_quantile)
 
-#create a df for correlating percieved difficulty with actual search time 
+#create a df for correlating perceived difficulty with actual search time 
 
 search_correlation <- search_summary_RT %>% 
   filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
