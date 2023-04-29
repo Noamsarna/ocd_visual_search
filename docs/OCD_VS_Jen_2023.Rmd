@@ -645,11 +645,12 @@ We didn't find an interaction between search type and group on first trials slop
 
 ``` {r full_range}
 
-m_full_range <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *OCI_quantile+
+m_oc_full_range <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *oci_overall+
                (1|subj_id),
                data = search_slopes_df)
 summary(m_full_range)
 
+compare_accuracy(m1, m2, m_full_range)
 ```
 The interaction between OC and target presence remain not significant when analyzing the results using the entire quartile of OC `r apa_print(summary(m_full_range))` 
 
@@ -665,6 +666,7 @@ m_anx_depp <-lmer(estimate ~ 1+search_type * target_present +target_present *OCI
 
 summary(m_anx_depp)
 
+compare_accuracy(m2, m_anx_depp)
 ```
 
 *Exploratory analysis*
