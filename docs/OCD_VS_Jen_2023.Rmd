@@ -607,6 +607,7 @@ search_slopes_df_first_t <- first_trials_df %>%
   filter(term=='set_size25') %>% 
   filter(test_part=='first_two_trials')
 
+
 ```
 
 
@@ -645,12 +646,12 @@ We didn't find an interaction between search type and group on first trials slop
 
 ``` {r full_range}
 
-m_oc_full_range <-lmer(estimate ~ 1+OCI_quantile+ search_type * target_present +target_present *oci_overall+
+m_oc_full_range <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+
                (1|subj_id),
                data = search_slopes_df)
-summary(m_full_range)
+summary(m_oc_full_range)
 
-compare_accuracy(m1, m2, m_full_range)
+compare_accuracy(m2, m_oc_full_range)
 ```
 The interaction between OC and target presence remain not significant when analyzing the results using the entire quartile of OC `r apa_print(summary(m_full_range))` 
 
@@ -741,16 +742,26 @@ search_correlation <- search_summary_RT %>%
 search_correlation <- left_join(search_correlation, difficulty_rating %>% select(-OCI_quantile))
 # by="subj_id")
 
+search_correlation_wide <- search_correlation %>%
+  select(subj_id, set_size, search_type, target_present, OCI_quantile, median_RT, response) %>% 
+  filter(OCI_quantile==1 | OCI_quantile ==4) %>% 
+  pivot_wider(
+    names_from = c(search_type, target_present, set_size),
+    values_from = c(median_RT, response))
+
+
 #plot correlation between difficulty and search time 
 search_correlation %>% 
   filter(OCI_quantile==1 | OCI_quantile==4) %>% 
   ggplot(aes(x = as.double(response), y = median_RT,
              color  = as.factor(OCI_quantile))) +
   geom_point() + geom_smooth(method = "lm", se=F) +
-  ggpubr::stat_cor() +
+  ggpubr::stat_cor(p.accuracy = 0.001, cor.coef.name = "r") +
   facet_wrap(~difficulty_rating) +
   theme_bw()+
   xlab('perceived difficulty')
+
+
 
 ```
 
