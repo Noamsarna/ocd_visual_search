@@ -355,7 +355,8 @@ slopes_table <-search_slopes_df %>%
 
 *Hypothesis 1* - To validate our methods and the quality of our data, we will test for a difference in slopes between the two search types (C in O; O in C) beyond the presence of the target (present/absent). We expect to find an overall steeper slopes for O in C search compared to C in O search. To compare these slopes, we will use a one-tailed paired t-test. 
 
-In line with our hypothesis and paradign structure, search slopes between the two search type, followed the expected pattern with a steeper slope for the hard search (O in C) 
+
+As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r apa_print(` (104.76 ms/item) compared to the easy search (39.19 ms/item), t(795) = -66.30, p < .001. 
 `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))`
 
 *Hypothesis 2* We will test the difference of slopes between O in C in target presence and C in O in target absence. Based on our pilot and paradigm design, we expect to find a steeper slope for O in C in target presence than C in O in target absence. To compare these slopes, we will use a one-tailed paired t-test. 
@@ -400,7 +401,7 @@ by_sub_toffolo%>%
                position = position_dodge(0.9)) +
   stat_summary(fun = mean,
                geom = "label",
-               aes(label = round(..y..,2)),
+               aes(label = round(..y..,0)),
                color = "white", vjust = +2,
                position = position_dodge(0.9)) +
   theme_bw()+
@@ -411,7 +412,7 @@ by_sub_toffolo%>%
   scale_fill_manual(labels=c('Target Absent', 'Target Present'),values = wes_palette("Royal1"))
   
   
-#ggsave(filename = "toffolo_rep.png",width = 8, height = 6, dpi = 1000)  
+ggsave(filename = "toffolo_rep.png",width = 8, height = 6, dpi = 1000)  
 
 
 H3.df <- toffolo_data %>% 
