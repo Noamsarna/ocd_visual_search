@@ -413,7 +413,7 @@ by_sub_toffolo%>%
   scale_fill_manual(labels=c('Target Absent', 'Target Present'),values = wes_palette("Royal1"))
   
   
-ggsave(filename = "toffolo_rep.png",width = 8, height = 6, dpi = 1000)  
+#ggsave(filename = "toffolo_rep.png",width = 8, height = 6, dpi = 1000)  
 
 
 H3.df <- toffolo_data %>% 
@@ -732,16 +732,113 @@ search_correlation_wide <- search_correlation %>%
     values_from = c(median_RT, response))
 
 
-#plot correlation between difficulty and search time 
+#plot mean RT with perceived difficulty in one figure 
+
+p1<-
 search_correlation %>% 
-  filter(OCI_quantile==1 | OCI_quantile==4) %>% 
-  ggplot(aes(x = as.double(response), y = median_RT,
-             color  = as.factor(OCI_quantile))) +
-  geom_point() + geom_smooth(method = "lm", se=F) +
-  ggpubr::stat_cor(p.accuracy = 0.001, cor.coef.name = "r") +
-  facet_wrap(~difficulty_rating) +
-  theme_bw()+
-  xlab('perceived difficulty')
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = median_RT, fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+  
+ 
+p2<-  
+search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  #group_by(set_size, target_present) %>% 
+  #summarise(mean_RT=mean(median_RT)) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Perceived Difficulty', x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+p3<-
+search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = median_RT, fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Mean RT (ms)',x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+p4<-
+search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  #group_by(set_size, target_present) %>% 
+  #summarise(mean_RT=mean(median_RT)) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Perceived Difficulty', x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+commonplot <-ggarrange(p1, p2, p3, p4, common.legend = T)
+
+
+
+row1 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="High OC", angle = 90) + theme_void() 
+
+row2 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Low OC", angle = 90) + theme_void() 
+
+col1 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Mean RT (ms)") + theme_void() 
+
+col2 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Perceived difficulty") + theme_void() 
+
+layoutplot <- "
+#cccddd
+aeeefff
+aeeefff
+bggghhh
+bggghhh
+"
+
+plotlist <- list(a = row1, b = row2, c = col1, d = col2, e= p1, f=p2, g=p3, h=p4)
+
+wrap_plots(plotlist, guides = 'collect', design = layoutplot) 
+
+#ggsave(filename = "difficulty_RT.png",width = 8, height = 6, dpi = 1000)  
 
 
 
