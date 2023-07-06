@@ -54,6 +54,7 @@ library(caret)
 library(papaja)
 library(lvmisc)
 library(wesanderson)
+library(patchwork)
 ```
 
 ```{r analysis-preferences}
@@ -487,30 +488,10 @@ one_fig_LOC<-
   var_y_lim
 
 
-#two plots together 
-prow<-
-  plot_grid(
-    
-    one_fig_HOC  +theme(legend.position="none",
-
-    ), 
-    one_fig_LOC  +theme(legend.position = 'none',
+one_fig_HOC+one_fig_LOC+theme(legend.position = 'none',
                         axis.text.y = element_blank(),
                         axis.ticks.y = element_blank(),
-                        axis.title.y = element_blank()),
-    align = 'vh',
-    nrow = 1,
-    labels = "AUTO",
-    label_size = 1,
-    label_x = 0, label_y = 1,
-    hjust = -0.5, vjust = -0.5)
-
-#two plots with one legend 
-plot_grid(prow+theme(text = element_text(size = 20)),
-          legend,labels = "auto",
-          label_size = 0,
-          rel_widths = c(4, .4))
-
+                        axis.title.y = element_blank())+ plot_layout(guides = "collect")
 ```
 
 Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search `r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))` 
