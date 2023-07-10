@@ -1,0 +1,834 @@
+---
+title             : "Subclinical OCD and inference about absence in visual search"
+shorttitle        : "Subclinical OCD visual search "
+
+author: 
+  - name          : "Noam Sarna"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "Tel Aviv, Israel 69978"
+    email         : "noamsarna@mail.tau.ac.il"
+
+  - name          : "Ruvi Dar"
+    affiliation   : "1"
+
+  - name          : "Matan Mazor"
+    affiliation   : "2"
+
+
+affiliation:
+  - id            : "1"
+    institution   : "School of Psychological Sciences, Tel Aviv University"
+  - id            : "2"
+    institution   : "Department of Psychological Sciences, Birkbeck, University of London, UK"
+
+abstract: |
+  Inference about the absence of a target is qualitatively different than inference about the presence of one. While the latter is established from a signal evident in the external world, the former is based on the internal belief of not having missed the target. Obsessive-compulsive disorder (OCD) is characterized by inflated levels of doubt and difficulty accessing internal states. Previous research has shown that obsessive-compulsive participants indeed struggle when searching for an absent target; however, results were confounded by heightened uncertainty. In this study, we designed a paradigm intended to decouple absence from difficulty to probe the specific effects of obsessive-compulsive tendencies on visual processing and decision making in the absence of a target. High and low OC participants will be presented with 96 visual search displays and asked to decide whether a target is "absent" or "present." In addition, participants will provide information about explicit metacognitive knowledge to probe for discrepancies between behavior and belief. By introducing an easy target-absent condition, we can dissociate specific difficulties with inference about absence from more general difficulties with uncertainty. This experiment will provide key information about interactions between obsessive-compulsive tendencies and inference about absence, which are an essential window into OCD and metacognitive impairments. 
+
+  
+bibliography      : "r-references.bib"
+
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no
+
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+
+classoption       : "man"
+output            : papaja::apa6_word
+---
+
+```{r setup, include = FALSE}
+
+library(tidyverse)
+library(broom)
+library(nlme)
+library(lme4)
+library(lmerTest)
+library(ggpubr)
+library(cowplot)
+library(caret)
+library(papaja)
+library(lvmisc)
+library(wesanderson)
+library(patchwork)
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+<!-- # Introduction  -->
+
+Previous work by [@toffolo2013mild] , using a visual search paradigm in high (OC+) and low (OC-) OC individuals, provided evidence that OC+ participants search longer in target-absent trials. This robust finding has been replicated [@toffolo2014uncertainty] and extended to a clinical sample of OCD patients [@toffolo2016patients]. In these experiments, checking behavior was operationalized by search time and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, the longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking for mild uncertainty. However, the paradigm structure used in Toffolo's experiments has conflated uncertainty with target absence. Decisions about target absence are indeed qualitatively different from target-present trials since the evidence for lack of stimuli is less salient and based on the metacognitive belief of not having missed the target [@mazor2022efficient].
+
+Nevertheless, some decisions about absence can be accompanied by low subjective uncertainty, for instance, perceiving the absence of a red dot among blue dots. Distinguishing features of inference about absence from uncertainty will be achieved by introducing such a search where absence can be more directly inferred and will allow us to probe for distinct behavior of OC+ in absent trials.
+
+```{r load_data, echo=FALSE, cache=TRUE}
+
+#load anon jatos data 
+df<- read_csv('../data/anon_jatos_results_p1.csv')
+df2<- read_csv('../data/anon_jatos_results_p2.csv')
+
+df <- rbind(df, df2)
+rm(df2)
+
+#load anon prolific data 
+demo_prolific <- read.csv('../data/anon_demo_prolific.csv')
+
+
+# create OCI data ---------------------------------------------------------
+
+#parse oci data from df 
+OCI_df <- df %>%
+  filter(grepl('oci', Identifier)) %>% 
+  select(subj_id, question, answer_oci) %>% 
+  mutate(attention_check = question %in% c("OCI-Attention_check_1","OCI-Attention_check_2")) %>%
+  arrange(subj_id, question)%>%
+  #arrange it in a long format df 
+  group_by(subj_id) %>%
+  summarise(oci_overall=sum(as.numeric(answer_oci[!attention_check])), #compute oci general score 
+            failed_attention_OCI = answer_oci[question=='OCI-Attention_check_1']!=0 | #attention check failure
+            answer_oci[question=='OCI-Attention_check_2']!=2,
+            OCI_Absent = answer_oci[question=='OCI-Absent']) %>%
+  mutate(
+  #split to quartiles based on oci score
+    OCI_quantile = as.numeric(cut(oci_overall,
+                                  breaks = quantile(oci_overall[!failed_attention_OCI],
+                                                    probs = seq(0, 1, 0.25),
+                                                    na.rm = T,
+                                                    type = 9),
+                                  right = F, 
+                                  include.lowest = T,
+                                  include.highest = T))
+  )
+
+
+#check distribution between quartile 
+table(OCI_df$OCI_quantile)
+
+
+# create DASS data ---------------------------------------------------------
+
+#create vectors for DASS subscales. 
+DASS_anxiety <- c("DASS-4","DASS-7", "DASS-9", "DASS-15", "DASS-19", "DASS-20")
+DASS_depression <- c("DASS-3","DASS-5", "DASS-10", "DASS-13", "DASS-16", "DASS-17","DASS-21")
+
+#parse DASS data from df
+DASS_df <- df %>%
+  filter(grepl('DASS', Identifier)) %>% 
+  select(subj_id, question, answer_dass) %>% 
+  arrange(subj_id, question) %>%
+  #arrange in a new df 
+  group_by(subj_id)%>%
+  summarise(DASS_anxiety = sum(as.numeric(answer_dass[question %in% DASS_anxiety])),
+            DASS_depression = sum(as.numeric(answer_dass[question %in% DASS_depression])))
+
+# unite dass and oci
+questionnaires_df <- left_join(OCI_df, DASS_df,by = "subj_id")
+
+
+# df of explicit difficulty rating---------------------------------------------------
+
+#get data from df 
+difficulty_rating <- df %>% 
+  filter(trial_type == "html-slider-response") %>% 
+  select(subj_id,test_part,response) %>%
+  #retrieve variable names. 
+  mutate(difficulty_rating = case_when(str_detect(test_part,"PresentOinC25") ~ "OinC_25_TP",
+                                       str_detect(test_part,"Absent09") ~ "CinO_9_TA",
+                                       str_detect(test_part,"PresentOinC09") ~ "OinC_9_TP",
+                                       str_detect(test_part,"Absent25") ~ "CinO_25_TA")) %>% 
+  select(-test_part) %>% 
+  
+  #adding OCI quantile to difficulty df 
+  left_join(questionnaires_df %>% 
+              group_by(subj_id) %>%
+              summarise(OCI_quantile=first(OCI_quantile)) %>% 
+              select(subj_id, OCI_quantile), 
+            difficulty_rating,
+            by = "subj_id")
+
+# visual search df -------------------------------------------------------------
+
+search_df <- df %>% 
+  filter(trial_type == "p5vs_yn_small_grid") %>%
+  select(trial_type,trial_index,subj_id,sequence,target_position,
+          subj_id,set_size,target_present,
+         RT,test_part,correct,search_type) %>% 
+# unite search and questionnaire dfs together 
+  left_join(questionnaires_df,
+                       by = "subj_id") %>% 
+  #unite search df with demo prolific 
+  left_join(.,demo_prolific,
+            by = "subj_id")
+
+#recode variables 
+search_df$target_present<-search_df$target_present=='TRUE'
+search_df$RT <- as.numeric(search_df$RT)
+search_df$correct <- as.numeric(as.logical(search_df$correct))
+search_df$set_size <- as.factor(search_df$set_size)
+ 
+
+# Rejecting participants with more than 15% error trials -----------------------
+
+rejection_df <- search_df %>% 
+  group_by(subj_id) %>% 
+  summarise(accuracy = mean(correct)) %>% 
+  mutate(reject = accuracy<0.85)
+
+rejected_num <- sum(rejection_df$reject=='TRUE')
+
+
+# flag bad trails
+search_df <- search_df %>% rowwise() %>% 
+  mutate(under_100 = as.numeric(RT <= 100)) 
+
+
+#filter out participants for accuracy and attention check 
+search_df <- left_join(search_df, 
+                       rejection_df %>% select(subj_id, reject), 'subj_id') %>%
+  # MM: this is wrong I think, this way you include participants who failed the attention check.
+  # filter(reject=='FALSE' | failed_attention_OCI == 1)
+  filter(reject=='FALSE' & failed_attention_OCI == 0) %>%
+  filter(under_100 == 0) #filter our trials 
+
+#total n after participants removal 
+df.N_total <- search_df$subj_id %>% unique() %>% length()
+
+#total n in each quartile 
+search_df %>% select(subj_id, OCI_quantile) %>% unique() %>% select(OCI_quantile) %>% table()
+
+```
+
+# Methods
+
+We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the study. <!-- 21-word solution (Simmons, Nelson & Simonsohn, 2012; retrieved from http://ssrn.com/abstract=2160588) -->
+
+## Participants
+
+The research complied with all relevant ethical regulations and was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). Participants will be recruited via Prolific and selected based on their acceptance rate (\>95%) and for being native English speakers, located in the UK, and not having participated in former study pilots. We encountered graphical problems with Safari browser during the pilot study, so we will ask participants to use only other browsers. The entire experiment will take 14 minutes to complete (the median completion time in a pilot study). Participants will be paid £2 for their participation, equivalent to an hourly wage of £8.57.
+
+## Material
+
+Visual search task The experiment described in this study was adapted from [@mazor2022efficient], with stimuli created to replicate the ones used in the [@toffolo2013mild] experiment. All elements (distractors and target) and their placement on the search grid were made to replicate as closely as possible the paradigm used in @toffolo2013mild. The visual search task will consist of 4 blocks, each containing 24 trials of searching for either a closed or an open square. To make sure participants understand the task, a practice phase will be given first. The practice phase will consist of one block with six trials of visual search. Elements in both practice and main part will be white on dark grey background. Each trial will last for a maximum of 10 seconds or until a response is received. If no response is given within 10 seconds, the next trial will immediately appear. Feedback about the response (wrong/right) will be given only in the practice phase, to help participants learn the task efficiently. In the main part of the experiment, no feedback will be given, as was the case in the original paradigm [@toffolo2013mild].
+
+## Procedure
+
+Participants will first be instructed about the experiment's structure, which comprises three parts: A visual search part, questions about the visual search part, and some more general questions. Then, they will be informed about the main part of the experiment -- the visual search part. Specifically, their task is to report, as accurately and quickly as possible, whether a target stimulus was present (press 'J') or absent (press 'F'). Then, practice trials will be delivered, in which the target stimulus is a rotated T, and distractors are rotated Ls. The purpose of the practice trials is to familiarize participants with the task structure. For these practice trials, the number of items will always be 4. In the practice trials, participants will be given feedback about the accuracy of their responses. The feedback will appear right after a response is given. If the response is correct, then the word "Correct!" will immediately pop on the screen, for 1 second. If the response is wrong, the word "Wrong!" will immediately pop on the screen for 5 seconds. The extended duration of the word "wrong" is intended to feel aversive and to make sure participants are paying full attention and giving accurate responses (a pilot study showed higher accuracy rates when using this method). Practice trials will be delivered in one block of 6 trials, and the main part of the experiment will start only once participants respond correctly on at least five trials.
+
+In the main part of the experiment, participants will look for an O (a square with rounded corners. Figure 1, right panel) or a rotated C (a square with rounded corners with a gap in one of its edges. Figure 1, left panel). The distractors in each trial will be either O's when searching for a C or C's when searching for an O. Due to a search asymmetry for open edges, searching of O among C's is qualitatively harder than the searching for a C among O's (Treisman & Gormican, 1988). In each trial the target can be present or absent. Set sizes will be 9 or 25, resulting in a 2X2X2 design (search type: 'C in O' or 'O in C'; Target: present/absent; set size: 9 or 25). Block order will be counterbalanced between participants: for about half of the participants, it will be: 'C in O', 'C in O', 'O in C', ' O in C '. For the other half, it would be:' O in C ',' O in C ', 'C in O', 'C in O'. For all participants, target change will be emphasized between the second and third blocks. Trial order will be fully randomized within individual blocks.
+
+After completing the first two blocks, participants will be given a short break encouraging them to let their eyes rest before continuing -- "Before you continue, we suggest that you take a short break. You can let your eyes rest for a moment and take a few breaths. When you are ready click on next/spacebar to move to the next block." Critically and unknown to subjects, the first two trials of the first and third blocks will always be target-absent trials (one of each set-size), presented in randomized order. Upon finishing the main part of the experiment, participants will move to the second part of the experiment, the difficulty estimation part, and will be informed:
+
+"In the next part you will answer questions regarding the first part you have just completed. Some searches are easier than others. This means that participants find the target faster in some searches, compared to others. In the following part you will be asked to rate the difficulty level of deciding that a target was present or absent among different distractors."
+
+Before evaluating the perceived difficulty of the trials, we added an explanation, telling participants that each question would contain a picture of the trial with a red square around the target if it were present or no marking at all if the target was absent. Doing that helps us to assure participants are not actively searching for the target in the difficulty estimation part.
+
+Participants will then be requested to rate the perceived difficulty of four different trial types: "To the best of your ability, try to rate how hard it is to find a target among distractors from very easy (fastest) to very hard (slowest). Drag the slider into position and click"continue" when you have finished rating." The four questions will be (each question will be accompanied by a picture depicting the trial):
+
+1.  How difficult is detecting the presence closed square among many open squares
+2.  How difficult is detecting the presence of one closed square among few open squares
+3.  How difficult is detecting the absence of one open square among many closed squares
+4.  How difficult is detecting the absence of one open square few closed squares
+
+We focused on these four trials as this was our most intriguing hypothesis, comparing easy target-absent trials to more challenging target-present trials. After finishing this part, participants will be informed they have reached the final part of the experiment. In the last part, they will fill out the OCI-R [@foa2002obsessive] and DASS-21 [@lovibond1995structure] questionnaires. We inserted two attention checks questions between the regular OCI items, asking participants to select a certain answer ('If you read this question, check the option 'Not at all'). As part of an exploratory analysis, we added another item to the OCI asking specifically about problems with inference about absence ('I sometimes go back and check that I didn't do something bad unintentionally'). Upon completion, participants they will receive a message thanking them for participation and then will be redirected back to prolific with a completion code.
+
+###Randomization The order and timing of experimental events will be determined pseudo-randomly by the Mersenne Twister pseudorandom number generator, initialized to ensure registration time-locking [@mazor2019novel].
+
+##Data analysis
+
+###Rejection criteria Participants will be excluded for making more than 15% errors in the main part of the experiment or for having extremely fast (below 100 milliseconds) in more than 25% of the trials. Error trials and trials with response times below 100 milliseconds will be excluded from the response-time analysis. Participants will also be excluded from the analysis if they are wrong in one or more of the attention checks questions (asking them to mark a specific answer in the questionnaire).
+
+## Data analysis
+
+We used `r cite_r("r-references.bib")` for all our analyses.
+
+##Hypotheses and analysis plan This experiment is designed to test several hypotheses about the behavior of individuals high on obsessive-compulsive tendencies (OC+) in a visual search paradigm. We will focus on search slopes during target-absent trials and the perceived difficulty of target-absent vs. target-present trials. Participants will be divided to OC+/OC- groups based on OCI scores (1st/4th quartiles). Subject-wise search slopes will be extracted for each combination of search type (C in O; O in C) and presence of the target (present/absent) by fitting a linear regression model to predict reaction time as a function of set size, with one intercept and one set-size term. We will use search slope as a dependent measure for all of our hypotheses concerning search times. We will use the full sample for the first two hypotheses validating our paradigm.
+
+# Results
+
+```{r analyze_data, echo=FALSE, cache=TRUE}
+
+# Perceived difficulty pre-processing -------------------------------------
+
+difficulty_rating_by_condition <- difficulty_rating %>% 
+  mutate(condition=case_when(str_detect(difficulty_rating, "_TA") ~ "Absent",
+                             str_detect(difficulty_rating, "_TP") ~ "Present")) %>% 
+  group_by(difficulty_rating, condition) %>%
+  summarise(mean = mean(as.numeric(response), na.rm = T),
+            sd = sd(as.numeric(response), na.rm = T)) %>% 
+  ungroup() 
+
+#difficulty rating with oc quantile 
+difficulty_rating_by_condition_with_oci <- difficulty_rating %>% 
+  mutate(condition=case_when(str_detect(difficulty_rating, "_TA") ~ "Absent",
+                             str_detect(difficulty_rating, "_TP") ~ "Present")) %>% 
+  group_by(difficulty_rating, condition, OCI_quantile) %>%
+  summarise(mean = mean(as.numeric(response), na.rm = T),
+            sd = sd(as.numeric(response), na.rm = T)) %>% 
+  ungroup() %>% 
+  filter(OCI_quantile=='1' | OCI_quantile=='4') %>% 
+  mutate(OCI_quantile_factor = recode(OCI_quantile, '1'='low', '4'='high'))
+
+# Summary dfs  ------------------------------------------------------------
+
+search_summary_RT <- 
+  #every participant gets a median score for each search option (8)
+  #we use median because we didn't exclude longer RT
+  search_df %>% 
+  filter(correct==1) %>% #only correct trials 
+  group_by(subj_id, set_size,search_type, target_present, OCI_quantile) %>% 
+  summarise(median_RT = median(RT, na.rm = T)) %>%
+  ungroup() 
+
+RT_over_participant <-
+  search_summary_RT %>% group_by(set_size,search_type, target_present) %>%
+  summarise(mean_RT= mean(median_RT, na.rm = T)) %>% 
+  ungroup()
+
+
+RT_over_participant_oci <-
+  search_summary_RT %>% group_by(set_size,search_type, target_present, OCI_quantile) %>%
+  summarise(mean_RT= mean(median_RT, na.rm = T)) %>% 
+  ungroup()
+
+toffolo_data <- search_df %>%
+  filter(set_size == 25) %>% 
+  filter(search_type == "OinC") %>% 
+  arrange(subj_id, target_present)
+
+
+by_sub_toffolo <- toffolo_data %>% 
+  group_by(subj_id, target_present, OCI_quantile, 
+           oci_overall,
+           DASS_anxiety, DASS_depression, Age) %>% 
+  summarise(N = n(),
+            mean_RT = mean(RT, na.rm = T),
+            median_RT = median(RT, na.rm = T),
+            sd_RT = sd(RT, na.rm = T)) %>% ungroup() %>% 
+  mutate(log_mRT = log(mean_RT))
+
+# Extracting slopes ------------------------------------------------------------------
+
+#Reordering set size to get the slopes for the effect of going from 9 to 25. 
+search_df$set_size <- relevel(as.factor(search_df$set_size), '9')
+
+#extracting slopes 
+search_slopes_df <- search_df %>%
+  group_by(subj_id,search_type,target_present) %>%
+  nest() %>%
+  mutate(model = map(data, ~ lm(RT ~ set_size, data =.)),
+         tidy = map(model, ~ tidy(.x))) %>%
+  unnest(tidy) %>%
+  # we are interested in the slope, i.e., the effect of set size.
+  filter(term=='set_size25')
+
+search_slopes_df<- left_join(search_slopes_df, questionnaires_df %>% 
+                               select(subj_id, OCI_quantile, oci_overall, DASS_depression, DASS_anxiety),
+                             by='subj_id') 
+
+
+
+slopes_table <-search_slopes_df %>% 
+  group_by(OCI_quantile, search_type, target_present) %>% 
+  summarise(mean(estimate)) %>%
+  filter(OCI_quantile==1 | OCI_quantile==4)
+
+
+```
+
+*Hypothesis 1* - To validate our methods and the quality of our data, we will test for a difference in slopes between the two search types (C in O; O in C) beyond the presence of the target (present/absent). We expect to find an overall steeper slopes for O in C search compared to C in O search. To compare these slopes, we will use a one-tailed paired t-test.
+
+As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r apa_print(` (104.76 ms/item) compared to the easy search (39.19 ms/item), t(795) = -66.30, p \< .001. `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))`
+
+*Hypothesis 2* We will test the difference of slopes between O in C in target presence and C in O in target absence. Based on our pilot and paradigm design, we expect to find a steeper slope for O in C in target presence than C in O in target absence. To compare these slopes, we will use a one-tailed paired t-test.
+
+```{r h2_t-test, echo=FALSE, cache=TRUE}
+#creating a df for second hypothesis testing 
+
+H2.df<- search_slopes_df %>% 
+  filter(target_present==TRUE & search_type=='OinC' |target_present==FALSE & search_type=='CinO')  %>% 
+  mutate(group = case_when(search_type == 'OinC' ~ 'hard_present',
+                           search_type == 'CinO' ~ 'easy_absent'));
+                          
+H2.df %>% group_by(group) %>% summarise(mean_slope = mean(estimate))
+
+```
+
+`r apa_print(t.test(estimate~group, data=H2.df, paired=T))`
+
+In line with our hypothesis, search slopes for the easy absent search were less steep than search slopes in the hard present condition.
+
+*Hypothesis 3* Replication of previous findings by Toffolo et al., (2013). In order to directly replicate Toffolo's findings, we will focus on the hard search type (O in C) with the larger set size (set size =25), the same as was used in both studies (Toffolo et al., 2013, 2014). We will compare the mean RT between the two groups (OC+/OC-) in both target-present and target-absent trials. For this hypothesis, we will conduct a mixed-effects ANOVA, with mean RT as a dependent variable, group (OC+/OC-) as a between-subject variable and target presence (present/absent) as within-subject variable. We expect to find an interaction between group and target present, in which mean search times difference between OC+ and OC- will be significantly stronger in target-absent trials.
+
+```{r DR_h3, echo=FALSE, cache=TRUE}
+  
+  # Toffolo replication plots -----------------------------------------------------
+
+
+by_sub_toffolo%>% 
+  filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
+  mutate(oci_type = ifelse(.$OCI_quantile == 1, "Low OC (OC-)", "High OC (OC+)")) %>% 
+  ggplot(aes(x = oci_type, y = mean_RT,
+             fill = target_present)) +
+  stat_summary(fun.data = mean_se,
+               geom = "col",
+               alpha = 0.6,
+               position = position_dodge(0.9)) +
+  stat_summary(fun.data = mean_se,
+               geom = "errorbar",
+               width = 0.4,
+               position = position_dodge(0.9)) +
+  stat_summary(fun = mean,
+               geom = "label",
+               aes(label = round(..y..,0)),
+               color = "white", vjust = +2,
+               position = position_dodge(0.9)) +
+  theme_bw()+
+  theme(axis.title.x=element_blank(),
+        text = element_text(size = 15))+
+  ylab('Mean RT (ms)')+
+  guides(fill = guide_legend(title = "Response",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Target Absent', 'Target Present'),values = wes_palette("Royal1"))
+  
+  
+#ggsave(filename = "toffolo_rep.png",width = 8, height = 6, dpi = 1000)  
+
+
+H3.df <- toffolo_data %>% 
+  filter(OCI_quantile==1| OCI_quantile==4) %>%
+  group_by(subj_id, OCI_quantile, target_present) %>%
+  summarise(mean_RT=mean(RT))
+
+```
+
+In contrast to our hypothesis, we didn't find an interaction between group and target presence in the direction we expected `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))`.
+
+*Hypothesis 4* Extension of the replication mentioned above of findings by Toffolo et al., (2013). Following the previous hypothesis, we will conduct the same mixed-effects ANOVA, with group (OC+/OC-) as between-subject variable and target presence(present/absent) as within-subject variables, only this time we will focus on the search slopes (reaction time as a function of set size) as a dependent variable. We expect to find an interaction between group and target present, in which the search slope differences between OC+ and OC- will be significantly stronger in target-absent trials.
+
+```{r h4_anova, echo=FALSE, cache=TRUE}
+
+H4.df<- search_slopes_df %>% 
+  filter(OCI_quantile==1 | OCI_quantile==4) %>% 
+  filter(search_type=='OinC')
+                          
+H4.df %>% group_by(OCI_quantile, target_present) %>% summarise(mean_slope = mean(estimate))
+
+```
+
+A mixed effects ANOVA was performed with group as between subjects variables and target presence as a within subject variable, with search slope as dependent variable. A mixed effects ANOVA revealed that there wasn't a statistically significant interaction between group and target presence `r apa_print(afex::aov_ez("subj_id", "estimate", H4.df, between = "OCI_quantile", within = "target_present"))`
+
+*Hypothesis 5* Difficulty of OC+ participants with inference about absence in the easy search type. We will check for the interaction between group and target presence and focus on the easy search type (C in O). We will test the hypothesis that the search slope differences between OC+ and OC- will be significantly stronger in target-absent trials. Obtaining this interaction pattern would strengthen the hypothesis that decisions about absence contribute to OC+ search times irrespective of task uncertainty (figure 4 top panel). On the other hand, an interaction between group and target presence with the same pairwise comparison pattern that is specific to the hard search (Hypothesis 4, above) will strengthen the competing hypothesis that heightened uncertainty contributes to OC+ search times (figure 4 bottom panel).
+
+```{r h5_anova, echo=FALSE, cache=TRUE}
+H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
+
+#Plot figure that shows 
+var_y_lim <- ylim(750, 5000)
+
+#high OC
+one_fig_HOC<-
+  RT_over_participant_oci %>%
+  filter(OCI_quantile==4) %>% 
+  
+  unite('target_present_search_type', target_present,search_type, remove = F)  %>% 
+  ggplot(aes(x=set_size, 
+             y=mean_RT, 
+             color = search_type))+
+  geom_line(aes(group = target_present_search_type, linetype = target_present), size=1)+
+  geom_point(aes(shape = search_type), size=4, stroke=1.5, alpha=0.8)+
+  scale_x_discrete(limits = c("9", "25"))+
+  scale_linetype_manual(values=c("dashed","solid"))+
+  scale_color_manual(values=c('#000000','#f01616'))+
+  scale_size_manual(values=c(2, 5))+
+  scale_shape_manual(values=c(1,15))+
+  theme_bw()+
+  labs(title="OC+")+
+  var_y_lim
+
+
+#low OC
+one_fig_LOC<-
+  RT_over_participant_oci %>%
+  filter(OCI_quantile==1) %>% 
+  
+  unite('target_present_search_type', target_present,search_type, remove = F)  %>% 
+  ggplot(aes(x=set_size, 
+             y=mean_RT, 
+             color = search_type))+
+  geom_line(aes(group = target_present_search_type, linetype = target_present), size=1)+
+  geom_point(aes(shape = search_type), size=4, stroke=1.5, alpha=0.8)+
+  scale_x_discrete(limits = c("9", "25"))+
+  scale_linetype_manual(values=c("dashed","solid"))+
+  scale_color_manual(values=c('#000000','#f01616'))+
+  scale_size_manual(values=c(2, 5))+
+  scale_shape_manual(values=c(1,15))+
+  theme_bw()+
+  labs(title="OC-")+
+  var_y_lim
+
+
+one_fig_HOC+one_fig_LOC+theme(legend.position = 'none',
+                        axis.text.y = element_blank(),
+                        axis.ticks.y = element_blank(),
+                        axis.title.y = element_blank())+ plot_layout(guides = "collect")
+```
+
+Hypothesis 5 isn't met. There isn't a significant interaction between group and target present in the easy search `r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))`
+
+*Hypothesis 6* Model comparison - search type or target-presence contribute to OC+ search time. In order to directly test the hypothesis that target-presence affects OC+ search time to a greater extent than search type we will conduct a model comparison between two multiple regression models. The first model will predict search slopes using the following predictors: search type; group; the interaction between search type and target presence; the interaction between search type and group. The first model will use the following formula:
+
+slope_estimate\~ 1+group+search_type X target_presence+ search_type X group
+
+The second model will predict search slopes using the following predictors: search type; group; the interaction between search type and target presence and the interaction between target presence and group. The second model will use the following formula:
+
+slope_estimate\~ 1+group+ search_type X target_present+target_present X group
+
+These two models differ only in their last interaction effect. Thus, their complexity level (that is, the number of fitted coefficients) will be the same, which will allow us to compare these models directly. We will compare model performance using leave-one-out cross validation.
+
+```{r model_comparison, echo=FALSE, cache=TRUE}
+
+#We didn't use LOOCV since we could not run it with a random intercept for participant. So we fitted the models and compared their AIC and BIC values. 
+
+#first model 
+#fit a regression model with random intercept for participant 
+
+m1 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +search_type *OCI_group+
+         (1|subj_id),
+        data =.)
+
+#second model 
+#fit a regression model with random intercept for participant 
+
+m2 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +target_present *OCI_group+
+         (1|subj_id),
+        data = .)
+
+compare_accuracy(m1, m2)
+
+```
+
+Model comparison table shows that both models have the same AIC and BIC values suggesting that the interaction between group and target presence, doesn't explain search time to a greater extent than the interaction between group and search type.
+
+*Hypothesis 7*: First trials analysis. Prior to the analysis, we will correct for trial and block order effects by using the following formula:
+
+Where RTs,b,t corresponds to the reaction time of subject s in block b and trial t, and RTs to the mean RT for subject s in trials 1 and 2 of blocks 1 and 3. Then, at the whole group level we will compare the slopes of the two types of searches (O in C and C in O) to see if they are different already in the first trials, using a two-tailed paired t-test. Finding a difference between them will serve as a sign for metacognitive knowledge about the asymmetry between the two types of searches, that was in place before experiencing target-present trials.
+
+```{r first_trials, echo=FALSE, cache=TRUE}
+# correct trial order effects
+
+first_trials_df <- search_df %>%
+  filter(test_part=='first_two_trials' & correct) %>%
+  group_by(subj_id) %>%
+  filter(n()==4) %>% #include only subjects who have a valid 4 first trials
+  arrange(trial_index) %>%
+  mutate(trial_index = seq(n()), #standardizing trial order across participants
+  mean_subj_RT = mean(RT)) %>%
+  group_by(trial_index) %>%
+  mutate(mean_position_RT = mean(RT)) %>%
+  ungroup() %>%
+  mutate(corrected_RT = RT-mean_position_RT+mean_subj_RT)
+
+  first_trials_df %>% 
+  group_by(search_type, set_size) %>% 
+  summarise(median_RT =median(corrected_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=median_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  #ylim(900, 2000)+
+  scale_x_discrete(limits = c("9", "25")) +
+  labs(title="First trials full sample", y='median RT', x='set size') +
+  geom_label(aes(label=round(median_RT,2)), color='white')
+
+
+search_slopes_df_first_t <- first_trials_df %>%
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id,search_type,target_present, test_part,OCI_quantile) %>%
+  nest() %>%
+  mutate(model = map(data, ~ lm(corrected_RT ~ set_size, data =.)),
+         tidy = map(model, ~ tidy(.x))) %>%
+  unnest(tidy) %>%
+  filter(term=='set_size25') %>% 
+  filter(test_part=='first_two_trials')
+
+
+```
+
+Consistent with our hypotesis, we found a significance difference between the slope of the easy search (C in O) and the slope of the hard search (C in O) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_first_t, paired=T))`. This significant difference between the search slopes indicate that subjects had some knowledge of the search assymetry already in the first trials of the task.
+
+*Hypothesis 8*: Interaction between group and search time on first-trials slopes. Using a mixed-effects ANOVA, with slope as a dependent variable and group and search type as the two between- and within-subject independent variables, we will test for an interaction of group (OC+/OC-) with search type.
+
+```{r first_trials_ocd, echo=FALSE, cache=TRUE}
+
+#figure
+  search_df %>% 
+  filter(test_part=='first_two_trials') %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id, search_type, set_size, OCI_quantile) %>% 
+  summarise(mean_RT =mean(RT)) %>% 
+    group_by(search_type, set_size, OCI_quantile) %>% 
+    summarise(mean_RT =mean(mean_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=mean_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  facet_wrap(~OCI_quantile)+
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
+
+
+```
+
+We didn't find an interaction between search type and group on first trials slopes `r apa_print(afex::aov_ez("subj_id", "estimate", search_slopes_df_first_t, between = "OCI_quantile", within = "search_type"))`
+
+*Hypothesis 9*: Correlations between OC tendencies and search slopes. In order to strengthen the validity of our results, we will reanalyze our main hypothesis using the entire range of OC scores. That way, we will be able to investigate whether search times in absent trials varies as a function of OC tendencies. We will do so by correlating OC tendencies with search slopes in target-absent and target presence conditions.
+
+```{r full_range}
+
+m_oc_full_range <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+
+               (1|subj_id),
+               data = search_slopes_df)
+summary(m_oc_full_range)
+
+compare_accuracy(m2, m_oc_full_range)
+```
+
+The interaction between OC and target presence remain not significant when analyzing the results using the entire quartile of OC `r apa_print(summary(m_full_range))`
+
+*Hypothesis 10*: Finally, in order to test the robustness of our results, we will add depression and anxiety scores as covariates into our model, for possible mediating effects. We will use the DASS questionnaire to measure anxiety and depression [@lovibond1995structure].
+
+```{r DASS_mediation, echo=FALSE, cache=TRUE}
+
+m_anx_depp <-lmer(estimate ~ 1+search_type * target_present +target_present *OCI_quantile+
+               DASS_anxiety+DASS_depression+
+               (1|subj_id),
+               data = search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4))
+
+summary(m_anx_depp)
+
+compare_accuracy(m2, m_anx_depp)
+```
+
+*Exploratory analysis* Measuring the perceived difficulty of participants will serve us to compare between participants' explicit metacognitive knowledge and their behavior. Findings a discrepancy between the perceived difficulty and task performance in the OC+ group, will indicate a dissociation and disruption between action and knowledge. On the other hand, finding a correspondence between the perceived difficulty and task performance in the OC+ group, will indicate an intact behavior monitoring and good insight. Results in the OC- group will serve as a control group.
+
+```{r explicit_dif, echo=FALSE, cache=TRUE}
+
+difficulty_rating_by_condition%>% 
+  ggplot(aes(x = reorder(difficulty_rating, mean), y = mean, fill=condition)) +
+  geom_col() +
+  theme_bw()+
+  scale_fill_manual(values = c("#bcb9c1", "#e5989b"))+
+  labs(x = "test part", title = "Perceived difficulty")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+#with OCI quantile 
+difficulty_rating_by_condition_with_oci%>% 
+  ggplot(aes(x = reorder(difficulty_rating, mean), y = mean, fill=condition)) +
+  geom_col() +
+  theme_bw()+
+  scale_fill_manual(values = c("#bcb9c1", "#e5989b"))+
+  labs(x = "test part", title = "Perceived difficulty")+
+  facet_wrap(~OCI_quantile_factor)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+#coding condition and set size as variables. 
+m_difficulty <- difficulty_rating %>% 
+  mutate(condition=case_when(str_detect(difficulty_rating, "_TA") ~ "Absent",
+                             str_detect(difficulty_rating, "_TP") ~ "Present")) %>% 
+  mutate(set_size=case_when(str_detect(difficulty_rating, "_9") ~ "9",
+                            str_detect(difficulty_rating, "_25") ~ "25")) %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  #buidling a model to predict the perceived difficulty 
+  lmer(as.numeric(response) ~ 1+OCI_quantile* condition*set_size+
+               (1+set_size+condition|subj_id), #random intercept for each subject with random slope for set size and condition. 
+               data =.)
+
+summary(m_difficulty)
+
+#plotting a figure of mean RT in the same structure as the perceived difficulty for comparison. 
+RT_over_participant_oci %>% 
+  filter(OCI_quantile==1 |OCI_quantile ==4) %>% 
+  filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
+         search_type=='CinO' & set_size=='25' & target_present=='FALSE'|
+         search_type=='OinC' & set_size=='9' & target_present=='TRUE'|
+         search_type=='OinC' & set_size=='25' & target_present=='TRUE') %>% 
+  mutate(target_present =case_when(target_present=='TRUE' ~ 'TP',
+                                   target_present=='FALSE' ~ 'TA')) %>% 
+  unite('condition', c(search_type, set_size, target_present), remove = F) %>% 
+
+
+  ggplot(aes(x = reorder(condition, mean_RT), y = mean_RT, fill=target_present)) +
+  geom_col() +
+  theme_bw()+
+  scale_fill_manual(values = c("#bcb9c1", "#e5989b"))+
+  labs(x = "test part", title = "mean RT")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  facet_wrap(~OCI_quantile)
+
+#create a df for correlating perceived difficulty with actual search time 
+
+search_correlation <- search_summary_RT %>% 
+  filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
+           search_type=='CinO' & set_size=='25' & target_present=='FALSE'|
+           search_type=='OinC' & set_size=='9' & target_present=='TRUE'|
+           search_type=='OinC' & set_size=='25' & target_present=='TRUE') %>%  
+  mutate(target_present =case_when(target_present=='TRUE' ~ 'TP',
+                                                                                                            target_present=='FALSE' ~ 'TA')) %>% 
+  unite('difficulty_rating', c(search_type, set_size, target_present), remove = F)
+
+search_correlation <- left_join(search_correlation, difficulty_rating %>% select(-OCI_quantile))
+# by="subj_id")
+
+search_correlation_wide <- search_correlation %>%
+  select(subj_id, set_size, search_type, target_present, OCI_quantile, median_RT, response) %>% 
+  filter(OCI_quantile==1 | OCI_quantile ==4) %>% 
+  pivot_wider(
+    names_from = c(search_type, target_present, set_size),
+    values_from = c(median_RT, response))
+
+
+#plot mean RT with perceived difficulty in one figure 
+
+p1<-
+search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = median_RT, fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+  
+ 
+p2<-  
+search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  #group_by(set_size, target_present) %>% 
+  #summarise(mean_RT=mean(median_RT)) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Perceived Difficulty', x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+p3<-
+search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = median_RT, fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Mean RT (ms)',x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+p4<-
+search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  #group_by(set_size, target_present) %>% 
+  #summarise(mean_RT=mean(median_RT)) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Perceived Difficulty', x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+commonplot <-ggarrange(p1, p2, p3, p4, common.legend = T)
+
+
+
+row1 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="High OC", angle = 90) + theme_void() 
+
+row2 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Low OC", angle = 90) + theme_void() 
+
+col1 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Mean RT (ms)") + theme_void() 
+
+col2 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Perceived difficulty") + theme_void() 
+
+layoutplot <- "
+#cccddd
+aeeefff
+aeeefff
+bggghhh
+bggghhh
+"
+
+plotlist <- list(a = row1, b = row2, c = col1, d = col2, e= p1, f=p2, g=p3, h=p4)
+
+wrap_plots(plotlist, guides = 'collect', design = layoutplot) 
+
+#ggsave(filename = "difficulty_RT.png",width = 8, height = 6, dpi = 1000)  
+
+
+
+```
+
+# Discussion
+
+\newpage
+
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::

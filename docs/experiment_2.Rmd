@@ -1,0 +1,279 @@
+---
+title             : "Subclinical OCD and inference about absence in visual search"
+shorttitle        : "Subclinical OCD visual search "
+
+author: 
+  - name          : "Noam Sarna"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "Tel Aviv, Israel 69978"
+    email         : "noamsarna@mail.tau.ac.il"
+
+  - name          : "Ruvi Dar"
+    affiliation   : "1"
+
+  - name          : "Matan Mazor"
+    affiliation   : "2"
+
+
+affiliation:
+  - id            : "1"
+    institution   : "School of Psychological Sciences, Tel Aviv University"
+  - id            : "2"
+    institution   : "Department of Psychological Sciences, Birkbeck, University of London, UK"
+
+abstract: |
+   In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search setting. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1004, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
+
+
+bibliography      : "r-references.bib"
+
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no
+
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+
+classoption       : "man"
+output            : papaja::apa6_word
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(reshape2)
+library(wesanderson)
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+<!-- # Introduction  -->
+
+Previous work by [@toffolo2013mild] , using a visual search paradigm in high (OC+) and low (OC-) OC individuals, provided evidence that OC+ participants search longer in target-absent trials. This robust finding has been replicated [@toffolo2014uncertainty] and extended to a clinical sample of OCD patients [@toffolo2016patients]. In these experiments, checking behavior was operationalized by search time and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, the longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking for mild uncertainty. However, the paradigm structure used in Toffolo's experiments has conflated uncertainty with target absence. Decisions about target absence are indeed qualitatively different from target-present trials since the evidence for lack of stimuli is less salient and based on the metacognitive belief of not having missed the target [@mazor2022efficient].
+
+Nevertheless, some decisions about absence can be accompanied by low subjective uncertainty, for instance, perceiving the absence of a red dot among blue dots. Distinguishing features of inference about absence from uncertainty will be achieved by introducing such a search where absence can be more directly inferred and will allow us to probe for distinct behavior of OC+ in absent trials.
+
+
+```{r load_data, echo=FALSE, cache=TRUE}
+
+# Pre processing  ---------------------------------------------------------
+
+#load df from jatos 
+jatos_df <-read_csv("../data/Exp_2_anon_jatos_results_10July2023.csv")
+
+
+failed_practice <- jatos_df %>% 
+  filter(trial_index != "trial_index") %>%
+  group_by(subj_id) %>% 
+  summarise(max_trail = max(as.double(trial_index, na.rm = T)),
+            failed_practice = max_trail <= 42) %>% 
+  select(subj_id, max_trail,failed_practice)  
+
+jatos_df <- left_join(jatos_df, failed_practice)
+
+n_failed_practice <- failed_practice %>% pull(failed_practice) %>% sum()
+
+total_valid_n <- jatos_df %>%
+  filter(failed_practice=='FALSE') %>%
+  pull(subj_id) %>%  n_distinct()
+
+
+#load prolific df 
+demo_prolific<-read.csv("../data/Ex2_anon_demo_prolific.csv")
+demo_prolific$subj_id <- as.factor(demo_prolific$subj_id)
+
+#merge df
+jatos_df$subj_id <- as.factor(jatos_df$subj_id)
+jatos_df <- left_join(jatos_df, demo_prolific, by='subj_id')
+
+
+#parse oci data from df 
+OCI_df <- jatos_df %>%
+  filter(failed_practice=='FALSE') %>% 
+  filter(grepl('oci', Identifier)) %>% 
+  select(subj_id, question, answer_oci) %>% 
+  mutate(attention_check = question %in% c("OCI-Attention_check_1","OCI-Attention_check_2")) %>%
+  arrange(subj_id, question)%>%
+  #arrange it in a long format df 
+  group_by(subj_id) %>%
+  summarise(oci_overall=sum(as.numeric(answer_oci[!attention_check])), #compute oci general score 
+            failed_attention_OCI = answer_oci[question=='OCI-Attention_check_1']!=0 | #attention check failure
+              answer_oci[question=='OCI-Attention_check_2']!=2,
+            OCI_Absent = answer_oci[question=='OCI-Absent']) %>%
+  mutate(
+    #split to quartiles based on toffolo 2013 scores 
+    OCI_quantile = case_when(oci_overall>=17 ~ "high", 
+                             oci_overall<=5 ~ "low",
+                             TRUE ~ 'else'))
+
+#count how many participants in each group 
+OCI_df %>% group_by(OCI_quantile) %>% count()
+
+
+# merge data with oci 
+jatos_df <- left_join(jatos_df, 
+                      OCI_df %>% select(subj_id, oci_overall, OCI_quantile, OCI_Absent),
+                      by='subj_id')
+
+############ create a df for the checking task 
+
+checking_task <- jatos_df %>% 
+  filter(trial_type == "image-keyboard-response") %>%
+  filter(isPractice=='FALSE') %>% 
+  select(trial_type,trial_index,subj_id,condition,
+         rt,correct, isPractice, OCI_quantile, oci_overall, OCI_Absent)
+
+#create a table making sure every participant have 50 trials, 25 absent and 25 present 
+checking_table <-checking_task %>% group_by(subj_id) %>% 
+  count(condition)
+
+#recode variable
+checking_task$rt <-as.numeric(checking_task$rt)
+
+# accuracy df  -----------------------------------------------------------
+checking_task$correct <- checking_task$correct=='TRUE' #change to Boolean 
+
+checking_task <- checking_task %>% group_by(subj_id) %>% 
+  mutate(mean_acc = mean(correct)) #calculate mean accuracy per subject 
+
+#create accuracy df with acc score and OCI group per subject 
+acc_data_frame <- checking_task %>% 
+  group_by(subj_id) %>% select(subj_id, mean_acc, OCI_quantile) %>% slice(1)
+
+#Create variables of accuracy in standard deviation units to exclude participants 
+acc_data_frame$Zscore <-scale(acc_data_frame$mean_acc)[,1]
+
+#take a look on overall accuracy scores 
+acc_data_frame %>% 
+  group_by(OCI_quantile) %>% 
+  summarise(mean_acc=mean(mean_acc))
+
+#Sanity check - standardized values should have: mean=0 and SD=1.  
+round(mean(acc_data_frame$Zscore), 2)
+round(sd(acc_data_frame$Zscore), 2)
+
+#mark participant who had error greater than Z>-2.5
+acc_data_frame$remove <-acc_data_frame$Zscore<(-2.5)
+
+#merge acc df with the checking df 
+checking_task <- left_join(checking_task, acc_data_frame)
+
+#remove participants who had more than Z>-2.5 errors. Three participants are removed. 
+checking_task <-checking_task %>%
+  filter(remove=='FALSE')
+
+#plot figure of mean RT for each group  
+checking_task %>% 
+  filter(rt!='null') %>% 
+  filter(OCI_quantile!='else') %>% 
+  ggplot(aes(x = OCI_quantile, y = rt,
+             fill = condition)) +
+  stat_summary(fun.data = mean_se,
+               geom = "col",
+               alpha = 0.6,
+               position = position_dodge(0.9)) +
+  stat_summary(fun.data = mean_se,
+               geom = "errorbar",
+               width = 0.4,
+               position = position_dodge(0.9)) +
+  stat_summary(fun = mean,
+               geom = "label",
+               aes(label = round(after_stat(y),2)),
+               color = "white", vjust = +2,
+               position = position_dodge(0.9)) +
+  theme_bw()+
+  coord_cartesian(ylim = c(1000,7500)) +
+  theme(axis.title.x=element_blank(),
+        text = element_text(size = 15))+
+  ylab('Mean RT (ms)')+
+  guides(fill = guide_legend(title = "Response",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Target Absent', 'Target Present'),values = wes_palette("Royal1"))
+
+#ggsave(filename = "toffolo_rep_exp2.png",width = 8, height = 6, dpi = 1000)  
+
+# make a planned contrast df in which every participant has one raw with a difference score of the mean 
+#target absent search time minus the mean target present search time. 
+
+planned_df <- checking_task %>% 
+  filter(rt!='null') %>%   filter(OCI_quantile!='else') %>% 
+  group_by(subj_id, condition, OCI_quantile, oci_overall) %>% 
+  summarise(mean_RT =mean(rt))%>% ungroup
+
+#long to wide format 
+planned_wide <- spread(planned_df, key = condition, value = mean_RT)
+
+#adding difference score 
+planned_wide <- planned_wide %>% mutate(RT_diff = ABS- PRE) 
+
+```
+
+
+# Methods
+We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the study. <!-- 21-word solution (Simmons, Nelson & Simonsohn, 2012; retrieved from http://ssrn.com/abstract=2160588) -->
+
+## Participants
+
+
+## Material
+
+
+## Procedure
+
+
+###Randomization
+The order and timing of experimental events will be determined pseudo-randomly by the Mersenne Twister pseudorandom number generator, initialized to ensure registration time-locking [@mazor2019novel].
+
+##Data analysis
+
+###Rejection criteria
+Participants will be excluded for making more than 15% errors in the main part of the experiment or for having extremely fast (below 100 milliseconds) in more than 25% of the trials. Error trials and trials with response times below 100 milliseconds will be excluded from the response-time analysis. Participants will also be excluded from the analysis if they are wrong in one or more of the attention checks questions (asking them to mark a specific answer in the questionnaire). 
+
+
+## Data analysis
+We used `r cite_r("r-references.bib")` for all our analyses.
+
+##Hypotheses and analysis plan
+This experiment is designed to test several hypotheses about the behavior of individuals high on obsessive-compulsive tendencies (OC+) in a visual search paradigm. We will focus on search slopes during target-absent trials and the perceived difficulty of target-absent vs. target-present trials. Participants will be divided to OC+/OC- groups based on OCI scores (1st/4th quartiles). 
+Subject-wise search slopes will be extracted for each combination of search type (C in O; O in C) and presence of the target (present/absent) by fitting a linear regression model to predict reaction time as a function of set size, with one intercept and one set-size term. We will use search slope as a dependent measure for all of our hypotheses concerning search times.  We will use the full sample for the first two hypotheses validating our paradigm. 
+
+# Results
+```{r analyze_data, echo=FALSE, cache=TRUE}
+
+#mean for target present trials - 
+round(mean(unlist(planned_df[planned_df$condition=='PRE', 'mean_RT'])), 2)
+
+#mean for target absent trials -
+round(mean(unlist(planned_df[planned_df$condition=='ABS', 'mean_RT'])), 2)
+
+planned_df %>% 
+  t.test(mean_RT~condition, data=., alternative='greater', paired=T)
+
+```
+
+*Hypothesis 1* - 
+Hypothesis 1- We expect to find an effect of condition (target-absent/target-present) on mean search times, beyond the groups, in which overall search time in target-absent will be longer than search time in target-present trials. We will perform a one-tailed t-test with mean search time as our dependent variable and condition as our independent variable,predicting a higher search time in target-absent.  trials.  
+
+`r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))`
+
+
+*Hypothesis 2* 
+This experiment is designed to mainly test the group (OC+/OC-) by condition (target-absent/target-present) interaction. To that end, we will use a planned contrast approach, since our hypothesis about the interaction is one tailed. We will perform a one-tailed t-test with the difference between search times as a dependent measure (mean RT absent - mean RT present), and group (OC+/OC-) as our independent measure, predicting a higher difference score for the OC+ group.
+ 
+`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))`
+
+
+# Discussion
+
+
+\newpage
+
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::
