@@ -168,7 +168,17 @@ checking_task <- left_join(checking_task, acc_data_frame)
 checking_task <-checking_task %>%
   filter(remove=='FALSE')
 
-
+ checking_by_sub <- checking_task %>% 
+  filter(OCI_quantile!='else') %>% 
+  group_by(subj_id, condition, OCI_quantile,
+           oci_overall) %>%
+  summarise(N = n(),
+            mean_RT = mean(rt, na.rm = T),
+            median_RT = median(rt, na.rm = T),
+            sd_RT = sd(rt, na.rm = T)) %>% ungroup() %>%
+  mutate(log_mRT = log(mean_RT)) %>% 
+  mutate(oci_type = ifelse(.$OCI_quantile == 'high', "High OC (OC+)", "Low OC (OC-)")) %>% 
+  mutate(target_present = ifelse(.$condition=='ABS', "Absent", "Present"))
 
 
 ```
