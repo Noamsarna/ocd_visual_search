@@ -328,11 +328,56 @@ H2.desc <- H2.df %>%
 
 ```
 
-*Hypotheses 1 and 2 - Task validation * - To validate our paradigm structure and to assess whether we successfully created an easier search by leveraging search asymmetries (i.e., switching between the target and distractors), we first examined the difference in slopes between the two search types (easy/hard), regardless of target presence (pre-registered hypothesis H1). As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r printnum (H1.desc[2,3])` compared to the easy search  `r printnum (H1.desc[1,3])`, `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))`. Furthermore, a one-tailed paired t-test revealed that target-present slopes in the hard search `r printnum (H2.desc[2,3])` were steeper than target-absent slopes in the easy search `r printnum (H2.desc[1,3])`, `r apa_print(t.test(estimate~group, data=H2.df, paired=T))` (pre-registered hypothesis H2).
+*Hypotheses 1 and 2 - Task validation * - To validate our paradigm structure and to assess whether we successfully created an easier search by leveraging search asymmetries (i.e., switching between the target and distractors), we first examined the difference in slopes between the two search types (easy/hard), regardless of target presence (pre-registered hypothesis H1). As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r printnum (H1.desc[2,3])` ms/item compared to the easy search  `r printnum (H1.desc[1,3])` ms/item, `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))$statistic`. Furthermore, a one-tailed paired t-test revealed that target-present slopes in the hard search `r printnum (H2.desc[2,3])` ms/item were steeper than target-absent slopes in the easy search `r printnum (H2.desc[1,3])` ms/item, `r apa_print(t.test(estimate~group, data=H2.df, paired=T))$statistic` (pre-registered hypothesis H2).
 
 
 The initial two control comparisons served to validate that we successfully designed a target-absent condition that was easier than a target-present condition, thereby experimentally decoupling decision certainty from target presence, and enabling to measure their independent effects on search time as a function of obsessive-compulsive tendencies.
 
+
+```{r DR_h3, echo=FALSE, cache=TRUE}
+  
+  # Toffolo replication plots -----------------------------------------------------
+
+
+exp1_mean_RT_fig <- by_sub_toffolo%>% 
+    filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
+    mutate(oci_type = ifelse(.$OCI_quantile == 1, "Low OC (OC-)", "High OC (OC+)")) %>% 
+    select(subj_id, target_present, oci_type, mean_RT)  %>%
+    ggplot(aes(x = target_present, y = mean_RT,  group = oci_type, shape = oci_type)) +
+    stat_summary(fun = mean,
+                 geom = "point",
+                 position = position_dodge(0.9),
+                 size = 5) +
+    stat_summary(fun.data = mean_se,
+                 geom = "errorbar",
+                 width = 0.4,
+                 position = position_dodge(0.9)) +
+    # stat_summary(fun = mean,
+    #              geom = "line",
+    #              position = position_dodge(0.9)) +
+    scale_shape_manual(values = c("High OC (OC+)" = 1, "Low OC (OC-)" = 2)) +
+    scale_x_discrete(labels = c("FALSE" = "Absent", "TRUE" = "Present")) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          text = element_text(size = 12)) +
+    ylab('Mean RT (ms)')+
+    labs(shape = "OC group")+ 
+    coord_cartesian(ylim = c(2500,7500))
+  
+  
+#ggsave(filename = "exp_1_results.png",width = 4, height = 3, dpi = 1500)  
+
+
+H3.df <- toffolo_data %>% 
+  filter(OCI_quantile==1| OCI_quantile==4) %>%
+  group_by(subj_id, OCI_quantile, target_present) %>%
+  summarise(mean_RT=mean(RT)) %>% 
+  ungroup()
+
+```
+
+*Hypothesis 3 - Replication of Toffolo et al. (2013), mean RT*
+To directly replicate the findings of Toffolo et al. (2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, wherein the mean RT difference between the OC+ and OC- groups would be significantly larger in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`, suggesting no difference in mean RT between the OC+ and OC- groups in either target-present or target-absent trials (figure 3). 
 
 # Discussion
 
