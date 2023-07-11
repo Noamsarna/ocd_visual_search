@@ -65,7 +65,7 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 
 <!-- # Introduction  -->
 
-Theories on obsessive-compulsive disorder (OCD) emphasize the pivotal role of pathological doubt in the disorder's phenomenology [@rasmussenClinicalFeaturesPhenomenology1989; @reedObsessionalExperienceCompulsive1985a; @shapiroNeuroticStyles1965]. This persistent doubt, marked by increased uncertainty, gives rise to repetitive checking rituals that, paradoxically, serve to intensify the doubt itself. In laboratory perceptual studies, checking behavior is commonly manifested in slow reaction times, as OC participants require more evidence under high uncertainty (Banca et al., 2015; Hauser et al., 2017). Previous studies found that participants with high obsessive compulsive tendencies (OC+) take longer to decide that a target is absent from a visual search array compared to those with low obsessive compulsive tendencies (OC-; Toffolo et al., 2013). These finding have been replicated (Toffolo et al., 2014) and extended to a clinical sample, where they were found to be specific to patients with OCD and absent in those suffering from anxiety (Toffolo et al., 2016).  In these experiments, checking behavior was operationalized by search time, and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, relatively longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking behavior under mild uncertainty. 
+Theories on obsessive-compulsive disorder (OCD) emphasize the pivotal role of pathological doubt in the disorder's phenomenology [@rasmussenClinicalFeaturesPhenomenology1989; @reedObsessionalExperienceCompulsive1985a; @shapiroNeuroticStyles1965]. This persistent doubt, marked by increased uncertainty, gives rise to repetitive checking rituals that, paradoxically, serve to intensify the doubt itself. In laboratory perceptual studies, checking behavior is commonly manifested in slow reaction times, as OC participants require more evidence under high uncertainty [@bancaEvidenceAccumulationObsessiveCompulsive2015; @hauserMetacognitiveImpairmentsExtend2017d. Previous studies found that participants with high obsessive compulsive tendencies (OC+) take longer to decide that a target is absent from a visual search array compared to those with low obsessive compulsive tendencies (OC-; @toffoloMildUncertaintyPromotes2013). These finding have been replicated [@toffoloUncertaintyCheckingIntolerance2014] and extended to a clinical sample, where they were found to be specific to patients with OCD and absent in those suffering from anxiety [@toffoloPatientsObsessiveCompulsiveDisorder2016].  In these experiments, checking behavior was operationalized by search time, and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, relatively longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking behavior under mild uncertainty. 
 
 
 ```{r load_data, echo=FALSE, cache=TRUE}
@@ -218,7 +218,6 @@ Participants will first be instructed about the experiment's structure, which co
 We used `r cite_r("r-references.bib")` for all our analyses.
 
 
-
 # Results
 
 ```{r analyze_data, echo=FALSE, cache=TRUE}
@@ -310,27 +309,29 @@ slopes_table <-search_slopes_df %>%
 
 
 ```
-
-*Hypothesis 1* - To validate our methods and the quality of our data, we will test for a difference in slopes between the two search types (C in O; O in C) beyond the presence of the target (present/absent). We expect to find an overall steeper slopes for O in C search compared to C in O search. To compare these slopes, we will use a one-tailed paired t-test.
-
-
-*Hypothesis 2* We will test the difference of slopes between O in C in target presence and C in O in target absence. Based on our pilot and paradigm design, we expect to find a steeper slope for O in C in target presence than C in O in target absence. To compare these slopes, we will use a one-tailed paired t-test.
-
-```{r h2_t-test, echo=FALSE, cache=TRUE}
+```{r h1_h2_t-test, echo=FALSE, cache=TRUE}
 #creating a df for second hypothesis testing 
+
+H1.desc <- search_slopes_df %>% group_by(search_type) %>%  
+  summarise(mean_slope = mean(estimate),
+            ms_item = mean_slope/(25-9))
 
 H2.df<- search_slopes_df %>% 
   filter(target_present==TRUE & search_type=='OinC' |target_present==FALSE & search_type=='CinO')  %>% 
   mutate(group = case_when(search_type == 'OinC' ~ 'hard_present',
                            search_type == 'CinO' ~ 'easy_absent'));
                           
-#H2.df %>% group_by(group) %>% summarise(mean_slope = mean(estimate))
+H2.desc <- H2.df %>% 
+  group_by(group) %>% 
+  summarise(mean_slope=mean(estimate),
+            ms_item = mean_slope/(25-9))
 
 ```
 
-`r apa_print(t.test(estimate~group, data=H2.df, paired=T))`
+*Hypotheses 1 and 2 - Task validation * - To validate our paradigm structure and to assess whether we successfully created an easier search by leveraging search asymmetries (i.e., switching between the target and distractors), we first examined the difference in slopes between the two search types (easy/hard), regardless of target presence (pre-registered hypothesis H1). As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r printnum (H1.desc[2,3])` compared to the easy search  `r printnum (H1.desc[1,3])`, `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))`. Furthermore, a one-tailed paired t-test revealed that target-present slopes in the hard search `r printnum (H2.desc[2,3])` were steeper than target-absent slopes in the easy search `r printnum (H2.desc[1,3])`, `r apa_print(t.test(estimate~group, data=H2.df, paired=T))` (pre-registered hypothesis H2).
 
-In line with our hypothesis, search slopes for the easy absent search were less steep than search slopes in the hard present condition.
+
+The initial two control comparisons served to validate that we successfully designed a target-absent condition that was easier than a target-present condition, thereby experimentally decoupling decision certainty from target presence, and enabling to measure their independent effects on search time as a function of obsessive-compulsive tendencies.
 
 
 # Discussion
