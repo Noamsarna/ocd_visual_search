@@ -211,33 +211,33 @@ We used `r cite_r("r-references.bib")` for all our analyses.
 ```{r Exp2_analyze_data, echo=FALSE, cache=TRUE}
 
 #plot figure of mean RT for each group  
-checking_task %>% 
-  filter(rt!='null') %>% 
-  filter(OCI_quantile!='else') %>% 
-  ggplot(aes(x = OCI_quantile, y = rt,
-             fill = condition)) +
-  stat_summary(fun.data = mean_se,
-               geom = "col",
-               alpha = 0.6,
-               position = position_dodge(0.9)) +
+
+checking_by_sub %>% 
+select(subj_id, target_present, oci_type, mean_RT)  %>%
+  ggplot(aes(x = target_present, y = mean_RT,  group = oci_type, shape = oci_type)) +
+  stat_summary(fun = mean,
+               geom = "point",
+               position = position_dodge(0.9),
+               size = 5) +
   stat_summary(fun.data = mean_se,
                geom = "errorbar",
                width = 0.4,
                position = position_dodge(0.9)) +
-  stat_summary(fun = mean,
-               geom = "label",
-               aes(label = round(after_stat(y),2)),
-               color = "white", vjust = +2,
-               position = position_dodge(0.9)) +
-  theme_bw()+
-  coord_cartesian(ylim = c(1000,7500)) +
-  theme(axis.title.x=element_blank(),
-        text = element_text(size = 15))+
+  # stat_summary(fun = mean,
+  #              geom = "line",
+  #              position = position_dodge(0.9)) +
+  scale_shape_manual(values = c("High OC (OC+)" = 1, "Low OC (OC-)" = 2)) +
+  scale_x_discrete(labels = c("FALSE" = "Absent", "TRUE" = "Present")) +
+  theme_bw() +
+  theme(axis.title.x = element_blank(),
+        text = element_text(size = 12)) +
   ylab('Mean RT (ms)')+
-  guides(fill = guide_legend(title = "Response",override.aes = aes(label = "")))+
-  scale_fill_manual(labels=c('Target Absent', 'Target Present'),values = wes_palette("Royal1"))
+  labs(shape = "OC group")+ 
+  coord_cartesian(ylim = c(2500,7500))
 
-#ggsave(filename = "toffolo_rep_exp2.png",width = 8, height = 6, dpi = 1000)  
+#ggsave(filename = "exp_2_results.png",width = 4, height = 3, dpi = 1500)  
+
+
 # make a planned contrast df in which every participant has one raw with a difference score of the mean 
 #target absent search time minus the mean target present search time. 
 
