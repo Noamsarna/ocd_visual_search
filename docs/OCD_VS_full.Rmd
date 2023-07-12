@@ -379,6 +379,21 @@ H3.df <- toffolo_data %>%
 *Hypothesis 3 - Replication of Toffolo et al. (2013), mean RT*
 To directly replicate the findings of Toffolo et al. (2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, wherein the mean RT difference between the OC+ and OC- groups would be significantly larger in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`, suggesting no difference in mean RT between the OC+ and OC- groups in either target-present or target-absent trials (figure 3). 
 
+```{r h4_anova, echo=FALSE, cache=TRUE}
+
+H4.df<- search_slopes_df %>% 
+  filter(OCI_quantile==1 | OCI_quantile==4) %>% 
+  filter(search_type=='OinC')
+                          
+H4.desc <- H4.df %>% group_by(OCI_quantile, target_present) %>% summarise(mean_slope = mean(estimate))
+
+```
+
+
+*Hypothesis 4: Extension of Toffolo et al. (2013), search slopes*
+Following the previous hypothesis, we conducted the same mixed-effects ANOVA, with group (OC+/OC-) as between-subject variable and target presence (present/absent) as within-subject variables, only this time, we focused on the search slopes (reaction time as a function of set size) as a dependent variable. Consistent with our findings for Hypothesis 3, a mixed-effects ANOVA revealed no statistically significant interaction between group and target presence `r apa_print(afex::aov_ez("subj_id", "estimate", data=H4.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`, again providing no evidence for a selective slowing of OC+ individuals in target-absent trials. 
+
+
 # Discussion
 
 \newpage
