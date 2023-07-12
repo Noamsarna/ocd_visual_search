@@ -393,6 +393,14 @@ H4.desc <- H4.df %>% group_by(OCI_quantile, target_present) %>% summarise(mean_s
 *Hypothesis 4: Extension of Toffolo et al. (2013), search slopes*
 Following the previous hypothesis, we conducted the same mixed-effects ANOVA, with group (OC+/OC-) as between-subject variable and target presence (present/absent) as within-subject variables, only this time, we focused on the search slopes (reaction time as a function of set size) as a dependent variable. Consistent with our findings for Hypothesis 3, a mixed-effects ANOVA revealed no statistically significant interaction between group and target presence `r apa_print(afex::aov_ez("subj_id", "estimate", data=H4.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`, again providing no evidence for a selective slowing of OC+ individuals in target-absent trials. 
 
+```{r h5_anova, echo=FALSE, cache=TRUE}
+H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
+
+```
+
+*Hypothesis 5: Low-uncertainty inference about absence*  
+Originally, our primary focus was on this hypothesis, examining the effect of obsessive-compulsive tendencies on target-absent search times in an easy, low-uncertainty, search setting. However, given our failure to replicate a group difference in the hard search (Hypotheses 3 and 4), a significant result here seemed unlikely. Indeed, a mixed-effects ANOVA with group as a between-subjects variable and target presence as a within-subjects variable did not reveal a significant interaction between group and target presence in the easy search, F(1, 431) = 1.27, p = .26. 
+`r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))`
 
 # Discussion
 
