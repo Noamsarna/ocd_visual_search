@@ -399,8 +399,55 @@ H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filte
 ```
 
 *Hypothesis 5: Low-uncertainty inference about absence*  
-Originally, our primary focus was on this hypothesis, examining the effect of obsessive-compulsive tendencies on target-absent search times in an easy, low-uncertainty, search setting. However, given our failure to replicate a group difference in the hard search (Hypotheses 3 and 4), a significant result here seemed unlikely. Indeed, a mixed-effects ANOVA with group as a between-subjects variable and target presence as a within-subjects variable did not reveal a significant interaction between group and target presence in the easy search, F(1, 431) = 1.27, p = .26. 
-`r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))`
+Originally, our primary focus was on this hypothesis, examining the effect of obsessive-compulsive tendencies on target-absent search times in an easy, low-uncertainty, search setting. However, given our failure to replicate a group difference in the hard search (Hypotheses 3 and 4), a significant result here seemed unlikely. Indeed, a mixed-effects ANOVA with group as a between-subjects variable and target presence as a within-subjects variable did not reveal a significant interaction between group and target presence in the easy search, `r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`. 
+
+
+```{r model_comparison, echo=FALSE, cache=TRUE}
+
+#We didn't use LOOCV since we included random terms in our model. So instead we comapred models by their AIC and BIC values.  
+
+m1 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +search_type *OCI_group+
+         (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+        data =.)
+
+#examine model parameters 
+#parameters::model_parameters(m1)
+
+#second model 
+#fit a regression model with random intercept for participant 
+
+m2 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +target_present *OCI_group+
+         (search_type+target_present|subj_id),
+        data = .)
+
+#examine model parameters 
+#parameters::model_parameters(m2)
+
+
+H6.model_acc_table <-as.data.frame(compare_accuracy(m1, m2))  %>% 
+  select(Model, AIC, BIC)
+
+H6.model_acc_table
+
+#I had problem creating this table in APA format and also including the formula within the table.. Would appreciate some help with that.  
+
+```
+*Hypothesis 6: Model comparison*
+Our experimental design aimed to differentiate between difficulties arising from higher uncertainty and those arising from the absence of the target. To achieve this, we used two search types: a hard search (searching for a closed square among open squares), and an easy search (searching for an open square among closed squares). Additionally, we manipulated the presence or absence of the target. To determine whether uncertainty or absence had a greater impact on OC+ search time, we constructed two competing regression models that differed only in their interaction terms (table 1). Beyond the search type and the target presence predictors, the first model (M1) included the interaction between group and search type (easy/hard; slope_estimate~ 1+group+search_type * target_presence+ search_type * group), while the second model (M2) included the interaction between group and target presence (absent/present; slope_estimate~ 1+group+ search_type * target_present+target_present * group). 
+Since the two models differ only in their last interaction effect, their complexity (that is, the number of fitted coefficients) is the same, which allowed us to compare these models directly. We compare model performance using their AIC and BIC values. The model comparison table shows that both models have the same AIC and BIC values suggesting that the interaction between group and target presence does not explain search time to a greater extent than the interaction between group and search type.
+
+
+
 
 # Discussion
 
