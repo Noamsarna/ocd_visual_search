@@ -1,0 +1,259 @@
+
+## This is the appendix subsection 
+
+
+```{r first_trials, echo=FALSE, cache=TRUE}
+# correct trial order effects
+
+first_trials_df <- search_df %>%
+  filter(test_part=='first_two_trials' & correct) %>%
+  group_by(subj_id) %>%
+  filter(n()==4) %>% #include only subjects who have a valid 4 first trials
+  arrange(trial_index) %>%
+  mutate(trial_index = seq(n()), #standardizing trial order across participants
+  mean_subj_RT = mean(RT)) %>%
+  group_by(trial_index) %>%
+  mutate(mean_position_RT = mean(RT)) %>%
+  ungroup() %>%
+  mutate(corrected_RT = RT-mean_position_RT+mean_subj_RT)
+
+  first_trials_df %>% 
+  group_by(search_type, set_size) %>% 
+  summarise(median_RT =median(corrected_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=median_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  #ylim(900, 2000)+
+  scale_x_discrete(limits = c("9", "25")) +
+  labs(title="First trials full sample", y='median RT', x='set size') +
+  geom_label(aes(label=round(median_RT,2)), color='white')
+
+
+search_slopes_df_first_t <- first_trials_df %>%
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id,search_type,target_present, test_part,OCI_quantile) %>%
+  nest() %>%
+  mutate(model = map(data, ~ lm(corrected_RT ~ set_size, data =.)),
+         tidy = map(model, ~ tidy(.x))) %>%
+  unnest(tidy) %>%
+  filter(term=='set_size25') %>% 
+  filter(test_part=='first_two_trials')
+
+#figure
+  search_df %>% 
+  filter(test_part=='first_two_trials') %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id, search_type, set_size, OCI_quantile) %>% 
+  summarise(mean_RT =mean(RT)) %>% 
+    group_by(search_type, set_size, OCI_quantile) %>% 
+    summarise(mean_RT =mean(mean_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=mean_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  facet_wrap(~OCI_quantile)+
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
+
+
+```
+
+*Hypotheses 7 and 8 - First trials*
+
+In this analysis, we focused on the two first trials of each search type. These trials are special in that by the time of making these responses, participants haven’t yet experienced target presence. First, we compared the slopes of the two types of searches (easy/hard search) to see if they were different already in the first trials, using a two-tailed paired t-test (H7). This allowed us to isolate pre-specified search termination strategies from ones that were acquired throughout the course of the experiment.
+  We found a significant difference between the slope of the easy search (53.93 ms/item) and the slope of the hard search (134.94 ms/item) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_first_t, paired=T))$statistic`. This significant difference between the search slopes indicates that subjects’ search termination rule was sensitive to the difference between the two search types prior to having experience with the easy and hard search tasks. 
+  We next asked whether this effect of search type on target-absent search times was similar for OC+ and OC- individuals (H8). Using a mixed-effects ANOVA with slope as a dependent variable and group and search type as the two between- and within-subject independent variables, we tested for the interaction of group (OC+/OC-) with search type in the first trials. We did not find a significant interaction between search type and group on first-trial slopes `r apa_print(afex::aov_ez("subj_id", "estimate", search_slopes_df_first_t, between = "OCI_quantile", within = "search_type"))$statistic$OCI_quantile_search_type`. 
+  
+```{r H9_full_range}
+
+m3 <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+ (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+               data = search_slopes_df)
+
+
+parameters::model_parameters(m3)
+
+compare_accuracy(m2, m3)
+```
+
+*Hypothesis 9: Correlations between OC tendencies and search slopes.* 
+ 	In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) by incorporating the entire spectrum of OC scores (raw OCI scores). We employed a mixed-effects regression model, analogous to M2 in hypothesis 6, but utilizing the complete range of total OCI scores rather than solely the top and bottom quartiles. First, the interaction between search type and total OCI score is not significant (model parameters table). Second, model performance was compared using their AIC and BIC values. The model comparison table reveals that the model featuring the full range of OCI scores (M3) exhibits substantially higher AIC and BIC values than the model with the two OC groups (M2), suggesting that adding the full range of OCI scores, does not contribute to explaining the variance in search slopes.
+
+```{r DASS_mediation, echo=FALSE, cache=TRUE}
+
+m4 <-lmer(estimate ~ 1+search_type * target_present +target_present *OCI_quantile+
+               DASS_anxiety+DASS_depression+
+              (search_type+target_present|subj_id),#random slope for search type and target present for each participant 
+               data = search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4))
+
+parameters::model_parameters(m4)
+```
+
+*Hypothesis 10:  Controlling for depression and anxiety* 
+Finally, in order to test the possible effects of depression and anxiety, we added DASS subscales of depression and anxiety scores as predictors into our model. We used a mixed-effects regression model identical to the second model in hypothesis 6, except for the addition of depression and anxiety as predictors. The interaction between group and target presence remained below the significance threshold after adding depression and anxiety to the model (see model parameters table).   
+
+*Exploratory analysis - Measuring the perceived difficulty of participants* 
+In order to compare explicit metacognitive knowledge with behavior, we collected perceived difficulty ratings for the different search tasks. A discrepancy between perceived difficulty and task performance in the OC+ group would suggest a dissociation between action and knowledge, in line with previous findings (Vaghi et al., 2017, 2019). We examined two search types: target-absent easy searches and target-present hard searches, with set sizes of 9 and 25. For both groups, discrepancies between perceived difficulty and mean response time were observed in the same direction: despite slower search times in easy target-absent searches, these searches were perceived as easier than hard target-present trials.
+
+
+```{r explicit_dif, echo=FALSE, cache=TRUE}
+
+
+#coding condition and set size as variables. 
+m_difficulty <- difficulty_rating %>% 
+  mutate(condition=case_when(str_detect(difficulty_rating, "_TA") ~ "Absent",
+                             str_detect(difficulty_rating, "_TP") ~ "Present")) %>% 
+  mutate(set_size=case_when(str_detect(difficulty_rating, "_9") ~ "9",
+                            str_detect(difficulty_rating, "_25") ~ "25")) %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  #buidling a model to predict the perceived difficulty 
+  lmer(as.numeric(response) ~ 1+OCI_quantile* condition*set_size+
+               (1+set_size+condition|subj_id), #random intercept for each subject with random slope for set size and condition. 
+               data =.)
+
+summary(m_difficulty)
+
+#create a df for correlating perceived difficulty with actual search time 
+
+search_correlation <- search_summary_RT %>% 
+  filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'|
+           search_type=='CinO' & set_size=='25' & target_present=='FALSE'|
+           search_type=='OinC' & set_size=='9' & target_present=='TRUE'|
+           search_type=='OinC' & set_size=='25' & target_present=='TRUE') %>%  
+  mutate(target_present =case_when(target_present=='TRUE' ~ 'TP',
+                                                                                                            target_present=='FALSE' ~ 'TA')) %>% 
+  unite('difficulty_rating', c(search_type, set_size, target_present), remove = F)
+
+search_correlation <- left_join(search_correlation, difficulty_rating %>% select(-OCI_quantile))
+# by="subj_id")
+
+search_correlation_wide <- search_correlation %>%
+  select(subj_id, set_size, search_type, target_present, OCI_quantile, median_RT, response) %>% 
+  filter(OCI_quantile==1 | OCI_quantile ==4) %>% 
+  pivot_wider(
+    names_from = c(search_type, target_present, set_size),
+    values_from = c(median_RT, response))
+
+
+#plot mean RT with perceived difficulty in one figure 
+
+p1<-
+search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = median_RT, fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+  
+ 
+p2<-  
+search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  #group_by(set_size, target_present) %>% 
+  #summarise(mean_RT=mean(median_RT)) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Perceived Difficulty', x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+p3<-
+search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = median_RT, fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Mean RT (ms)',x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+p4<-
+search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  #group_by(set_size, target_present) %>% 
+  #summarise(mean_RT=mean(median_RT)) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill=target_present)) +
+  stat_summary(fun = mean, 
+               geom='col',
+               position=position_dodge(0.9),
+               alpha = 0.6,)+
+  stat_summary(fun.data = mean_se,
+               geom='errorbar',
+               position=position_dodge(0.9), 
+               width=0.4)+
+  labs(y='Perceived Difficulty', x='Set Size')+
+  guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
+  scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
+  theme(axis.title.y = element_blank())
+  theme_bw()
+
+
+commonplot <-ggarrange(p1, p2, p3, p4, common.legend = T)
+
+
+
+row1 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="High OC", angle = 90) + theme_void() 
+
+row2 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Low OC", angle = 90) + theme_void() 
+
+col1 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Mean RT (ms)") + theme_void() 
+
+col2 <- ggplot() + annotate(geom = 'text', x=1, y=1, label="Perceived difficulty") + theme_void() 
+
+layoutplot <- "
+#cccddd
+aeeefff
+aeeefff
+bggghhh
+bggghhh
+"
+
+plotlist <- list(a = row1, b = row2, c = col1, d = col2, e= p1, f=p2, g=p3, h=p4)
+
+wrap_plots(plotlist, guides = 'collect', design = layoutplot) 
+
+#ggsave(filename = "difficulty_RT.png",width = 8, height = 6, dpi = 1000)  
+
+
+
+```
+
+
+
+

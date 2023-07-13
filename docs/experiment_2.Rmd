@@ -65,36 +65,36 @@ In Experiment 1, target-absent search times were not significantly slower in OC+
 # Pre processing  ---------------------------------------------------------
 
 #load df from jatos 
-jatos_df <-read_csv("../data/Exp_2_anon_jatos_results_10July2023.csv")
+exp2.jatos_df <-read_csv("../data/Exp_2_anon_jatos_results_10July2023.csv")
 
 
-failed_practice <- jatos_df %>% 
+failed_practice <- exp2.jatos_df %>% 
   filter(trial_index != "trial_index") %>%
   group_by(subj_id) %>% 
   summarise(max_trail = max(as.double(trial_index, na.rm = T)),
             failed_practice = max_trail <= 42) %>% 
   select(subj_id, max_trail,failed_practice)  
 
-jatos_df <- left_join(jatos_df, failed_practice)
+exp2.jatos_df <- left_join(exp2.jatos_df, failed_practice)
 
 n_failed_practice <- failed_practice %>% pull(failed_practice) %>% sum()
 
-total_valid_n <- jatos_df %>%
+total_valid_n <- exp2.jatos_df %>%
   filter(failed_practice=='FALSE') %>%
   pull(subj_id) %>%  n_distinct()
 
 
 #load prolific df 
-demo_prolific<-read.csv("../data/Ex2_anon_demo_prolific.csv")
-demo_prolific$subj_id <- as.factor(demo_prolific$subj_id)
+exp2.demo_prolific<-read.csv("../data/Ex2_anon_demo_prolific.csv")
+exp2.demo_prolific$subj_id <- as.factor(exp2.demo_prolific$subj_id)
 
 #merge df
-jatos_df$subj_id <- as.factor(jatos_df$subj_id)
-jatos_df <- left_join(jatos_df, demo_prolific, by='subj_id')
+exp2.jatos_df$subj_id <- as.factor(exp2.jatos_df$subj_id)
+exp2.jatos_df <- left_join(exp2.jatos_df, exp2.demo_prolific, by='subj_id')
 
 
 #parse oci data from df 
-OCI_df <- jatos_df %>%
+exp2.OCI_df <- exp2.jatos_df %>%
   filter(failed_practice=='FALSE') %>% 
   filter(grepl('oci', Identifier)) %>% 
   select(subj_id, question, answer_oci) %>% 
@@ -113,37 +113,37 @@ OCI_df <- jatos_df %>%
                              TRUE ~ 'else'))
 
 #count how many participants in each group 
-OCI_df %>% group_by(OCI_quantile) %>% count()
+exp2.OCI_df %>% group_by(OCI_quantile) %>% count()
 
 
 # merge data with oci 
-jatos_df <- left_join(jatos_df, 
-                      OCI_df %>% select(subj_id, oci_overall, OCI_quantile, OCI_Absent),
+exp2.jatos_df <- left_join(exp2.jatos_df, 
+                      exp2.OCI_df %>% select(subj_id, oci_overall, OCI_quantile, OCI_Absent),
                       by='subj_id')
 
 ############ create a df for the checking task 
 
-checking_task <- jatos_df %>% 
+exp2.checking_task <- exp2.jatos_df %>% 
   filter(trial_type == "image-keyboard-response") %>%
   filter(isPractice=='FALSE') %>% 
   select(trial_type,trial_index,subj_id,condition,
          rt,correct, isPractice, OCI_quantile, oci_overall, OCI_Absent)
 
 #create a table making sure every participant have 50 trials, 25 absent and 25 present 
-checking_table <-checking_task %>% group_by(subj_id) %>% 
+checking_table <-exp2.checking_task %>% group_by(subj_id) %>% 
   count(condition)
 
 #recode variable
-checking_task$rt <-as.numeric(checking_task$rt)
+exp2.checking_task$rt <-as.numeric(exp2.checking_task$rt)
 
 # accuracy df  -----------------------------------------------------------
-checking_task$correct <- checking_task$correct=='TRUE' #change to Boolean 
+exp2.checking_task$correct <- exp2.checking_task$correct=='TRUE' #change to Boolean 
 
-checking_task <- checking_task %>% group_by(subj_id) %>% 
+exp2.checking_task <- exp2.checking_task %>% group_by(subj_id) %>% 
   mutate(mean_acc = mean(correct)) #calculate mean accuracy per subject 
 
 #create accuracy df with acc score and OCI group per subject 
-acc_data_frame <- checking_task %>% 
+acc_data_frame <- exp2.checking_task %>% 
   group_by(subj_id) %>% select(subj_id, mean_acc, OCI_quantile) %>% slice(1)
 
 #Create variables of accuracy in standard deviation units to exclude participants 
@@ -162,13 +162,13 @@ round(sd(acc_data_frame$Zscore), 2)
 acc_data_frame$remove <-acc_data_frame$Zscore<(-2.5)
 
 #merge acc df with the checking df 
-checking_task <- left_join(checking_task, acc_data_frame)
+exp2.checking_task <- left_join(exp2.checking_task, acc_data_frame)
 
 #remove participants who had more than Z>-2.5 errors. Three participants are removed. 
-checking_task <-checking_task %>%
+exp2.checking_task <-exp2.checking_task %>%
   filter(remove=='FALSE')
 
- checking_by_sub <- checking_task %>% 
+ checking_by_sub <- exp2.checking_task %>% 
   filter(OCI_quantile!='else') %>% 
   group_by(subj_id, condition, OCI_quantile,
            oci_overall) %>%
@@ -241,7 +241,7 @@ select(subj_id, target_present, oci_type, mean_RT)  %>%
 # make a planned contrast df in which every participant has one raw with a difference score of the mean 
 #target absent search time minus the mean target present search time. 
 
-planned_df <- checking_task %>% 
+planned_df <- exp2.checking_task %>% 
   filter(rt!='null') %>%   filter(OCI_quantile!='else') %>% 
   group_by(subj_id, condition, OCI_quantile, oci_overall) %>% 
   summarise(mean_RT =mean(rt))%>% ungroup
@@ -263,11 +263,11 @@ Exp2_H1_desc <-planned_df %>% group_by(condition) %>% summarise(mean_rt=mean(mea
 ```
 
 *Hypothesis 1 - Task validation*  
-To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))` with `r printnum(Exp2_H1_desc[2 ,2])` ms for target-present responses and `r printnum(Exp2_H1_desc[1 ,2])` ms for target-absent responses. 
+To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic` with `r printnum(Exp2_H1_desc[2 ,2])` ms for target-present responses and `r printnum(Exp2_H1_desc[1 ,2])` ms for target-absent responses. 
 
 
 *Hypothesis 2 - Direct replication* 
-The primary aim of experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). We conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable, expecting a greater difference score for the OC+ group. The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))`, providing no evidence for the expected interaction.
+The primary aim of experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). We conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable, expecting a greater difference score for the OC+ group. The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction.
 
 
 # Discussion
