@@ -2,7 +2,9 @@
 
 See OSF preregistration [here](https://osf.io/yxqu9).
 
-You can try the experiment by clicking [here](https://jatos.mindprobe.eu/publix/ODUWXaYuNlI).
+You can try experiment 1 by clicking [here](https://jatos.mindprobe.eu/publix/ODUWXaYuNlI).
+
+You can try experiment 2 by clicking [here](https://jatos.mindprobe.eu/publix/Qkm6hi2c3vS).
 
 Fully-anonymized experimental data is available [here](https://github.com/Noamsarna/ocd_visual_search/tree/main/data).
 
