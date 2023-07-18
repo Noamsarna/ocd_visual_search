@@ -45,6 +45,8 @@ search_slopes_df_first_t <- first_trials_df %>%
   filter(test_part=='first_two_trials')
 
 #figure
+
+
   search_df %>% 
   filter(test_part=='first_two_trials') %>% 
   filter(OCI_quantile==1|OCI_quantile==4) %>% 
@@ -78,9 +80,9 @@ m3 <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present
                data = search_slopes_df)
 
 
-parameters::model_parameters(m3)
+prm_m3 <- parameters::model_parameters(m3)
 
-compare_accuracy(m2, m3)
+acc_table_m2_m3 <- compare_accuracy(m2, m3)
 ```
 
 *Hypothesis 9: Correlations between OC tendencies and search slopes.* 
@@ -93,7 +95,7 @@ m4 <-lmer(estimate ~ 1+search_type * target_present +target_present *OCI_quantil
               (search_type+target_present|subj_id),#random slope for search type and target present for each participant 
                data = search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4))
 
-parameters::model_parameters(m4)
+prm_m4 <- parameters::model_parameters(m4)
 ```
 
 *Hypothesis 10:  Controlling for depression and anxiety* 
@@ -118,7 +120,6 @@ m_difficulty <- difficulty_rating %>%
                (1+set_size+condition|subj_id), #random intercept for each subject with random slope for set size and condition. 
                data =.)
 
-summary(m_difficulty)
 
 #create a df for correlating perceived difficulty with actual search time 
 
@@ -160,7 +161,7 @@ search_correlation %>%
   guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
   scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
   theme(axis.title.y = element_blank())
-  theme_bw()
+
   
  
 p2<-  
@@ -181,7 +182,7 @@ search_correlation %>%
   guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
   scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
   theme(axis.title.y = element_blank())
-  theme_bw()
+
 
 
 p3<-
@@ -200,7 +201,7 @@ search_correlation %>%
   guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
   scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
   theme(axis.title.y = element_blank())
-  theme_bw()
+
 
 
 p4<-
@@ -221,7 +222,7 @@ search_correlation %>%
   guides(fill = guide_legend(title = "Trial type",override.aes = aes(label = "")))+
   scale_fill_manual(labels=c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1"))+
   theme(axis.title.y = element_blank())
-  theme_bw()
+  
 
 
 commonplot <-ggarrange(p1, p2, p3, p4, common.legend = T)

@@ -39,6 +39,7 @@ footnotelist      : no
 
 classoption       : "man"
 output            : papaja::apa6_word
+appendix          : appendix.rmd
 ---
 
 ```{r setup, include = FALSE, warning=FALSE}
@@ -667,3 +668,12 @@ The primary aim of experiment 2 was to examine the interaction between group (OC
 ---
 appendix: "appendix.Rmd"
 ---
+
+
+\newpage
+
+# (APPENDIX) Appendix {-}
+
+```{r child = "appendix.rmd"}
+```
+
