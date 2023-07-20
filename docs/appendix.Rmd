@@ -76,17 +76,21 @@ In this analysis, we focused on the two first trials of each search type. These 
   
 ```{r H9_full_range}
 
-m3 <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+ (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+m3 <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+ 
+            (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
                data = search_slopes_df)
 
 
-prm_m3 <- parameters::model_parameters(m3)
+prm_m3 <- parameters::model_parameters(m3, ci_method= 's')
+#I don't know how to report the interaction using apa print function. 
 
-acc_table_m2_m3 <- compare_accuracy(m2, m3)
+
+H9.model_acc_table <-as.data.frame(compare_accuracy(m2, m3))  %>% 
+  select(Model, AIC, BIC) 
 ```
 
 *Hypothesis 9: Correlations between OC tendencies and search slopes.* 
- 	In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) by incorporating the entire spectrum of OC scores (raw OCI scores). We employed a mixed-effects regression model, analogous to M2 in hypothesis 6, but utilizing the complete range of total OCI scores rather than solely the top and bottom quartiles. First, the interaction between search type and total OCI score is not significant (model parameters table). Second, model performance was compared using their AIC and BIC values. The model comparison table reveals that the model featuring the full range of OCI scores (M3) exhibits substantially higher AIC and BIC values than the model with the two OC groups (M2), suggesting that adding the full range of OCI scores, does not contribute to explaining the variance in search slopes.
+ 	In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) by incorporating the entire spectrum of OC scores (raw OCI scores). We employed a mixed-effects regression model, analogous to M2 in hypothesis 6, but utilizing the complete range of total OCI scores rather than solely the top and bottom quartiles. First, the interaction between search type and total OCI score remained not significant (b= 0.90, SE=1.27, 95% CI [-1.59, 3.39] , t(929.24)= 0.71 p= .477. Second, model performance was compared using their AIC and BIC values. The model comparison table reveals that the model featuring the full range of OCI scores (M3) exhibits substantially higher AIC and BIC values than the model with the two OC groups (M2), suggesting that adding the full range of OCI scores, does not contribute to explaining the variance in search slopes.
 
 ```{r DASS_mediation, echo=FALSE, cache=TRUE}
 
@@ -95,11 +99,11 @@ m4 <-lmer(estimate ~ 1+search_type * target_present +target_present *OCI_quantil
               (search_type+target_present|subj_id),#random slope for search type and target present for each participant 
                data = search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4))
 
-prm_m4 <- parameters::model_parameters(m4)
+prm_m4 <- parameters::model_parameters(m4, ci_method= 's')
 ```
 
 *Hypothesis 10:  Controlling for depression and anxiety* 
-Finally, in order to test the possible effects of depression and anxiety, we added DASS subscales of depression and anxiety scores as predictors into our model. We used a mixed-effects regression model identical to the second model in hypothesis 6, except for the addition of depression and anxiety as predictors. The interaction between group and target presence remained below the significance threshold after adding depression and anxiety to the model (see model parameters table).   
+Finally, in order to test the possible effects of depression and anxiety, we added DASS subscales of depression and anxiety scores as predictors into our model. We used a mixed-effects regression model identical to the second model in hypothesis 6, except for the addition of depression and anxiety as predictors. The interaction between group and target presence remained below the significance threshold after adding depression and anxiety to the model (b= 19.77, SE=15.67, 95% CI [-11.01, 50.56] , t(458.97)= 1.26 p= .207).   
 
 *Exploratory analysis - Measuring the perceived difficulty of participants* 
 In order to compare explicit metacognitive knowledge with behavior, we collected perceived difficulty ratings for the different search tasks. A discrepancy between perceived difficulty and task performance in the OC+ group would suggest a dissociation between action and knowledge, in line with previous findings (Vaghi et al., 2017, 2019). We examined two search types: target-absent easy searches and target-present hard searches, with set sizes of 9 and 25. For both groups, discrepancies between perceived difficulty and mean response time were observed in the same direction: despite slower search times in easy target-absent searches, these searches were perceived as easier than hard target-present trials.

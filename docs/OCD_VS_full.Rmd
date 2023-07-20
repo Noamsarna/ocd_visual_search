@@ -412,7 +412,7 @@ m1 <-
         data =.)
 
 #examine model parameters 
-#parameters::model_parameters(m1)
+#parameters::model_parameters(m1, ci_method= 's')
 
 
 
@@ -426,11 +426,11 @@ m2 <-
         data = .)
 
 #examine model parameters 
-#parameters::model_parameters(m2)
+#parameters::model_parameters(m2, ci_method= 's')
 
 
 H6.model_acc_table <-as.data.frame(compare_accuracy(m1, m2))  %>% 
-  select(Model, AIC, BIC)
+  select(Model, AIC, BIC) 
 
 H6.model_acc_table
 
