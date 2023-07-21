@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>visual_search</title>
+  <script src="jquery/jquery.min.js"></script>
+  <script src="jspsych-6.1.0/jspsych.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-p5vs_yn.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-p5vs_yn_small_grid.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-p5text.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-call-function.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-external-html.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-free-sort.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-html-slider-response.js"></script>
+  <script src="p5/p5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Corben&family=Quicksand&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  </link>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
+
+<body></body>
+<script>
+
+
+  //load images 
+  var images_to_preload = [
+    'stimuli/keyboard_layout.png',
+    'stimuli/T.png',
+    'stimuli/closed_sqaure.png',
+    'stimuli/open_sqaure_right.png',
+    'stimuli/marked/practice_absent.png',
+    'stimuli/newStim/PresentOinC25.png',
+    'stimuli//newStim/PresentOinC09.png',
+    'stimuli//newStim/Absent25.png',
+    'stimuli/newStim/Absent09.png'
+  ]
+
+
+  //These are the coordinates for drawing all the squares 
+  var buttomOpen = [5, 17, 5, 17]
+  var topOpen = [5, -7, 5, -7]
+  var leftOpen = [-7, 5, -7, 5]
+  var rightOpen = [17, 5, 17, 5]
+  var listOfCoordinates = [];
+  listOfCoordinates.push(buttomOpen);
+  listOfCoordinates.push(topOpen);
+  listOfCoordinates.push(leftOpen);
+  listOfCoordinates.push(rightOpen);
+  var random = Math.floor(Math.random() * listOfCoordinates.length);
+
+  var randomX = [];
+  var randomY = [];
+
+
+  for (var i = 0; i < 25; i++) {
+    randomX.push(Math.random());
+    randomY.push(Math.random());
+  }
+
+  window.practice_loop = 0;
+  window.followed_instructions = true;
+
+  function makeTimeline() {
+
+    timeline = [];
+
+    timeline.push({
+      type: 'fullscreen',
+      fullscreen_mode: true
+    });
+
+    // Instructions
+    var instructions = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>Welcome to the experiment! Click next or use the space bar to move to the next screen.',
+          '<p> This experiment comprises three parts: A visual search part, questions about the visual search part, and some more general questions.</p>',
+          '<p>The main part of the experiment will be the visual search part, in which you will search for one target shape among other shapes, ' +
+          'presented in a square.</p>',
+          '<p>Click on the <strong>J</strong> key if the target shape is in the square, or on the <strong>F</strong> ' +
+          'key if it is not there. Be accurate and quick!</p>',
+          '<p>For your convenience, we suggest you position your ' +
+          'hands like this:</p></br><img src="stimuli/keyboard_layout.png" width="40%" class="center">',
+          '<p>Before each trial, a plus sign "+" will apear in the middle of the screen, try focusing your gaze on it.</p>',
+          '<p>Let\'s start with a few practice trials, ' +
+          'in which you will be searching for a T: </p>' +
+          '<p></br><img src="stimuli/T.png" width="7%" class="center"</p>' +
+          '<p></br>Pay attention, your target can apear rotated.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    }
+
+    timeline.push(instructions)
+
+    var drawT = function (p, t, du, randomNumber, randX, randY) {
+      p.scale(0.5)
+      p.translate(randX * 35, randY * 35)
+      var dir1 = {
+        line1: [-du / 20, 0, du / 20, 0],
+        line2: [-du / 20, -du / 20, -du / 20, du / 20]
+      }
+      var dir2 = {
+        line1: [-du / 20, 0, du / 20, 0],
+        line2: [du / 20, -du / 20, du / 20, du / 20]
+      }
+
+      var dir3 = {
+        line1: [-du / 20, du / 20, du / 20, du / 20],
+        line2: [0, -du / 20, 0, du / 20]
+      }
+
+      var dir4 = {
+        line1: [-du / 20, -du / 20, du / 20, -du / 20],
+        line2: [0, -du / 20, 0, du / 20]
+      }
+
+      var dir = [dir1, dir2, dir3, dir4][randomNumber]
+      //console.log(dir)
+      p.strokeWeight(3)
+      p.stroke('white')
+      p.line(dir.line1[0], dir.line1[1], dir.line1[2], dir.line1[3])
+      p.line(dir.line2[0], dir.line2[1], dir.line2[2], dir.line2[3])
+    }
+
+    var drawL = function (p, t, du, randomNumber, randX, randY) {
+      p.scale(0.5)
+      p.translate(randX * 35, randY * 35)
+      var dir1 = {
+        line1: [-du / 20, du / 20, -du / 20, -du / 20],
+        line2: [-du / 20, -du / 20, du / 20, -du / 20]
+      }
+      var dir2 = {
+        line1: [du / 20, du / 20, du / 20, -du / 20],
+        line2: [-du / 20, -du / 20, du / 20, -du / 20]
+      }
+
+      var dir3 = {
+        line1: [-du / 20, du / 20, -du / 20, -du / 20],
+        line2: [-du / 20, du / 20, du / 20, du / 20]
+      }
+
+      var dir4 = {
+        line1: [du / 20, du / 20, du / 20, -du / 20],
+        line2: [-du / 20, du / 20, du / 20, du / 20]
+      }
+
+      var dir = [dir1, dir2, dir3, dir4][randomNumber]
+      //console.log(dir)
+      p.strokeWeight(3)
+      p.stroke('white')
+      p.line(dir.line1[0], dir.line1[1], dir.line1[2], dir.line1[3])
+      p.line(dir.line2[0], dir.line2[1], dir.line2[2], dir.line2[3])
+    }
+
+
+    var drawC = function (p, m, du, randomNumber, randomX, randomY) {
+
+      // console.log(p)
+      // console.log(m)
+      // console.log(du)
+      p.scale(0.5)
+      p.translate(35 * randomX, 35 * randomY)
+      var xxx = Math.floor(Math.random() * listOfCoordinates.length);
+      var ang = [0, 90, 180, 270][xxx]
+      var x = 5
+      var y = 5
+      var height = 25
+      var width = 25
+      var radios = 6
+
+      p.noFill();
+      // p.stroke(0);
+      p.strokeWeight(3);
+      p.stroke(255)
+      p.rect(x, y, height, width, radios);
+      p.strokeWeight(7);
+      //p.stroke(0);
+      p.stroke(100)
+      //p.line(5, 17, 5, 17)
+
+      p.line(listOfCoordinates[randomNumber][0], listOfCoordinates[randomNumber][1], listOfCoordinates[randomNumber][2], listOfCoordinates[randomNumber][3]); //I know these is a more elegent way to create this. 
+      p.stroke(100)
+    }
+
+    //coordinates for sqaure open in the buttom part: (5, 17, 5, 17), top part - (5, -7, 5.5, -7)  right - (17, 5, 17, 5), left (-7, 5, -7, 5)
+
+    var drawO = function (p, millis, du, randNumber, randx, randY) {
+      p.scale(0.5)
+      p.translate(randx * 35, randY * 35)
+      var x = 5
+      var y = 5
+      var height = 25
+      var width = 25
+      var radios = 6
+      p.fill(100)
+      p.stroke(0, 0, 0);
+      p.stroke(255)
+      p.strokeWeight(3);
+      p.rect(x, y, height, width, radios);
+    }
+
+
+    var vs_trial_practice = {
+      type: "p5vs_yn",
+      target_function: jsPsych.timelineVariable('target_function'),
+      distractor_function: jsPsych.timelineVariable('distractor_function'),
+      set_size: jsPsych.timelineVariable('set_size'),
+      target_present: jsPsych.timelineVariable('target_present'),
+      isCTarget: jsPsych.timelineVariable("isCTarget"),
+      isCDistractor: jsPsych.timelineVariable("isCDistractor"),
+      set_size: jsPsych.timelineVariable('set_size'),
+      is_practice_for_c_trials: true,
+      trial_duration: 10000,
+      random_x: randomX,
+      random_y: randomY,
+      on_finish: function (data) {
+        data.correct = data.response == data.correct_response;
+      },
+      data: jsPsych.timelineVariable('data')
+    };
+
+    var vs_trial_test = {
+      type: "p5vs_yn_small_grid",
+      target_function: jsPsych.timelineVariable('target_function'),
+      distractor_function: jsPsych.timelineVariable('distractor_function'),
+      set_size: jsPsych.timelineVariable('set_size'),
+      target_present: jsPsych.timelineVariable('target_present'),
+      set_size: jsPsych.timelineVariable('set_size'),
+      isCTarget: jsPsych.timelineVariable("isCTarget"),
+      isCDistractor: jsPsych.timelineVariable("isCDistractor"),
+      trial_duration: 10000,
+      random_x: randomX,
+      random_y: randomY,
+      on_finish: function (data) {
+        data.correct = data.response == data.correct_response;
+      },
+      data: jsPsych.timelineVariable('data')
+    };
+
+    var feedback = {
+      type: 'html-keyboard-response',
+      stimulus: function () {
+        var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+        if (last_trial_correct) {
+          return "<div style=\"width:150px;height:56px;font-size:30px;text-align:center;\">Correct!</div>";
+        } else {
+          return "<div style=\"width:150px;height:56px;border:0px;font-size:30px;text-align:center\">Wrong.</div>"
+        }
+      },
+      trial_duration: function () {
+        var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+        if (last_trial_correct) {
+          return 1000;
+        } else {
+          return 5000
+        }
+      },
+      response_ends_trial: false
+    }
+
+    var presence_array = [[false, 'f'], [true, 'j']]
+
+    practice_vars = [
+
+      {
+        target_present: true,
+        set_size: 4,
+        target_function: drawT,
+        distractor_function: drawL,
+        data: {
+          correct_response: 'j',
+          test_part: 'practice'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 4,
+        target_function: drawT,
+        distractor_function: drawL,
+        data: {
+          correct_response: 'f',
+          test_part: 'practice'
+        },
+      }
+    ]
+
+    var practice = {
+      timeline: [vs_trial_practice, feedback],
+      timeline_variables: practice_vars,
+      repetitions: 3,
+      randomize_order: true
+    }
+
+
+    var introduce_vs = {
+      type: "p5Text",
+      title: 'Let\'s try again',
+      text: function () {
+        var trials = jsPsych.data.get().last(12).filter({ test_part: 'practice' });
+        var num_correct = trials.filter({ correct: true }).count();
+        var mean_RT = trials.select('RT').mean() / 1000;
+        return "You got " + num_correct + " searches right out of 6, and your average " +
+          "response time was " + mean_RT.toPrecision(2) + " seconds. Let's try again. Your task is to decide " +
+          "whether a 'T' appears inside a square or not. Keep in mind - the 'T' can apear rotated. " +
+          "Press 'J' for 'yes' and 'F' for 'no'. You will only use your keyboard for this challenge, so " +
+          "we recommend placing your right and left index fingers on the 'J' and 'F' keys.\n" +
+          "Be accurate and quick."
+      }
+    };
+
+    var practice_loop_node = {
+      timeline: [{ timeline: [introduce_vs], conditional_function: function () { return window.practice_loop > 0 } }, practice],
+      loop_function: function (data) {
+        // get the data from the previous trial,
+        // and check which key was pressed
+        var num_correct = data.filter({ correct: true }).count();
+        if (num_correct > 4) {
+          return false;
+        } else {
+          window.practice_loop++
+          return true;
+        }
+      }
+    }
+
+
+    // Instructions
+    var main_part_instructions = {
+      type: 'instructions',
+      pages: function () {
+        var trials = jsPsych.data.get().last(12).filter({ test_part: 'practice' });
+        var num_correct = trials.filter({ correct: true }).count();
+        var mean_RT = trials.select('RT').mean() / 1000;
+
+        return [
+          '<p>Excellent. ' +
+          "You got " + num_correct + " searches right out of 6, and your average " +
+          "response time was " + mean_RT.toPrecision(2) + " seconds. " +
+          'We are now ready to move on to the main part of the experiment.</p>',
+          '<p>The visual search part includes four separate blocks with 24 searches each. ' +
+          'After completing two blocks, you will have a short break. </p>',
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    }
+
+    timeline.push(practice_loop_node)
+    timeline.push(main_part_instructions)
+
+
+    var first_instructions_seq_1 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>In the next round, this is going to be your target, a closed square:</p>' +
+          '<p></br><img src="stimuli/closed_sqaure.png" width="7%" class="center"</p>',
+          '<p>And this is going to be the distractor, an open square:</p>' +
+          '<p></br><img src="stimuli/open_sqaure_right.png" width="6%" class="center"</p>' +
+          '<p></br>Pay Attention, the open square can apear rotated.<p>',
+
+          '<p></br>Click on the <strong>J</strong> key if the target is <u>in</u> the search area, or on the <strong>F</strong> ' +
+          'key if it is <u>not</u> there.</p>',
+          '<p>You will perform 24 searches of searching for a closed square among open squares.</p>',
+          "<p></br>Please notice, from now on, you won't get feedback on your responce.</p>" +
+          '<p></br>Be accurate and quick! Good luck.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+    var first_instructions_seq_2 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>In the next round, this is going to be your target, an open square: </p>' +
+          '<p></br><img src="stimuli/open_sqaure_right.png" width="6%" class="center"</p>' +
+          '<p></br>Pay Attention, the open square can apear rotated.</p>',
+          '<p>This is going to be the distractor, a closed square:</p>' +
+          '<p></br><img src="stimuli/closed_sqaure.png" width="7%" class="center"</p>',
+          '<p>Click on the <strong>J</strong> key if the target is <u>in</u> the search area, or on the <strong>F</strong> ' +
+          'key if it is <u>not</u> there.</p>',
+          '<p>You will perform 24 searches of searching for a rotated open square among closed squares.</p>',
+          "<p></br>Please notice, from now on, you won't get feedback on your responce.</p>" +
+          '<p></br>Be accurate and quick! Good luck.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+    block_OinC = [
+
+      {
+        target_present: true,
+        set_size: 9,
+        target_function: drawO,
+        distractor_function: drawC,
+        isCTarget: false,
+        isCDistractor: true,
+        data: {
+          correct_response: 'j',
+          test_part: 'Block_OinC',
+          search_type: 'OinC'
+        },
+      },
+      {
+        target_present: true,
+        set_size: 25,
+        target_function: drawO,
+        distractor_function: drawC,
+        isCTarget: false,
+        isCDistractor: true,
+        data: {
+          correct_response: 'j',
+          test_part: 'Block_OinC',
+          search_type: 'OinC'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 9,
+        target_function: drawO,
+        distractor_function: drawC,
+        isCTarget: false,
+        isCDistractor: true,
+        data: {
+          correct_response: 'f',
+          test_part: 'Block_OinC',
+          search_type: 'OinC'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 25,
+        target_function: drawO,
+        distractor_function: drawC,
+        isCTarget: false,
+        isCDistractor: true,
+        data: {
+          correct_response: 'f',
+          test_part: 'Block_OinC',
+          search_type: 'OinC'
+        },
+      }
+    ];
+
+    block_CinO = [
+
+      {
+        target_present: true,
+        set_size: 9,
+        target_function: drawC,
+        distractor_function: drawO,
+        isCTarget: true,
+        isCDistractor: false,
+        data: {
+          correct_response: 'j',
+          test_part: 'Block_CinO',
+          search_type: 'CinO'
+        },
+      },
+      {
+        target_present: true,
+        set_size: 25,
+        target_function: drawC,
+        distractor_function: drawO,
+        isCTarget: true,
+        isCDistractor: false,
+        data: {
+          correct_response: 'j',
+          test_part: 'Block_CinO',
+          search_type: 'CinO'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 9,
+        target_function: drawC,
+        distractor_function: drawO,
+        isCTarget: true,
+        isCDistractor: false,
+        data: {
+          correct_response: 'f',
+          test_part: 'Block_CinO',
+          search_type: 'CinO'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 25,
+        target_function: drawC,
+        distractor_function: drawO,
+        isCTarget: true,
+        isCDistractor: false,
+        data: {
+          correct_response: 'f',
+          test_part: 'Block_CinO',
+          search_type: 'CinO'
+        },
+      }
+    ];
+
+
+    block_CinO_first_trials = [
+      {
+        target_present: false,
+        set_size: 9,
+        target_function: drawC,
+        distractor_function: drawO,
+        isCTarget: true,
+        isCDistractor: false,
+        data: {
+          correct_response: 'f',
+          test_part: 'first_two_trials',
+          search_type: 'CinO'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 25,
+        target_function: drawC,
+        distractor_function: drawO,
+        isCTarget: true,
+        isCDistractor: false,
+        data: {
+          correct_response: 'f',
+          test_part: 'first_two_trials',
+          search_type: 'CinO'
+        },
+      }
+    ];
+
+
+    block_OinC_first_trials = [
+      {
+        target_present: false,
+        set_size: 9,
+        target_function: drawO,
+        distractor_function: drawC,
+        isCTarget: false,
+        isCDistractor: true,
+        data: {
+          correct_response: 'f',
+          test_part: 'first_two_trials',
+          search_type: 'OinC'
+        },
+      },
+      {
+        target_present: false,
+        set_size: 25,
+        target_function: drawO,
+        distractor_function: drawC,
+        isCTarget: false,
+        isCDistractor: true,
+        data: {
+          correct_response: 'f',
+          test_part: 'first_two_trials',
+          search_type: 'OinC'
+        },
+      }
+    ];
+
+
+    //This function is used for creating a random sequence in the first block 
+    function shuffle(array) {
+      var currentIndex = array.length, randomIndex;
+
+      // While there remain elements to shuffle...
+      while (currentIndex != 0) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+
+      return array;
+    }
+
+    var block_OinC_first_trials_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_OinC_first_trials,
+      randomize_order: true
+    }
+
+
+    var block_CinO_first_trials_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_CinO_first_trials,
+      randomize_order: true
+    }
+
+    var block_1_OinC_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_OinC,
+      sample: {
+        type: 'custom',
+        fn: function (t) {
+          var x = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
+          //short list: [0, 1, 2, 3]
+          x = shuffle(x)
+          return (x);
+        }
+      },
+      randomize_order: true
+    }
+
+
+    var block_1_CinO_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_CinO,
+      sample: {
+        type: 'custom',
+        fn: function (t) {
+          var x = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
+          //full list: [0, 1, 2, 3]
+          x = shuffle(x)
+          //console.log("===================")
+          //console.log(x)
+          return (x);
+        }
+      },
+      randomize_order: true
+    }
+
+
+
+    var block_3_OinC_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_OinC,
+      sample: {
+        type: 'custom',
+        fn: function (t) {
+          var x = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
+          //short list: [0, 1, 2, 3]
+          x = shuffle(x)
+          return (x);
+        }
+      },
+      randomize_order: true
+    }
+
+
+
+
+    var block_3_CinO_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_CinO,
+      sample: {
+        type: 'custom',
+        fn: function (t) {
+          var x = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
+          //full list: [0, 1, 2, 3]
+          x = shuffle(x)
+          //console.log("===================")
+          //console.log(x)
+          return (x);
+        }
+      },
+      randomize_order: true
+    }
+
+
+    var first_block_completion_seq_1 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Good job! You have completed the first block of the experiment. You have three more to go. </p>',
+          "<p> In this block you will perform 24 searches of searching for a <strong>closed square:</strong> " +
+          '<p></br><img src="stimuli/closed_sqaure.png" width="7%" class="center"</p>' +
+          '<p></br>Click on the <strong>J</strong> key if the target is in the search area, or on the <strong>F</strong> ' +
+          'key if it is not there.</p>',
+          '<p></br>As before be accurate and quick! Click on next/spacebar to start. </p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+    var first_block_completion_seq_2 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Good job! You have completed the first block of the experiment. You have three more to go. </p>',
+          '<p> In this block you will perform 24 searches of searching for an <strong>open square</strong>: ' +
+          '<p></br><img src="stimuli/open_sqaure_right.png" width="6%" class="center"</p>' +
+          '<p></br>Keep in mind that as before, the open square can apear rotated.</p>',
+          '<p>Click on the <strong>J</strong> key if the target is in the search area, or on the <strong>F</strong> ' +
+          'key if it is not there.</p>',
+          '<p>Be accurate and quick! Click on next/spacebar to start. </p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+    var block_CinO_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_CinO,
+      repetitions: 6,
+      randomize_order: true
+    }
+
+
+    var second_block_completion_seq_1 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Good job! You have completed the second block of the experiment. You have two more to go. </p>',
+          '<p> Before you continue, we suggest that you take a short break. You can let your eyes rest for a moment and take a few breaths. ' +
+          'When you are ready click on next/spacebar to move to the next block. </p>',
+          '<p> <h1>Target change!</h1></p> ' +
+          "<p>In this block you will perform 24 searches of searching for an <strong>open square</strong>. Notice that now the target is different, you'll be searching for an <strong>open square</strong>, like this:</p>" +
+          '<p></br><img src="stimuli/open_sqaure_right.png" width="6%" class="center"</p>' +
+          '<p></br>Pay Attention, the open square can apear rotated. </p>',
+          '<p>This is going to be the distractor, a closed square: </p>' +
+          '<p></br><img src="stimuli/closed_sqaure.png" width="7%" class="center"</p>',
+
+          '<p></br>Click on the <strong>J</strong> key if the target is <u>in</u> the search area, or on the <strong>F</strong> ' +
+          'key if it is <u>not</u> there.</p>',
+          '<p></br>As always be accurate and quick! Click on next/spacebar to start.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+    var second_block_completion_seq_2 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Good job! You have completed the second block of the experiment. You have two more to go. </p>',
+          '<p> Before you continue, we suggest that you take a short break. You can let your eyes rest for a moment and take a few breaths. ' +
+          'When you are ready click on next/spacebar to move to the next block. </p>',
+          '<p> <h1>Target change!</h1></p>' +
+          '<p> In this block you will perform 24 searches of searching for a <strong>closed square</strong>, like this:</p>' +
+          '<p></br><img src="stimuli/closed_sqaure.png" width="7%" class="center"</p>' +
+          "<p></br> Notice that now the target is different: you'll be searching for a <strong>closed square</strong>.",
+          '<p>This is going to be the distractor, an open square: </p>' +
+          '<p></br><img src="stimuli/open_sqaure_right.png" width="6%" class="center"</p>' +
+          '<p></br>Pay Attention, the open square can apear rotated. </p>',
+          '<p></br>Click on the <strong>J</strong> key if the target is <u>in</u> the search area, or on the <strong>F</strong> ' +
+          'key if it is <u>not</u> there.</p>',
+          "<p>As always be accurate and quick! Click on next/spacebar to start.</p>"
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+    var block_OinC_procedure = {
+      timeline: [vs_trial_test],
+      timeline_variables: block_OinC,
+      repetitions: 6,
+      randomize_order: true
+    }
+
+
+    var third_block_completion_seq_1 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Keep it up! You have completed the third block of the experiment. You have one more to go. </p>',
+          "<p> In this block you will perform 24 searches of searching for an <strong>open square</strong>: " +
+          '<p></br><img src="stimuli/open_sqaure_right.png" width="7%" class="center"</p>' +
+          '<p></br>Keep in mind that as before, the open square can apear rotated.',
+          '<p></br>Click on the <strong>J</strong> key if the target is in the search area, or on the <strong>F</strong> ' +
+          'key if it is not there.</p>',
+          '<p> As always be accurate and quick! Click on next/spacebar to start.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+
+
+    var third_block_completion_seq_2 = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Keep it up! You have completed the third block of the experiment. You have one more to go. </p>',
+          "<p> In this block you will perform 24 searches of searching for a <strong>closed square</strong>: " +
+          '<p></br><img src="stimuli/closed_sqaure.png" width="7%" class="center"</p>' +
+          '<p></br>Click on the <strong>J</strong> key if the target is in the search area, or on the <strong>F</strong> ' +
+          'key if it is not there.</p>',
+          '<p>As always be accurate and quick! Click on next/spacebar to start.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+
+    var sequence_1 = [first_instructions_seq_1,
+      block_OinC_first_trials_procedure,
+      block_1_OinC_procedure,
+      first_block_completion_seq_1,
+      block_OinC_procedure,
+      second_block_completion_seq_1,
+      block_CinO_first_trials_procedure, block_3_CinO_procedure,
+      third_block_completion_seq_1,
+      block_CinO_procedure
+    ];
+
+    var sequence_2 = [first_instructions_seq_2,
+      block_CinO_first_trials_procedure, block_1_CinO_procedure,
+      first_block_completion_seq_2,
+      block_CinO_procedure,
+      second_block_completion_seq_2,
+      block_OinC_first_trials_procedure, block_3_OinC_procedure,
+      third_block_completion_seq_2,
+      block_OinC_procedure
+    ];
+
+
+    if (list_indx == 0) {
+      chosen_seq = sequence_1;
+    } else {
+      chosen_seq = sequence_2;
+    }
+
+    // chosen_seq=sequence_1;
+
+
+    for (let i = 0; i < chosen_seq.length; i++) {
+      timeline.push(chosen_seq[i])
+    }
+
+
+    var search_estimate_instructions = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p> Well done, you have completed the first part of the experiment! ' +
+          'In the next part you will answer questions regarding the first part you have just completed. </p>',
+          '<p>Some searches are easier than others. This means that participants find the target faster in some searches, compared to others.</p>',
+          '<p>In the following part you will be asked to rate the difficulty level of finding a certain target among different distractors.',
+
+          '<p>To help you better remember what trials you have seen, each question about trial type will contain a picture of the trial with a red square around the target, if it was present. Like here: </br><img src="stimuli/marked/practice_present.png" width="40%" class="center">',
+          '<p>Or no marking at all if the target was absent. Like here: </br><img src="stimuli/marked/practice_absent.png" width="40%" class="center"></p>',
+          '<p>To the best of your ability, try to rate how hard it is to find a target among distractors from very easy (fastest) to very hard (slowest). Drag the slider into position and click "continue" when you have finished rating.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+
+    var stimuli_to_rank = ['stimuli/marked/CinO25_marked.png']
+
+    var search_estimation_part = {
+      timeline: [
+        {
+          type: 'html-slider-response',
+          stimulus: jsPsych.timelineVariable('kind'),
+          labels: ['<p>Easy (Fast)</p>', '<p>Hard (Slow)</p>'],
+          slider_width: 500,
+          button_label: 'Continue',
+          require_movement: true,
+          data: {
+            test_part: jsPsych.timelineVariable('kind')
+          }
+        }
+      ],
+
+      timeline_variables: [
+        { kind: '<p>How difficult is detecting the presence of one <strong>closed square</strong> among many <strong>open squares</strong> </br><img src="stimuli/newStim/PresentOinC25.png" width="40%" class="center" </p>' },
+        { kind: '<p>How difficult is detecting the presence of one <strong>closed square</strong> among few <strong>open squares</strong></br><img src="stimuli//newStim/PresentOinC09.png" width="40%" class="center" </p>' },
+        { kind: '<p>How difficult is detecting the absence of one <strong>open square</strong> among many <strong>closed squares</strong></br><img src="stimuli//newStim/Absent25.png" width="40%" class="center" </p>' },
+        { kind: '<p>How difficult is detecting the absence of one <strong>open square</strong> among few <strong>closed squares</strong></br><img src="stimuli/newStim/Absent09.png" width="40%" class="center" </p>' }
+      ],
+      randomize_order: true
+    }
+
+
+
+
+    var OCI_instructions = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>You have reached the final part of the experiment. In the next part you will see statements that refer to experiences that many people have in their everyday lives. Overall, there are three questionnaires in this part.</p>',
+          '<p>We will start with the first one, comprised of 20 items. Mark the number that best describes how much that experience has distressed or bothered you during the <b>PAST MONTH.</b>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    }
+
+
+    var likert_scale = [
+      "Not at all - 0",
+      "A little - 1",
+      "Moderately -2",
+      "A lot -3",
+      "Extremly - 4"
+    ];
+    //I've edited the plugin's css for font/color adjustments
+
+    //to write a genral funbction that gets question and returns likert survey 
+    //input is list of strings. 
+
+
+    var likert_trial_oci_1 = {
+      type: 'survey-likert',
+      preamble: 'Page 1/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I have saved up so many things that they get in the way.", name: 'OCI-1', labels: likert_scale, required: true },
+        { prompt: "I check things more often than necessary.", name: 'OCI-2', labels: likert_scale, required: true },
+        { prompt: "I get upset if objects are not arranged properly.", name: 'OCI-3', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_1', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_2 = {
+      type: 'survey-likert',
+      preamble: 'Page 2/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I feel compelled to count while I am doing things.", name: 'OCI-4', labels: likert_scale, required: true },
+        { prompt: "I find it difficult to touch an object when I know it has been touched by strangers or certain people.", name: 'OCI-5', labels: likert_scale, required: true },
+        { prompt: "I find it difficult to control my own thoughts.", name: 'OCI-6', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_2', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_3 = {
+      type: 'survey-likert',
+      preamble: 'Page 3/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I collect things I don't need.", name: 'OCI-7', labels: likert_scale, required: true },
+        { prompt: "I repeatedly check doors, windows, drawers, etc.", name: 'OCI-8', labels: likert_scale, required: true },
+        { prompt: "I get upset if others change the way I have arranged things.", name: 'OCI-9', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_3', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_4 = {
+      type: 'survey-likert',
+      preamble: 'Page 4/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I feel I have to repeat certain numbers.", name: 'OCI-10', labels: likert_scale, required: true },
+        { prompt: "If you read this question, check the option 'Not at all' ", name: 'OCI-Attention_check_1', labels: likert_scale, required: true },
+        { prompt: "I sometimes have to wash or clean myself simply because I feel contaminated.", name: 'OCI-11', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_4', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_5 = {
+      type: 'survey-likert',
+      preamble: 'Page 5/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I am upset by unpleasant thoughts that come into my mind against my will.", name: 'OCI-12', labels: likert_scale, required: true },
+        { prompt: "I avoid throwing things away because I am afraid I might need them later.", name: 'OCI-13', labels: likert_scale, required: true },
+        { prompt: "I repeatedly check gas and water taps and light switches after turning them off.", name: 'OCI-14', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_5', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+
+    var likert_trial_oci_6 = {
+      type: 'survey-likert',
+      preamble: 'Page 6/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "If you read this question, check the option 'Moderately' ", name: 'OCI-Attention_check_2', labels: likert_scale, required: true },
+        { prompt: "I need things to be arranged in a particular way.", name: 'OCI-15', labels: likert_scale, required: true },
+        { prompt: "I feel that there are good and bad numbers.", name: 'OCI-16', labels: likert_scale, required: true },
+
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_6', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_7 = {
+      type: 'survey-likert',
+      preamble: 'Page 7/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I wash my hands more often and longer than necessary.", name: 'OCI-17', labels: likert_scale, required: true },
+        { prompt: "I frequently get nasty thoughts and have difficulty in getting rid of them.", name: 'OCI-18', labels: likert_scale, required: true },
+        { prompt: "I sometimes go back and check that I didn't do something bad unintentionally. ", name: 'OCI-Absent', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_7', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+
+
+    timeline.push(search_estimate_instructions)
+    timeline.push(search_estimation_part)
+    timeline.push(OCI_instructions)
+    timeline.push(likert_trial_oci_1)
+    timeline.push(likert_trial_oci_2)
+    timeline.push(likert_trial_oci_3)
+    timeline.push(likert_trial_oci_4)
+    timeline.push(likert_trial_oci_5)
+    timeline.push(likert_trial_oci_6)
+    timeline.push(likert_trial_oci_7)
+
+    var DASS_instructions = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>Well done! you have finished the first questionnaire. Now you will complete the second questionnaire, comprised of 14 items.</p>',
+          '<p>Please read each statement and circle a number 0, 1, 2 or 3 which indicates how much the statement applied to you over the <b>PAST WEEK</b>.</p>',
+          '<p>There are no right or wrong answers.  Do not spend too much time on any statement.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    }
+
+
+    var likert_scale_DASS = [
+      "0-Did not apply to me at all",
+      "1-Applied to me to some degree, or some of the time",
+      "2-Applied to me to a considerable <br> degree, or a good part of time",
+      "3-Applied to me very much, or most of the time",
+    ];
+
+    var likert_trial_1_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 1/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I was aware of dryness of my mouth", name: 'DASS-2', labels: likert_scale_DASS, required: true },
+        { prompt: "I couldn't seem to experience any positive feeling at all", name: 'DASS-3', labels: likert_scale_DASS, required: true },
+        { prompt: "I experienced breathing difficulty (eg, excessively rapid breathing, breathlessness in the absence of physical exertion)", name: 'DASS-4', labels: likert_scale_DASS, required: true },
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_1_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+
+    var likert_trial_2_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 2/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I found it difficult to work up the initiative to do things", name: 'DASS-5', labels: likert_scale_DASS, required: true },
+        { prompt: "I experienced trembling (eg, in the hands)", name: 'DASS-7', labels: likert_scale_DASS, required: true },
+        { prompt: "I was worried about situations in which I might panic and make a fool of myself", name: 'DASS-9', labels: likert_scale_DASS, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_2_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_3_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 3/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I felt that I had nothing to look forward to", name: 'DASS-10', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt down-hearted and blue", name: 'DASS-13', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt I was close to panic", name: 'DASS-15', labels: likert_scale_DASS, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_3_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+
+    var likert_trial_4_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 4/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I was unable to become enthusiastic about anything", name: 'DASS-16', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt I wasn't worth much as a person", name: 'DASS-17', labels: likert_scale_DASS, required: true },
+        { prompt: "I was aware of the action of my heart in the absence of physical exertion (eg, sense of heart rate increase, heart missing a beat)", name: 'DASS-19', labels: likert_scale_DASS, required: true }
+
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_4_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_5_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 5/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I felt scared without any good reason", name: 'DASS-20', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt that life was meaningless", name: 'DASS-21', labels: likert_scale_DASS, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_5_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+    //DASS part
+
+    timeline.push(DASS_instructions)
+    timeline.push(likert_trial_1_DASS)
+    timeline.push(likert_trial_2_DASS)
+    timeline.push(likert_trial_3_DASS)
+    timeline.push(likert_trial_4_DASS)
+    timeline.push(likert_trial_5_DASS)
+
+
+
+    var worker_comments = {
+      type: 'survey-text',
+      preamble: '<h1>Your Thoughts<h1>',
+      questions: [{
+        prompt: "That's it! Before we thank you, we would appreciate if you could share " +
+          "any thoughts you had about the experiment, or anything we should " +
+          "take into account when analyzing your data.",
+        pleaceholder: "your comments here",
+        rows: 8,
+        columns: 60,
+        name: 'worker_comments'
+      }]
+    };
+    timeline.push(worker_comments);
+
+    var thank_you = {
+      type: 'p5Text',
+      title: "Thank you!",
+      text: "Thanks for your time and effort. Your contribution will help us " +
+        "learn about the way people make decisions about what they see."
+    };
+
+    timeline.push({
+      type: 'fullscreen',
+      fullscreen_mode: false
+    });
+
+    timeline.push(thank_you);
+    return timeline
+  }
+
+
+  /* start the experiment */
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+
+  }
+  list_indx = getRandomInt(2);
+
+  timeline = makeTimeline()
+  jsPsych.init({
+    preload_images: images_to_preload,
+    timeline: timeline,
+    on_finish: function () {
+      jsPsych.data.addProperties(list_indx)
+      jsPsych.data.addProperties({ followed_instructions: window.followed_instructions });
+      jsPsych.data.get().localSave('csv', 'mydata.csv');
+    }
+  });
+
+
+</script>
+
+</html>
