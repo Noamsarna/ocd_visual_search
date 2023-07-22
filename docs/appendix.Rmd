@@ -111,20 +111,6 @@ In order to compare explicit metacognitive knowledge with behavior, we collected
 
 ```{r explicit_dif, echo=FALSE, cache=TRUE}
 
-
-#coding condition and set size as variables. 
-m_difficulty <- difficulty_rating %>% 
-  mutate(condition=case_when(str_detect(difficulty_rating, "_TA") ~ "Absent",
-                             str_detect(difficulty_rating, "_TP") ~ "Present")) %>% 
-  mutate(set_size=case_when(str_detect(difficulty_rating, "_9") ~ "9",
-                            str_detect(difficulty_rating, "_25") ~ "25")) %>% 
-  filter(OCI_quantile==1|OCI_quantile==4) %>% 
-  #buidling a model to predict the perceived difficulty 
-  lmer(as.numeric(response) ~ 1+OCI_quantile* condition*set_size+
-               (1+set_size+condition|subj_id), #random intercept for each subject with random slope for set size and condition. 
-               data =.)
-
-
 #create a df for correlating perceived difficulty with actual search time 
 
 search_correlation <- search_summary_RT %>% 

@@ -190,7 +190,8 @@ search_df <- left_join(search_df,
                        rejection_df %>% select(subj_id, reject), 'subj_id') %>%
   # filter(reject=='FALSE' | failed_attention_OCI == 1)
   filter(reject=='FALSE' & failed_attention_OCI == 0) %>%
-  filter(under_100 == 0) #filter our trials 
+  filter(under_100 == 0)  #filter our trials 
+  
 
 #total n after participants removal 
 df.N_total <- search_df$subj_id %>% unique() %>% length()
@@ -289,6 +290,7 @@ search_df$set_size <- relevel(as.factor(search_df$set_size), '9')
 
 #extracting slopes 
 search_slopes_df <- search_df %>%
+  filter(correct==1) %>% #only correct trials 
   group_by(subj_id,search_type,target_present) %>%
   nest() %>%
   mutate(model = map(data, ~ lm(RT ~ set_size, data =.)),
