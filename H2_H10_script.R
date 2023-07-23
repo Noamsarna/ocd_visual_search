@@ -1,7 +1,7 @@
 
 
 library(tidyverse)
-
+library(broom)
 #load anon jatos data 
 df<- read_csv('data/anon_jatos_results_p1.csv')
 df2<- read_csv('data/anon_jatos_results_p2.csv')
