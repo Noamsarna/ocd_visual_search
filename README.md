@@ -8,4 +8,4 @@ You can try experiment 2 by clicking [here](https://noamsarna.github.io/ocd_visu
 
 Fully-anonymized experimental data is available [here](https://github.com/Noamsarna/ocd_visual_search/tree/main/data).
 
-A fully reproducible version analysis pipeline in RMD format is available [here](https://github.com/Noamsarna/ocd_visual_search/blob/main/docs/OCD_VS_Jen_2023.Rmd)
+A fully reproducible version analysis pipeline in RMD format is available [here](https://github.com/Noamsarna/ocd_visual_search/blob/main/docs/OCD_VS_full.Rmd)
