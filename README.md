@@ -4,7 +4,7 @@ See OSF preregistration [here](https://osf.io/yxqu9).
 
 You can try experiment 1 by clicking [here](https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp1/).
 
-You can try experiment 2 by clicking [here](https://jatos.mindprobe.eu/publix/Qkm6hi2c3vS).
+You can try experiment 2 by clicking [here](https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp2/).
 
 Fully-anonymized experimental data is available [here](https://github.com/Noamsarna/ocd_visual_search/tree/main/data).
 
