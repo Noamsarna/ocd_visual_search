@@ -2,6 +2,10 @@
 
 library(tidyverse)
 library(broom)
+library(wesanderson)
+library(ggpubr)
+
+
 #load anon jatos data 
 df<- read_csv('data/anon_jatos_results_p1.csv')
 df2<- read_csv('data/anon_jatos_results_p2.csv')
@@ -127,11 +131,12 @@ search_df <- left_join(search_df,
 # Summary dfs  ------------------------------------------------------------
 
 #create a df in which every participant gets a mean score for each search option (8)
-search_summary_mean_RT <- 
+search_summary <- 
   search_df %>% 
   filter(correct==1) %>% #only correct trials 
   group_by(subj_id, set_size,search_type, target_present, OCI_quantile) %>% 
-  summarise(mean_rt = mean(RT, na.rm = T)) %>%
+  summarise(mean_rt = mean(RT, na.rm = T),
+            median_rt = median(RT, na.rm = T)) %>%
   ungroup() 
 
 # Extracting slopes ------------------------------------------------------------------
@@ -169,7 +174,7 @@ H2.desc <- H2.df %>%
 #create a df in the same format as the difficulty df, so include only 4 searches of difficulty estimation:
 #hard present and easy absent with both set sizes. 
 
-search_correlation_mean <- search_summary_mean_RT %>% 
+search_correlation <- search_summary %>% 
   filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'| #easy absent small set size
            search_type=='CinO' & set_size=='25' & target_present=='FALSE'| #easy absent big set size 
            search_type=='OinC' & set_size=='9' & target_present=='TRUE'| #hard present small set size
@@ -179,9 +184,9 @@ search_correlation_mean <- search_summary_mean_RT %>%
   unite('difficulty_rating', c(search_type, set_size, target_present), remove = F) #create names like in the difficulty df 
 
 #combine with the difficulty df 
-search_correlation_mean<- left_join(search_correlation_mean, difficulty_rating %>% select(-OCI_quantile))
+search_correlation<- left_join(search_correlation, difficulty_rating %>% select(-OCI_quantile))
 
-search_correlation_wide <- search_correlation_mean %>%
+search_correlation_wide <- search_correlation %>%
   select(subj_id, set_size, search_type, target_present, OCI_quantile, mean_rt, response) %>% 
   pivot_wider(
     names_from = c(search_type, target_present, set_size),
@@ -203,4 +208,130 @@ search_correlation_wide %>%
   summarise(mean_slope_easy_absent = mean(slope_easy_absent),
             mean_slope_hard_present = mean(slope_hard_present))
 
+#plot for the entire sample 
 
+p1<-
+search_correlation %>% 
+ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Mean of median', 
+       subtitle = 'Entire sample')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank())
+
+
+#plot for the OC- group  
+
+p2<-
+  search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Mean of median', 
+       subtitle = 'OC-')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank())
+
+
+#plot for the OC+ group  
+
+p3<-
+  search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Mean of median', 
+       subtitle = 'OC+')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank())
+
+
+# plot together  ----------------------------------------------------------
+
+# Define color and shape vectors for convenience
+my_colors <- wes_palette("Royal1")[1:2]
+my_shapes <- c(21, 24)
+
+# Increase legend text size in p1 and ensure filled shapes in legend
+p1 <- p1 + theme(legend.text = element_text(size = 15)) +
+  scale_fill_manual(values = my_colors, 
+                    labels = c('Easy target-absent', 'Hard target-present'), 
+                    name = NULL) +
+  scale_shape_manual(values = my_shapes, 
+                     labels = c('Easy target-absent', 'Hard target-present'), 
+                     name = NULL) +
+  guides(fill = guide_legend(override.aes = list(fill = my_colors)),
+         shape = guide_legend(override.aes = list(shape = my_shapes)))
+
+# Assuming p2 and p3 are already created, remove the legends from p2 and p3
+p2 <- p2 + theme(legend.position = "none")
+p3 <- p3 + theme(legend.position
+                 = "none")
+
+# Load the ggpubr package
+library(ggpubr)
+
+# Use ggarrange to combine the plots
+p <- ggarrange(p1, p2, p3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+# Print the plot
+print(p)
+
+#ggsave(filename = "mean_of_median.png",width = 9, height = 6, dpi = 1000) 
