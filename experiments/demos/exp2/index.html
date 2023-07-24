@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>visual_search</title>
+  <script src="jquery/jquery.min.js"></script>
+  <script src="jspsych-6.1.0/jspsych.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-p5text.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-call-function.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-external-html.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-survey-likert.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-free-sort.js"></script>
+  <script src="jspsych-6.1.0/plugins/jspsych-html-slider-response.js"></script>
+  <script src="p5/p5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Corben&family=Quicksand&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  </link>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  </head>
+
+<body></body>
+<script>
+
+
+  //load images 
+  var images_to_preload = [
+    'stimuli/instrcutions_dis.png',
+    'stimuli/instrcutions_target.png',
+    'stimuli/keyboard_layout.png'
+  ]
+
+  let imageNames = ['practice_PRE_1.png','practice_PRE_2.png','practice_ABS_1.png', 'practice_ABS_2.png','OCD004026ABS.png', 'OCD004026PRE.png', 'OCD004027ABS.png', 'OCD004027PRE.png', 'OCD004028ABS.png', 'OCD004028PRE.png', 'OCD004029ABS.png', 'OCD004029PRE.png', 'OCD004030ABS.png', 'OCD004030PRE.png', 'OCD004031ABS.png', 'OCD004031PRE.png', 'OCD004032ABS.png', 'OCD004032PRE.png', 'OCD004033ABS.png', 'OCD004033PRE.png', 'OCD004034ABS.png', 'OCD004034PRE.png', 'OCD004035ABS.png', 'OCD004035PRE.png', 'OCD004036ABS.png', 'OCD004036PRE.png', 'OCD004037ABS.png', 'OCD004037PRE.png', 'OCD004038ABS.png', 'OCD004038PRE.png', 'OCD004039ABS.png', 'OCD004039PRE.png', 'OCD004040ABS.png', 'OCD004040PRE.png', 'OCD004041ABS.png', 'OCD004041PRE.png', 'OCD004042ABS.png', 'OCD004042PRE.png', 'OCD004043ABS.png', 'OCD004043PRE.png', 'OCD004044ABS.png', 'OCD004044PRE.png', 'OCD004045ABS.png', 'OCD004045PRE.png', 'OCD004046ABS.png', 'OCD004046PRE.png', 'OCD004047ABS.png', 'OCD004047PRE.png', 'OCD004048ABS.png', 'OCD004048PRE.png', 'OCD004049ABS.png', 'OCD004049PRE.png', 'OCD004050ABS.png', 'OCD004050PRE.png']
+  imageNames = imageNames.map(name => "stimuli/original_stim/" + name)
+  images_to_preload = images_to_preload.concat(imageNames)
+
+  let imageItems = imageNames.map(name => {
+    var x = { stimImage: name }
+    return x;
+  })
+
+  let practiceStimImages = imageItems.slice(0, 4)
+  let stimImageArray = imageItems.slice(4,54)
+  console.log(imageItems)
+  console.log(practiceStimImages)
+  console.log(stimImageArray)
+  window.practice_loop = 0;
+  window.followed_instructions = true;
+
+  function makeTimeline() {
+
+    timeline = [];
+
+    timeline.push({
+      type: 'fullscreen',
+      fullscreen_mode: true
+    });
+
+    // Instructions
+var instructions = {
+  type: 'instructions',
+  pages: function () {
+    return [
+      '<p>Welcome to the experiment! Click next or use the space bar to move to the next screen.',
+      '<p> The task will consist of 50 search fields and a number of questions.</p>',
+      '<p>In each search, you will see a field on the screen containing a large number of figures. These figures can look as follows:' +
+      '<p></br><img src="stimuli/instrcutions_dis.png" width="25%" class="center"</p>' +
+      '<p></br>(a square with an opening on one side)<p>',
+      '<p>Sometimes there will be a target (a closed square)</p>'+
+      '<p>between the open squares, and sometimes not. This is what the target looks like:</p>'+
+      '<p></br><img src="stimuli/instrcutions_target.png" width="7%" class="center"</p>' ,
+      "<p>You will always have to indicate as quickly as possible whether there is or there isn't a target present in the field.</p>",
+      '<p>Before each trial, a "+" sign will apear in the middle of the screen, try focusing your gaze on it.</p>',
+      '<p>Once you are ready, press the spacebar to move into the search field.',
+      '<p>When you are in the search field, Click on the <strong>J</strong> key if the target is present, or on the <strong>F</strong> ' +
+      'key if it is not there. </p>',
+      '<p>For your convenience, we suggest you position your ' +
+      'hands like this:</p></br><img src="stimuli/keyboard_layout.png" width="40%" class="center">',
+     
+      '<p>We will start with a practice session to make you familiar with the task. Be accurate and quick!</p>'
+      
+    ]
+  },
+  show_clickable_nav: true,
+  key_forward: 'space'
+}
+
+timeline.push(instructions)
+var presence_array = [[false, 'f'], [true, 'j']]
+
+// 
+
+
+
+// Instructions
+var practice_instructions = {
+  type: 'instructions',
+  pages: function () {
+
+    return [
+      '<p>First, a "+" sign will always appear in the middle of the screen. Focus on it. Press the spacebar to move into the search field.</p>',
+      '<p>Once you press the spacebar, figures will appear and you will have to indicate whether a closed square is present or not.' +
+      '<p>Click on the <strong>J</strong> key if the target is present, or on the <strong>F</strong> if it is absent. ',
+      '<p> click next to start the practice trials</p>'
+    ]
+  },
+  show_clickable_nav: true,
+  key_forward: 'space'
+}
+
+timeline.push(practice_instructions)
+var presence_array = [[false, 'f'], [true, 'j']]
+
+
+
+    // Instructions
+    var main_part_instructions = {
+      type: 'instructions',
+      pages: function () {
+        var trials = jsPsych.data.get().filter([{ condition: "PRE" }, { condition: "ABS" }]).last(4)
+        var num_correct = trials.filter({ correct: true }).count();
+        var mean_RT = trials.select('RT').mean() / 1000;
+
+        return [
+          '<p>Excellent. ' +
+          "You got " + num_correct + " searches right out of 4. " +
+          'We are now ready to move on to the main part of the experiment.</p>',
+          '<p>The visual search part includes 50 separate searches. ' +
+          "<p>From now on, you won't be told if you response is correct or not. ",
+          '<p>Try to complete the task to the best of your ability and avoid making mistakes. Click next to start. </p>',
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    }
+
+    var imageTrial = {
+      type: 'image-keyboard-response',
+      stimulus: jsPsych.timelineVariable("stimImage"),
+      choices: ["f", "j"],
+      trial_duration: 10000,
+      response_ends_trial: true,
+      stimulus_height: window.screen.availHeight,
+      on_finish: function (data) {
+        var isPractice= false;
+
+        for (let i = 0; i < practiceStimImages.length; i++) {
+          if(data.stimulus.includes(practiceStimImages[i].stimImage)){
+            console.log(data.stimulus)
+            console.log(practiceStimImages[i])
+            isPractice = true;
+          }
+        }
+
+        data.isPractice = isPractice;
+        var condition = data.stimulus.includes("PRE") ? "PRE" : "ABS";
+        data.condition = condition;
+
+        var keypress = undefined
+
+        if (data.key_press == 74) {
+          keypress = "j"
+        }
+
+        if (data.key_press == 70) {
+          keypress = "f"
+        }
+
+        data.key_val = keypress
+
+        if ((keypress == "j" && condition == "PRE") || (keypress == "f" && condition == "ABS")) {
+          data.correct = true;
+        } else {
+          data.correct = false;
+        }
+      }
+    }
+
+    fixation_cross = {
+      type: 'html-keyboard-response',
+      stimulus: "<p > <center style='font-size: 200%'> +  </center></p>",
+      choices: " ",
+      response_ends_trial: true
+    }
+
+    var feedback = {
+      type: 'html-keyboard-response',
+      stimulus: function () {
+        var last_trial_correct = jsPsych.data.get().filter([{ condition: "PRE" }, { condition: "ABS" }]).last(1).values()[0].correct;
+
+        if (last_trial_correct) {
+          return "<div style=\"width:150px;height:56px;font-size:30px;text-align:center;\">Correct!</div>";
+        } else {
+          return "<div style=\"width:150px;height:56px;border:0px;font-size:30px;text-align:center\">Wrong.</div>"
+        }
+      },
+      trial_duration: function () {
+        var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+        if (last_trial_correct) {
+          return 1000;
+        } else {
+          return 5000
+        }
+      },
+      response_ends_trial: false
+    }
+
+    practice_procedure = {
+      timeline: [fixation_cross, imageTrial, feedback],
+      timeline_variables: practiceStimImages,
+      randomize_order: true
+    }
+
+    timeline.push(practice_procedure)
+
+    let count = 1;
+    let did_fail = false;
+
+    var introduce_vs = {
+      type: "p5Text",
+      title: 'Let\'s try again',
+      text: function () {
+        var trials = jsPsych.data.get().filter([{ condition: "PRE" }, { condition: "ABS" }]).last(4);
+        var num_correct = trials.filter({ correct: true }).count();
+        var mean_RT = trials.select('RT').mean() / 1000;
+        return "You got " + num_correct + " searches right out of 4. " +
+          "Let's try again. Your task is to decide " +
+          "whether a closed sqaure appears among other open squares. " +
+          "Press 'J' for 'yes' and 'F' for 'no'. You will only use your keyboard for this challenge, so " +
+          "we recommend placing your right and left index fingers on the 'J' and 'F' keys.\n" +
+          "Be accurate and quick."
+      }
+    };
+
+
+    let should_repeat_practice = {
+      timeline: [introduce_vs, practice_procedure],
+      conditional_function: function () {
+        console.log("count = " + count)
+        let practice_trials = jsPsych.data.get().filter([{ condition: "PRE" }, { condition: "ABS" }]).last(4)
+        let is_correct = practice_trials.select('correct').all(function (x) { return x == true })
+        console.log(is_correct)
+        console.log(practice_trials)
+
+        if (!is_correct && count < 3) {
+          count = count + 1;
+          return true;
+        } else if (!is_correct && count == 3) {
+          did_fail = true;
+          jsPsych.data.get().push({numPracticeTries: count})
+          return false
+        } else {
+          jsPsych.data.get().push({numPracticeTries: count})
+          return false
+        }
+      }
+    }
+
+    timeline.push(should_repeat_practice)
+
+    timeline.push(should_repeat_practice)
+    
+    timeline.push(should_repeat_practice)
+
+    var abort_message = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          "You failed too many times"
+          ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'      
+    };
+
+    var show_abort_message = {
+      timeline: [abort_message],
+      conditional_function: function () {
+        return did_fail
+      }
+    }
+
+    timeline.push(show_abort_message)
+
+
+    var abort_if_failed_practice = {
+      type: 'call-function',
+      func: function () { 
+        if (did_fail) {
+         
+        jsPsych.endExperiment() 
+        }
+        }
+    };
+
+    timeline.push(abort_if_failed_practice)
+
+    var stim_procedure = {
+      timeline: [fixation_cross, imageTrial],
+      timeline_variables: stimImageArray,
+      randomize_order: true
+    }
+
+    
+    timeline.push(main_part_instructions)
+    timeline.push(stim_procedure)
+
+    
+    var oci_instructions = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>You have reached the final part of the experiment. In the next part you will see statements that refer to experiences that many people have in their everyday lives. Overall, there are two questionnaires in this part.</p>',
+          '<p>We will start with the first one, comprised of 20 items. Mark the number that best describes how much that experience has distressed or bothered you during the <b>PAST MONTH.</b>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    };
+
+
+    
+
+    var likert_scale = [
+      "Not at all - 0",
+      "A little - 1",
+      "Moderately -2",
+      "A lot -3",
+      "Extremly - 4"
+    ];
+    //I've edited the plugin's css for font/color adjustments
+
+    //to write a genral funbction that gets question and returns likert survey 
+    //input is list of strings. 
+
+
+    var likert_trial_oci_1 = {
+      type: 'survey-likert',
+      preamble: 'Page 1/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I have saved up so many things that they get in the way.", name: 'OCI-1', labels: likert_scale, required: true },
+        { prompt: "I check things more often than necessary.", name: 'OCI-2', labels: likert_scale, required: true },
+        { prompt: "I get upset if objects are not arranged properly.", name: 'OCI-3', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_1', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_2 = {
+      type: 'survey-likert',
+      preamble: 'Page 2/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I feel compelled to count while I am doing things.", name: 'OCI-4', labels: likert_scale, required: true },
+        { prompt: "I find it difficult to touch an object when I know it has been touched by strangers or certain people.", name: 'OCI-5', labels: likert_scale, required: true },
+        { prompt: "I find it difficult to control my own thoughts.", name: 'OCI-6', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_2', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_3 = {
+      type: 'survey-likert',
+      preamble: 'Page 3/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I collect things I don't need.", name: 'OCI-7', labels: likert_scale, required: true },
+        { prompt: "I repeatedly check doors, windows, drawers, etc.", name: 'OCI-8', labels: likert_scale, required: true },
+        { prompt: "I get upset if others change the way I have arranged things.", name: 'OCI-9', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_3', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_4 = {
+      type: 'survey-likert',
+      preamble: 'Page 4/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I feel I have to repeat certain numbers.", name: 'OCI-10', labels: likert_scale, required: true },
+        { prompt: "If you read this question, check the option 'Not at all' ", name: 'OCI-Attention_check_1', labels: likert_scale, required: true },
+        { prompt: "I sometimes have to wash or clean myself simply because I feel contaminated.", name: 'OCI-11', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_4', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_5 = {
+      type: 'survey-likert',
+      preamble: 'Page 5/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I am upset by unpleasant thoughts that come into my mind against my will.", name: 'OCI-12', labels: likert_scale, required: true },
+        { prompt: "I avoid throwing things away because I am afraid I might need them later.", name: 'OCI-13', labels: likert_scale, required: true },
+        { prompt: "I repeatedly check gas and water taps and light switches after turning them off.", name: 'OCI-14', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_5', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+
+    var likert_trial_oci_6 = {
+      type: 'survey-likert',
+      preamble: 'Page 6/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "If you read this question, check the option 'Moderately' ", name: 'OCI-Attention_check_2', labels: likert_scale, required: true },
+        { prompt: "I need things to be arranged in a particular way.", name: 'OCI-15', labels: likert_scale, required: true },
+        { prompt: "I feel that there are good and bad numbers.", name: 'OCI-16', labels: likert_scale, required: true },
+
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_6', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_oci_7 = {
+      type: 'survey-likert',
+      preamble: 'Page 7/7',
+      scale_width: 1000,
+      questions: [
+        { prompt: "I wash my hands more often and longer than necessary.", name: 'OCI-17', labels: likert_scale, required: true },
+        { prompt: "I frequently get nasty thoughts and have difficulty in getting rid of them.", name: 'OCI-18', labels: likert_scale, required: true },
+        { prompt: "I sometimes go back and check that I didn't do something bad unintentionally. ", name: 'OCI-Absent', labels: likert_scale, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_oci_7', question: question, answer_oci: questions[question] })
+        }
+
+      }
+    };
+
+
+    timeline.push(oci_instructions)
+    timeline.push(likert_trial_oci_1)
+    timeline.push(likert_trial_oci_2)
+    timeline.push(likert_trial_oci_3)
+    timeline.push(likert_trial_oci_4)
+    timeline.push(likert_trial_oci_5)
+    timeline.push(likert_trial_oci_6)
+    timeline.push(likert_trial_oci_7)
+
+    var DASS_instructions = {
+      type: 'instructions',
+      pages: function () {
+        return [
+          '<p>Well done! you have finished the first questionnaire. Now you will complete the second questionnaire, comprised of 14 items.</p>',
+          '<p>Please read each statement and circle a number 0, 1, 2 or 3 which indicates how much the statement applied to you over the <b>PAST WEEK</b>.</p>',
+          '<p>There are no right or wrong answers.  Do not spend too much time on any statement.</p>'
+        ]
+      },
+      show_clickable_nav: true,
+      key_forward: 'space'
+    }
+
+
+    var likert_scale_DASS = [
+      "0-Did not apply to me at all",
+      "1-Applied to me to some degree, or some of the time",
+      "2-Applied to me to a considerable <br> degree, or a good part of time",
+      "3-Applied to me very much, or most of the time",
+    ];
+
+    var likert_trial_1_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 1/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I was aware of dryness of my mouth", name: 'DASS-2', labels: likert_scale_DASS, required: true },
+        { prompt: "I couldn't seem to experience any positive feeling at all", name: 'DASS-3', labels: likert_scale_DASS, required: true },
+        { prompt: "I experienced breathing difficulty (eg, excessively rapid breathing, breathlessness in the absence of physical exertion)", name: 'DASS-4', labels: likert_scale_DASS, required: true },
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_1_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+
+    var likert_trial_2_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 2/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I found it difficult to work up the initiative to do things", name: 'DASS-5', labels: likert_scale_DASS, required: true },
+        { prompt: "I experienced trembling (eg, in the hands)", name: 'DASS-7', labels: likert_scale_DASS, required: true },
+        { prompt: "I was worried about situations in which I might panic and make a fool of myself", name: 'DASS-9', labels: likert_scale_DASS, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_2_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_3_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 3/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I felt that I had nothing to look forward to", name: 'DASS-10', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt down-hearted and blue", name: 'DASS-13', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt I was close to panic", name: 'DASS-15', labels: likert_scale_DASS, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_3_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+
+    var likert_trial_4_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 4/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I was unable to become enthusiastic about anything", name: 'DASS-16', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt I wasn't worth much as a person", name: 'DASS-17', labels: likert_scale_DASS, required: true },
+        { prompt: "I was aware of the action of my heart in the absence of physical exertion (eg, sense of heart rate increase, heart missing a beat)", name: 'DASS-19', labels: likert_scale_DASS, required: true }
+
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_4_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+
+    var likert_trial_5_DASS = {
+      type: 'survey-likert',
+      preamble: 'Page 5/5',
+      scale_width: 1200,
+      questions: [
+        { prompt: "I felt scared without any good reason", name: 'DASS-20', labels: likert_scale_DASS, required: true },
+        { prompt: "I felt that life was meaningless", name: 'DASS-21', labels: likert_scale_DASS, required: true }
+      ],
+      randomize_question_order: true,
+      on_finish: function (data) {
+        var questions = JSON.parse(data.responses);
+
+        for (question in questions) {
+          jsPsych.data.get().push({ Identifier: 'likert_trial_5_DASS', question: question, answer_dass: questions[question] })
+        }
+
+      }
+    };
+    //DASS part
+
+    timeline.push(DASS_instructions)
+    timeline.push(likert_trial_1_DASS)
+    timeline.push(likert_trial_2_DASS)
+    timeline.push(likert_trial_3_DASS)
+    timeline.push(likert_trial_4_DASS)
+    timeline.push(likert_trial_5_DASS)
+
+
+
+    var worker_comments = {
+      type: 'survey-text',
+      preamble: '<h1>Your Thoughts<h1>',
+      questions: [{
+        prompt: "That's it! Before we thank you, we would appreciate if you could share " +
+          "any thoughts you had about the experiment, or anything we should " +
+          "take into account when analyzing your data.",
+        pleaceholder: "your comments here",
+        rows: 8,
+        columns: 60,
+        name: 'worker_comments'
+      }]
+    };
+    timeline.push(worker_comments);
+
+    var thank_you = {
+      type: 'p5Text',
+      title: "Thank you!",
+      text: "Thanks for your time and effort. Your contribution will help us " +
+        "learn about the way people make decisions about what they see."
+    };
+
+    timeline.push({
+      type: 'fullscreen',
+      fullscreen_mode: false
+    });
+
+    timeline.push(thank_you);
+    return timeline
+  }
+
+  /* start the experiment */
+  
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max);
+
+    }
+    list_indx = getRandomInt(2);
+ 
+  
+    timeline = makeTimeline()
+    jsPsych.init({
+      preload_images: images_to_preload,
+      timeline: timeline,
+      on_finish: function () {
+        jsPsych.data.addProperties(list_indx)
+        jsPsych.data.addProperties({ followed_instructions: window.followed_instructions });
+       jsPsych.data.get().localSave('csv', 'mydata.csv');
+      }
+    });
+  
+
+</script>
+
+</html>
