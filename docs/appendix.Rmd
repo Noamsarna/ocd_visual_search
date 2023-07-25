@@ -80,13 +80,37 @@ m3 <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present
             (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
                data = search_slopes_df)
 
-
+#create models table (table 2)
 H9.model_acc_table <-as.data.frame(compare_accuracy(m2, m3))  %>% 
-  select(Model, AIC, BIC) 
+  select(Model, AIC) 
+
+#scale AIC values to zero 
+scaled_AIC_m2_h9 =H9.model_acc_table$AIC[1] - H9.model_acc_table$AIC[1]
+scaled_AIC_m3    =H9.model_acc_table$AIC[2] - H9.model_acc_table$AIC[1]
+
+
+H9.model_acc_table$scaled_AIC <- c(scaled_AIC_m2_h9, scaled_AIC_m3 )
+
+
+#extract model formula 
+m3_formula <- paste(deparse(formula(m3, fixed.only = T), width.cutoff = 500), collapse = " ")
+
+H9.model_acc_table$formula <- c(m2_formula, m3_formula)
 ```
 
 *Hypothesis 9: Correlations between OC tendencies and search slopes.* 
  	In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) by incorporating the entire spectrum of OC scores (raw OCI scores). We employed a mixed-effects regression model, analogous to M2 in hypothesis 6, but utilizing the complete range of total OCI scores rather than solely the top and bottom quartiles. First, the interaction between search type and total OCI score remained not significant `r apa_print(m3)$full_result$oci_overall_target_presentTRUE`. Second, model performance was compared using their AIC values. The model comparison table reveals that the model featuring the full range of OCI scores (M3) exhibits substantially higher AIC value than the model with the two OC groups (M2), suggesting that adding the full range of OCI scores, does not contribute to explaining the variance in search slopes.
+ 	
+
+```{r table_2, echo=FALSE, results='asis'}
+
+apa_table(H9.model_acc_table,
+          caption = 'Table 2 – Model comparison table',
+          note = 'Same conventions as table 1 '
+          )
+
+```
+
 
 ```{r DASS_mediation, echo=FALSE, cache=TRUE}
 

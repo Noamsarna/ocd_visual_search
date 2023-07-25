@@ -70,7 +70,7 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 
 Theories on obsessive-compulsive disorder (OCD) emphasize the pivotal role of pathological doubt in the disorder's phenomenology [@rasmussenClinicalFeaturesPhenomenology1989; @reedObsessionalExperienceCompulsive1985a; @shapiroNeuroticStyles1965]. This persistent doubt, marked by increased uncertainty, gives rise to repetitive checking rituals that, paradoxically, serve to intensify the doubt itself. In laboratory perceptual studies, checking behavior is commonly manifested in slow reaction times, as OC participants require more evidence under high uncertainty [@bancaEvidenceAccumulationObsessiveCompulsive2015; @hauserMetacognitiveImpairmentsExtend2017d. Previous studies found that participants with high obsessive compulsive tendencies (OC+) take longer to decide that a target is absent from a visual search array compared to those with low obsessive compulsive tendencies (OC-; @toffoloMildUncertaintyPromotes2013). These finding have been replicated [@toffoloUncertaintyCheckingIntolerance2014] and extended to a clinical sample, where they were found to be specific to patients with OCD and absent in those suffering from anxiety [@toffoloPatientsObsessiveCompulsiveDisorder2016]. In these experiments, checking behavior was operationalized by search time, and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Therefore, relatively longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking behavior under mild uncertainty.
 
-```{r load_data, echo=FALSE, cache=TRUE}
+```{r load_data, echo=FALSE, warning=FALSE, cache=TRUE}
 
 #load anon jatos data 
 df<- read_csv('../data/anon_jatos_results_p1.csv')
@@ -422,17 +422,38 @@ m2 <-
 #examine model parameters 
 #parameters::model_parameters(m2, ci_method= 's')
 
-
+#create models table (table 1)
 H6.model_acc_table <-as.data.frame(compare_accuracy(m1, m2))  %>% 
-  select(Model, AIC, BIC) 
+  select(Model, AIC) 
 
-H6.model_acc_table
+#scale AIC values to zero 
 
-#I had problem creating this table in APA format and also including the formula within the table.. Would appreciate some help with that.  
+scaled_AIC_m1 =H6.model_acc_table$AIC[1] - H6.model_acc_table$AIC[1] 
+scaled_AIC_m2 =H6.model_acc_table$AIC[2] - H6.model_acc_table$AIC[1]
+
+H6.model_acc_table$scaled_AIC <- c(scaled_AIC_m1, scaled_AIC_m2)
+
+
+#extract model formula 
+m1_formula <- paste(deparse(formula(m1, fixed.only = T), width.cutoff = 500), collapse = " ")
+m2_formula <- paste(deparse(formula(m2, fixed.only = T), width.cutoff = 500), collapse = " ")
+
+H6.model_acc_table$formula <- c(m1_formula, m2_formula)
 
 ```
 
+
+
 *Hypothesis 6: Model comparison* Our experimental design aimed to differentiate between difficulties arising from higher uncertainty and those arising from the absence of the target. To achieve this, we used two search types: a hard search (searching for a closed square among open squares), and an easy search (searching for an open square among closed squares). Additionally, we manipulated the presence or absence of the target. To determine whether uncertainty or absence had a greater impact on OC+ search time, we constructed two competing regression models that differed only in their interaction terms (table 1). Beyond the search type and the target presence predictors, the first model (M1) included the interaction between group and search type (easy/hard; slope_estimate\~ 1+group+search_type \* target_presence+ search_type \* group), while the second model (M2) included the interaction between group and target presence (absent/present; slope_estimate\~ 1+group+ search_type \* target_present+target_present \* group). Since the two models differ only in their last interaction effect, their complexity (that is, the number of fitted coefficients) is the same, which allowed us to compare these models directly. We compare model performance using their AIC and BIC values. The model comparison table shows that both models have the same AIC and BIC values suggesting that the interaction between group and target presence does not explain search time to a greater extent than the interaction between group and search type.
+
+```{r table_1, echo=FALSE, results='asis'}
+
+apa_table(H6.model_acc_table,
+          caption = 'Table 1 – Model comparison table',
+          note = 'The two models (M1, M2) are concerning hypothesis 6. AIC value of M1 was scaled to zero, to make the differences clearer.  Differences in AIC greater than 10 are considered as decisive evidence supporting the model with the lower numerical value. '
+          )
+
+```
 
 In summary, the results pertaining to hypotheses 3 through 6 indicate no substantiated evidence of prolonged search time among OC+ participants during target-absent trials. Similarly, no discernible group variances emerged, regardless of whether we used the complete OCI scale (preregistered hypothesis 9) or accounted for anxiety and depression (preregistered hypothesis 10). There were also no significant differences between groups during the task's initial trials, prior to the accumulation of any experience (preregistered hypothesis 8). Lastly, we observed no significant differences between the groups in their self-reported measures of task difficulty (preregistered exploratory analysis). Detailed calculations and results for all these hypotheses are provided in the Appendix for further reference.
 
