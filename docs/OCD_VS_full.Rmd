@@ -57,6 +57,7 @@ library(lvmisc)
 library(wesanderson)
 library(patchwork)
 library(reshape2)
+
 ```
 
 ```{r analysis-preferences}
@@ -247,25 +248,16 @@ difficulty_rating_by_condition_with_oci <- difficulty_rating %>%
 
 # Summary dfs  ------------------------------------------------------------
 
-search_summary_RT <- 
-  #every participant gets a median score for each search option (8)
-  #we use median because we didn't exclude longer RT
+#create a df in which every participant gets a mean score for each search option (8)
+search_summary <- 
   search_df %>% 
   filter(correct==1) %>% #only correct trials 
   group_by(subj_id, set_size,search_type, target_present, OCI_quantile) %>% 
-  summarise(median_RT = median(RT, na.rm = T)) %>%
+  summarise(mean_rt = mean(RT, na.rm = T),
+            median_rt = median(RT, na.rm = T)) %>%
   ungroup() 
 
-RT_over_participant <-
-  search_summary_RT %>% group_by(set_size,search_type, target_present) %>%
-  summarise(mean_RT= mean(median_RT, na.rm = T)) %>% 
-  ungroup()
 
-
-RT_over_participant_oci <-
-  search_summary_RT %>% group_by(set_size,search_type, target_present, OCI_quantile) %>%
-  summarise(mean_RT= mean(median_RT, na.rm = T)) %>% 
-  ungroup()
 
 toffolo_data <- search_df %>%
   filter(set_size == 25) %>% 

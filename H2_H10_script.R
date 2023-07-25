@@ -4,7 +4,7 @@ library(tidyverse)
 library(broom)
 library(wesanderson)
 library(ggpubr)
-
+library(patchwork)
 
 #load anon jatos data 
 df<- read_csv('data/anon_jatos_results_p1.csv')
@@ -236,44 +236,14 @@ ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_pres
   scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
   scale_shape_manual(values = c(21, 24), 
                      labels = c('Easy target-absent', 'Hard target-present')) +
-  theme(axis.title.y = element_blank())
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+   coord_cartesian(ylim = c(1400,2800))
 
 
 #plot for the OC- group  
 
 p2<-
-  search_correlation %>% 
-  filter(OCI_quantile==1) %>% 
-  ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
-  stat_summary(fun = mean, 
-               geom = 'point',
-               position = position_dodge(0.9),
-               size = 5,
-               alpha = 0.6) +
-  stat_summary(fun.data = mean_se,
-               geom = 'errorbar',
-               position = position_dodge(0.9), 
-               width = 0.4) +
-  stat_summary(fun = mean,
-               geom = 'line', 
-               aes(group = target_present),
-               position = position_dodge(0.9),
-               alpha = 0.6) +
-  labs(x = 'Set Size', 
-       y = 'RT ms', 
-       title = 'Mean of median', 
-       subtitle = 'OC-')+
-  guides(fill = FALSE,
-         shape = guide_legend(title = "Trial type")) +
-  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
-  scale_shape_manual(values = c(21, 24), 
-                     labels = c('Easy target-absent', 'Hard target-present')) +
-  theme(axis.title.y = element_blank())
-
-
-#plot for the OC+ group  
-
-p3<-
   search_correlation %>% 
   filter(OCI_quantile==4) %>% 
   ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
@@ -300,38 +270,179 @@ p3<-
   scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
   scale_shape_manual(values = c(21, 24), 
                      labels = c('Easy target-absent', 'Hard target-present')) +
-  theme(axis.title.y = element_blank())
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(1400,2800))
 
 
-# plot together  ----------------------------------------------------------
+#plot for the OC+ group  
 
-# Define color and shape vectors for convenience
-my_colors <- wes_palette("Royal1")[1:2]
-my_shapes <- c(21, 24)
+p3<-
+  search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Mean of median', 
+       subtitle = 'OC-')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(1400,2800))
 
-# Increase legend text size in p1 and ensure filled shapes in legend
-p1 <- p1 + theme(legend.text = element_text(size = 15)) +
-  scale_fill_manual(values = my_colors, 
-                    labels = c('Easy target-absent', 'Hard target-present'), 
-                    name = NULL) +
-  scale_shape_manual(values = my_shapes, 
-                     labels = c('Easy target-absent', 'Hard target-present'), 
-                     name = NULL) +
-  guides(fill = guide_legend(override.aes = list(fill = my_colors)),
-         shape = guide_legend(override.aes = list(shape = my_shapes)))
 
-# Assuming p2 and p3 are already created, remove the legends from p2 and p3
+#difficulty figures p4-p6 
+p4 <- 
+  search_correlation %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'Response', 
+       title = 'Difficulty rating', 
+       subtitle = 'Entire sample')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(30,80))
+
+p5 <- 
+  search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'Response', 
+       title = 'Difficulty rating', 
+       subtitle = 'OC+')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(30,80))
+
+p6 <- 
+  search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'Response', 
+       title = 'Difficulty rating', 
+       subtitle = 'OC-')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(30,80))
+
+
+
+
+# plot together  ------------------------------------------------------------
+
+
+# Remove the legend from each plot and add y-axis label for the first plot of each row
+p1 <- p1 + theme(legend.position = "none") + ylab("RT ms")
 p2 <- p2 + theme(legend.position = "none")
-p3 <- p3 + theme(legend.position
-                 = "none")
+p3 <- p3 + theme(legend.position = "none")
+p4 <- p4 + theme(legend.position = "none") + ylab("Response")
+p5 <- p5 + theme(legend.position = "none")
 
-# Load the ggpubr package
-library(ggpubr)
+# Ensure that colors and shapes are correctly set in p6
+p6 <- p6 + 
+  scale_fill_manual(values = my_colors, labels = c('Easy target-absent', 'Hard target-present'), name = NULL) +
+  scale_shape_manual(values = my_shapes, labels = c('Easy target-absent', 'Hard target-present'), name = NULL) +
+  guides(fill = guide_legend(override.aes = list(fill = my_colors)),
+         shape = guide_legend(override.aes = list(shape = my_shapes))) +
+  theme(legend.position = "bottom", legend.text = element_text(size = 12))
 
-# Use ggarrange to combine the plots
-p <- ggarrange(p1, p2, p3, ncol = 3, common.legend = TRUE, legend = "bottom")
+# Extract the legend
+common_legend <- cowplot::get_legend(p6)
 
-# Print the plot
-print(p)
+# Remove the legend from p6
+p6 <- p6 + theme(legend.position = "none")
 
-#ggsave(filename = "mean_of_median.png",width = 9, height = 6, dpi = 1000) 
+# Arrange the plots with the common legend at the bottom
+combined_plot <- cowplot::plot_grid(
+  cowplot::plot_grid(p1, p2, p3, ncol = 3),
+  cowplot::plot_grid(p4, p5, p6, ncol = 3),
+  common_legend,
+  ncol = 1,
+  rel_heights = c(1, 1, 0.1)  # Relative heights of rows (adjust as needed)
+)
+
+# Print the combined plot
+print(combined_plot)
+
+
