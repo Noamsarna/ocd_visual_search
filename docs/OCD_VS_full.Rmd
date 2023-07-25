@@ -440,7 +440,7 @@ In Experiment 1, target-absent search times were not significantly slower in OC+
 
 
 
-```{r Exp2_load_data, echo=FALSE, cache=TRUE}
+```{r Exp2_load_data, echo=FALSE, warning=FALSE, cache=TRUE}
 
 # Pre processing  ---------------------------------------------------------
 
@@ -588,7 +588,7 @@ We used `r cite_r("r-references.bib")` for all our analyses.
 
 
 # Results
-```{r Exp2_analyze_data, echo=FALSE, cache=TRUE}
+```{r Exp2_analyze_data, echo=FALSE, warning=FALSE, cache=TRUE}
 
 #plot figure of mean RT for each group  
 
