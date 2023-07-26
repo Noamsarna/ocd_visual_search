@@ -324,14 +324,13 @@ H2.desc <- H2.df %>%
 
 ```
 
-*Hypotheses 1 and 2 - Task validation*  - To validate our paradigm structure and to assess whether we successfully created an easier search by leveraging search asymmetries (i.e., switching between the target and distractors), we first examined the difference in slopes between the two search types (easy/hard), regardless of target presence (pre-registered hypothesis H1). As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r printnum (H1.desc[2,3])` ms/item compared to the easy search `r printnum (H1.desc[1,3])` ms/item, `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))$statistic`. Furthermore, a one-tailed paired t-test revealed that target-present slopes in the hard search `r printnum (H2.desc[2,3])` ms/item were steeper than target-absent slopes in the easy search `r printnum (H2.desc[1,3])` ms/item, `r apa_print(t.test(estimate~group, data=H2.df, paired=T))$statistic` (pre-registered hypothesis H2).
+*Hypotheses 1 and 2 - Task validation*  - To validate our paradigm structure and to assess whether we successfully created an easier search by leveraging search asymmetries (i.e., switching between the target and distractors), we first examined the difference in slopes between the two search types (easy/hard), regardless of target presence (pre-registered hypothesis H1). As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r printnum (H1.desc[2,3], digits=0)` ms/item compared to the easy search `r printnum (H1.desc[1,3], digits=0)` ms/item, `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))$statistic`. Furthermore, a one-tailed paired t-test revealed that target-present slopes in the hard search `r printnum (H2.desc[2,3], digits=0)` ms/item were steeper than target-absent slopes in the easy search `r printnum (H2.desc[1,3], digits=0)` ms/item, `r apa_print(t.test(estimate~group, data=H2.df, paired=T))$statistic` (pre-registered hypothesis H2).
 
 The initial two control comparisons served to validate that we successfully designed a target-absent condition that was easier than a target-present condition, thereby experimentally decoupling decision certainty from target presence, and enabling to measure their independent effects on search time as a function of obsessive-compulsive tendencies.
 
 ```{r DR_h3, echo=FALSE, cache=TRUE}
   
   # Toffolo replication plots -----------------------------------------------------
-
 
 exp1_mean_RT_fig <- by_sub_toffolo%>% 
     filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
