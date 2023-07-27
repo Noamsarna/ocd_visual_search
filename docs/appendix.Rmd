@@ -44,9 +44,16 @@ search_slopes_df_first_t <- first_trials_df %>%
   filter(term=='set_size25') %>% 
   filter(test_part=='first_two_trials')
 
+
+search_slopes_first_trials_desc <- search_slopes_df_first_t %>% 
+  group_by(search_type) %>% 
+  summarise(mean_slope=mean(estimate),
+            sd_slope = sd(estimate),
+            ms_item = mean_slope/(25-9))
+
 #figure
 
-
+First_trials_OC_groups<-
   search_df %>% 
   filter(test_part=='first_two_trials') %>% 
   filter(OCI_quantile==1|OCI_quantile==4) %>% 
@@ -71,12 +78,13 @@ search_slopes_df_first_t <- first_trials_df %>%
 *Hypotheses 7 and 8 - First trials*
 
 In this analysis, we focused on the two first trials of each search type. These trials are special in that by the time of making these responses, participants haven’t yet experienced target presence. First, we compared the slopes of the two types of searches (easy/hard search) to see if they were different already in the first trials, using a two-tailed paired t-test (H7). This allowed us to isolate pre-specified search termination strategies from ones that were acquired throughout the course of the experiment.
-  We found a significant difference between the slope of the easy search (53.93 ms/item) and the slope of the hard search (134.94 ms/item) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_first_t, paired=T))$statistic`. This significant difference between the search slopes indicates that subjects’ search termination rule was sensitive to the difference between the two search types prior to having experience with the easy and hard search tasks. 
+  We found a significant difference between the slope of the easy search (`r print_num(search_slopes_first_trials_desc[1,4], digits=0)` ms/item) and the slope of the hard search (`r print_num(search_slopes_first_trials_desc[2,4], digits=0)` ms/item) in the first trials of each block type `r apa_print(t.test(estimate~search_type, data=search_slopes_df_first_t, paired=T))$statistic`. This significant difference between the search slopes indicates that subjects’ search termination rule was sensitive to the difference between the two search types prior to having experience with the easy and hard search tasks. 
   We next asked whether this effect of search type on target-absent search times was similar for OC+ and OC- individuals (H8). Using a mixed-effects ANOVA with slope as a dependent variable and group and search type as the two between- and within-subject independent variables, we tested for the interaction of group (OC+/OC-) with search type in the first trials. We did not find a significant interaction between search type and group on first-trial slopes `r apa_print(afex::aov_ez("subj_id", "estimate", search_slopes_df_first_t, between = "OCI_quantile", within = "search_type"))$statistic$OCI_quantile_search_type`. 
   
 ```{r H9_full_range}
 
-m3 <-lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+ 
+m3 <-
+  lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+ 
             (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
                data = search_slopes_df)
 
@@ -128,7 +136,7 @@ Finally, in order to test the possible effects of depression and anxiety, we add
 In order to compare explicit metacognitive knowledge with behavior, we collected perceived difficulty ratings for the different search tasks. A discrepancy between perceived difficulty and task performance in the OC+ group would suggest a dissociation between action and knowledge, in line with previous findings (Vaghi et al., 2017, 2019). We examined two search types: target-absent easy searches and target-present hard searches, with set sizes of 9 and 25. For both groups, discrepancies between perceived difficulty and mean response time were observed in the same direction: despite slower search times in easy target-absent searches, these searches were perceived as easier than hard target-present trials.
 
 
-```{r explicit_dif, echo=FALSE, cache=TRUE}
+```{r explicit_dif, cache=TRUE, include=FALSE}
 
 #create a df in the same format as the difficulty df, so include only 4 searches of difficulty estimation:
 #hard present and easy absent with both set sizes. 
@@ -401,3 +409,4 @@ combined_plot <- cowplot::plot_grid(
 
 
 ```
+

@@ -175,7 +175,8 @@ search_df$set_size <- as.factor(search_df$set_size)
 
 rejection_df <- search_df %>% 
   group_by(subj_id) %>% 
-  summarise(accuracy = mean(correct)) %>% 
+  summarise(accuracy = mean(correct),
+            mean_error=1-accuracy) %>% 
   mutate(reject = accuracy<0.85)
 
 rejected_num <- sum(rejection_df$reject=='TRUE')
@@ -663,11 +664,11 @@ Exp2_H1_desc <-planned_df %>% group_by(condition) %>% summarise(mean_rt=mean(mea
 ```
 
 *Hypothesis 1 - Task validation*  
-To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic` with `r printnum(Exp2_H1_desc[2 ,2])` ms for target-present responses and `r printnum(Exp2_H1_desc[1 ,2])` ms for target-absent responses. 
+To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic` with `r printnum(Exp2_H1_desc[2 ,2], digits=0)` ms for target-present responses and `r printnum(Exp2_H1_desc[1 ,2], digits=0)` ms for target-absent responses. 
 
 
 *Hypothesis 2 - Direct replication* 
-The primary aim of experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). We conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable, expecting a greater difference score for the OC+ group. The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction.
+The primary aim of experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). We conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable, expecting a greater difference score for the OC+ group. The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction. A numeric interaction in the expected direction was driven by a descriptive difference in the timing of target-present responses, rather than by target-absent responses (see Figure 2.) 
 
 # Discussion
 
