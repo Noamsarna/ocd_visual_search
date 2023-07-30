@@ -1,2 +1,5 @@
 .Rhistory
 .Rproj.user
+docs/*_cache/*
+docs/OCD_VS_full_cache/*
+*.DS_Store
