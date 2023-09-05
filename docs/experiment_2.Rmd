@@ -258,16 +258,19 @@ round(mean(unlist(planned_df[planned_df$condition=='PRE', 'mean_RT'])), 2)
 round(mean(unlist(planned_df[planned_df$condition=='ABS', 'mean_RT'])), 2)
 
 
-Exp2_H1_desc <-planned_df %>% group_by(condition) %>% summarise(mean_rt=mean(mean_RT))
+Exp2_H1_desc <-planned_df %>% group_by(condition) %>% summarise(mean_rt=mean(mean_RT),
+                                                                sd = sd(mean_RT))
 
 ```
 
 *Hypothesis 1 - Task validation*  
-To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic` with `r printnum(Exp2_H1_desc[2 ,2])` ms for target-present responses and `r printnum(Exp2_H1_desc[1 ,2])` ms for target-absent responses. 
+To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic` with `r printnum(Exp2_H1_desc[2 ,2])` `r printnum(Exp2_H1_desc[2 ,3])` for target-present responses and `r printnum(Exp2_H1_desc[1 ,2])` `r printnum(Exp2_H1_desc[1 ,3])` ms for target-absent responses. 
 
 
 *Hypothesis 2 - Direct replication* 
 The primary aim of experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). We conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable, expecting a greater difference score for the OC+ group. The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction.
+
+
 
 
 # Discussion
