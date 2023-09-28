@@ -410,3 +410,54 @@ combined_plot <- cowplot::plot_grid(
 
 ```
 
+```{r reanalyze EXP2_H2, cache=TRUE, include=FALSE}
+
+#number of errors per participants 
+#mark trials of missing rt data 
+exp2.checking_task$missing_rt <- exp2.checking_task$rt %>% is.na()
+
+exp2.checking_task <-exp2.checking_task %>% 
+  group_by(subj_id) %>% 
+  mutate(num_error=50-(sum(correct))) 
+
+
+exp_2_mean_error_rate <- round(mean(exp2.checking_task$num_error), 2) 
+exp_2_SD_error <- round(sd(exp2.checking_task$num_error), 2)
+
+
+#reanalyze experiment 2 hypothesis 2 
+# make a planned contrast df in which every participant has one raw with a difference score of the mean 
+#target absent search time minus the mean target present search time. 
+
+planned_df_exc_19 <- exp2.checking_task %>% 
+  filter(num_error < 19) %>% 
+  filter(rt!='null') %>%   filter(OCI_quantile!='else') %>% 
+  group_by(subj_id, condition, OCI_quantile, oci_overall) %>% 
+  summarise(mean_RT =mean(rt))
+
+#long to wide format 
+planned_wide_exc_19 <- spread(planned_df_exc_19, key = condition, value = mean_RT)
+
+#adding difference score 
+planned_wide_exc_19 <- planned_wide_exc_19 %>% mutate(RT_diff = ABS- PRE) 
+
+planned_wide_exc_19 %>% 
+  group_by(OCI_quantile) %>% 
+  summarise(mean_diff = mean(RT_diff))
+
+
+# #Statistical analysis with exclusion of error<19 ---------------------------------------------------
+
+planned_wide_exc_19 %>% 
+  t.test(RT_diff~OCI_quantile, data=., alternative="greater")
+
+
+```
+
+*Reanalysis of Experiment 2, preregistered hypothesis 2* 
+Here we reanalyze Experiment 2, preregistered hypothesis 2, this time including only participants who had  error rate smaller than the actual  error rate used in @toffoloMildUncertaintyPromotes2013 (number of error <19). The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide_exc_19, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Here too, a numeric interaction in the expected direction was driven by a descriptive difference in the timing of target-present responses, rather than by target-absent responses.  
+
+
+
+
+
