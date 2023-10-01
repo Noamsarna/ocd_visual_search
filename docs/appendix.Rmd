@@ -190,7 +190,7 @@ ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_pres
                alpha = 0.6) +
   labs(x = 'Set Size', 
        y = 'RT ms', 
-       title = 'Mean of median', 
+       title = 'Reaction times', 
        subtitle = 'Entire sample')+
   guides(fill = FALSE,
          shape = guide_legend(title = "Trial type")) +
@@ -224,7 +224,7 @@ p2<-
                alpha = 0.6) +
   labs(x = 'Set Size', 
        y = 'RT ms', 
-       title = 'Mean of median', 
+       title = 'Reaction times', 
        subtitle = 'OC+')+
   guides(fill = FALSE,
          shape = guide_legend(title = "Trial type")) +
@@ -259,7 +259,7 @@ p3<-
                alpha = 0.6) +
   labs(x = 'Set Size', 
        y = 'RT ms', 
-       title = 'Mean of median', 
+       title = 'Reaction times', 
        subtitle = 'OC-')+
   guides(fill = FALSE,
          shape = guide_legend(title = "Trial type")) +
@@ -390,6 +390,12 @@ p6 <- p6 +
          shape = guide_legend(override.aes = list(shape = my_shapes))) +
   theme(legend.position = "bottom", legend.text = element_text(size = 12))
 
+#remove the white background from the legend 
+p6 <- p6 + theme(legend.background = element_blank(),
+                 legend.box.background = element_blank(),
+                 legend.box.margin = margin(0, 0, 0, 0),
+                 legend.key = element_blank())
+
 # Extract the legend
 common_legend <- cowplot::get_legend(p6)
 
@@ -405,7 +411,7 @@ combined_plot <- cowplot::plot_grid(
   rel_heights = c(1, 1, 0.1)  # Relative heights of rows (adjust as needed)
 )
 
-#ggsave(filename = "RT_and_estimation.png",width = 8, height = 6, dpi = 1000, path="./docs")  
+ggsave(filename = "RT_and_estimation.png",width = 8, height = 6, dpi = 1000, path="./figures")  
 
 
 ```
