@@ -1,5 +1,131 @@
 
-## This is the appendix subsection 
+## Appendix
+# Supplementary methods of Experiment 1 
+
+# Search termination without task experience 
+To assess participants’ search termination without task experience, i.e., decisions about target absence made before ever experiencing target-present trials (Mazor & Fleming, 2022), the first two trials of the first and third blocks were always target-absent trials (one of each set size), presented in randomized order.  This was unknown to the participants.
+
+# Estimation of search difficulty 
+After the visual search task, participants were asked to rate the difficulty of detecting a specific target, or inferring its absence, among various distractors. Each question referred to a picture of a trial with a red square around the target if it was present, or no marking at all if the target was absent (so that participants were not actively searching for the target in the difficulty estimation part). Participants then rated the perceived difficulty on a continues scale, dragging the curser from left to right (see figure 2; search estimation). They rated four different trial types: detecting the presence of one closed square among many open squares, detecting the presence of one closed square among few open, detecting the absence of one open square among many closed squares and detecting the absence of one open square few closed squares. We focused on these four trials as this was our most intriguing hypothesis, comparing easy target-absent trials to more challenging target-present trials.
+
+## Supplementary results of Experiment 1
+
+In this section we present the results for all of our preregistered hypotheses.  A detailed preregistration document including all our original hypotheses for Experiment 1 at osf.io/yxqu9. 
+For all of our hypotheses regarding search time provided in this section, we used search slopes as our dependent measure. Subject-wise search slopes were extracted for each combination of search type (easy/hard search) and presence of the target (present/absent), resulting in four search slopes estimates for each participant – easy-present; hard-present; easy-absent; hard-absent. These slopes were computed by fitting a linear regression model to predict reaction time as a function of set size, with one intercept and one set-size term. 
+
+
+```{r h1_h2_t-test, echo=FALSE, cache=TRUE}
+#creating a df for second hypothesis testing 
+
+H1.desc <- search_slopes_df %>% group_by(search_type) %>%  
+  summarise(mean_slope = mean(estimate),
+            ms_item = mean_slope/(25-9))
+
+H2.df<- search_slopes_df %>% 
+  filter(target_present==TRUE & search_type=='OinC' |target_present==FALSE & search_type=='CinO')  %>% 
+  mutate(group = case_when(search_type == 'OinC' ~ 'hard_present',
+                           search_type == 'CinO' ~ 'easy_absent'));
+                          
+H2.desc <- H2.df %>% 
+  group_by(group) %>% 
+  summarise(mean_slope=mean(estimate),
+            ms_item = mean_slope/(25-9))
+
+```
+
+*Hypotheses 1 and 2 - Task validation*  - To validate our paradigm structure and to assess whether we successfully created an easier search by leveraging search asymmetries (i.e., switching between the target and distractors), we first examined the difference in slopes between the two search types (easy/hard), regardless of target presence (pre-registered hypothesis H1). As anticipated, a one-tailed paired t-test demonstrated a steeper slope for the difficult search `r printnum (H1.desc[2,3], digits=0)` ms/item compared to the easy search `r printnum (H1.desc[1,3], digits=0)` ms/item, `r apa_print(t.test(estimate~search_type, data=search_slopes_df, paired=T))$statistic`. Furthermore, a one-tailed paired t-test revealed that target-present slopes in the hard search `r printnum (H2.desc[2,3], digits=0)` ms/item were steeper than target-absent slopes in the easy search `r printnum (H2.desc[1,3], digits=0)` ms/item, `r apa_print(t.test(estimate~group, data=H2.df, paired=T))$statistic` (pre-registered hypothesis H2).
+
+  The initial two control comparisons served to validate that we successfully designed a target-absent condition that was easier than a target-present condition, thereby experimentally decoupling decision certainty from target presence, and enabling to measure their independent effects on search time as a function of obsessive-compulsive tendencies.
+
+Hypothesis 3 – Direct replication. See main text.
+
+
+```{r h4_anova, echo=FALSE, cache=TRUE}
+
+H4.df<- search_slopes_df %>% 
+  filter(OCI_quantile==1 | OCI_quantile==4) %>% 
+  filter(search_type=='OinC')
+                          
+H4.desc <- H4.df %>% group_by(OCI_quantile, target_present) %>% summarise(mean_slope = mean(estimate))
+
+```
+
+*Hypothesis 4: Extension of Toffolo et al. (2013), search slopes* Following the previous hypothesis, we conducted the same mixed-effects ANOVA, with group (OC+/OC-) as between-subject variable and target presence (present/absent) as within-subject variables, only this time, we focused on the search slopes (reaction time as a function of set size) as a dependent variable. Consistent with our findings for Hypothesis 3, a mixed-effects ANOVA revealed no statistically significant interaction between group and target presence `r apa_print(afex::aov_ez("subj_id", "estimate", data=H4.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`, again providing no evidence for a selective slowing of OC+ individuals in target-absent trials.
+
+```{r h5_anova, echo=FALSE, cache=TRUE}
+H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
+
+```
+
+*Hypothesis 5: Low-uncertainty inference about absence*\
+Originally, our primary focus was on this hypothesis, examining the effect of obsessive-compulsive tendencies on target-absent search times in an easy, low-uncertainty, search setting. However, given our failure to replicate a group difference in the hard search (Hypotheses 3 and 4), a significant result here seemed unlikely. Indeed, a mixed-effects ANOVA with group as a between-subjects variable and target presence as a within-subjects variable did not reveal a significant interaction between group and target presence in the easy search, `r apa_print(afex::aov_ez("subj_id", "estimate", H5.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`.
+
+```{r model_comparison, echo=FALSE, cache=TRUE}
+
+#We didn't use LOOCV since we included random terms in our model. So instead we comapred models by their AIC and BIC values.  
+
+m1 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +search_type *OCI_group+
+         (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+        data =.)
+
+#examine model parameters 
+#parameters::model_parameters(m1, ci_method= 's')
+
+
+
+m2 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +target_present *OCI_group+
+         (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+        data = .)
+
+#examine model parameters 
+#parameters::model_parameters(m2, ci_method= 's')
+
+#create models table (table 1)
+H6.model_acc_table <-as.data.frame(compare_accuracy(m1, m2))  %>% 
+  select(Model, AIC) 
+
+#scale AIC values to zero 
+
+scaled_AIC_m1 =H6.model_acc_table$AIC[1] - H6.model_acc_table$AIC[1] 
+scaled_AIC_m2 =H6.model_acc_table$AIC[2] - H6.model_acc_table$AIC[1]
+
+H6.model_acc_table$scaled_AIC <- c(scaled_AIC_m1, scaled_AIC_m2)
+
+
+#extract model formula 
+m1_formula <- paste(deparse(formula(m1, fixed.only = T), width.cutoff = 500), collapse = " ")
+m2_formula <- paste(deparse(formula(m2, fixed.only = T), width.cutoff = 500), collapse = " ")
+
+H6.model_acc_table$formula <- c(m1_formula, m2_formula)
+
+```
+
+
+
+*Hypothesis 6: Model comparison* Our experimental design aimed to differentiate between difficulties arising from higher uncertainty and those arising from the absence of the target. To achieve this, we used two search types: a hard search (searching for a closed square among open squares), and an easy search (searching for an open square among closed squares). Additionally, we manipulated the presence or absence of the target. To determine whether uncertainty or absence had a greater impact on OC+ search time, we constructed two competing regression models that differed only in their interaction terms (table 1). Beyond the search type and the target presence predictors, the first model (M1) included the interaction between group and search type (easy/hard; slope_estimate\~ 1+group+search_type \* target_presence+ search_type \* group), while the second model (M2) included the interaction between group and target presence (absent/present; slope_estimate\~ 1+group+ search_type \* target_present+target_present \* group). Since the two models differ only in their last interaction effect, their complexity (that is, the number of fitted coefficients) is the same, which allowed us to compare these models directly. We compare model performance using their AIC and BIC values. The model comparison table shows that both models have the same AIC and BIC values suggesting that the interaction between group and target presence does not explain search time to a greater extent than the interaction between group and search type.
+
+```{r table_1, echo=FALSE, results='asis'}
+
+apa_table(H6.model_acc_table,
+          caption = 'Table 1 – Model comparison table',
+          note = 'The two models (M1, M2) are concerning hypothesis 6. AIC value of M1 was scaled to zero, to make the differences clearer.  Differences in AIC greater than 10 are considered as decisive evidence supporting the model with the lower numerical value. '
+          )
+
+``` 
+
+
+
+
 
 
 ```{r first_trials, echo=FALSE, cache=TRUE}
@@ -461,7 +587,7 @@ planned_wide_exc_19 %>%
 ```
 
 *Reanalysis of Experiment 2, preregistered hypothesis 2* 
-Here we reanalyze Experiment 2, preregistered hypothesis 2, this time including only participants who had  error rate smaller than the actual  error rate used in @toffoloMildUncertaintyPromotes2013 (number of error <19). The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide_exc_19, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Here too, a numeric interaction in the expected direction was driven by a descriptive difference in the timing of target-present responses, rather than by target-absent responses.  
+Here we reanalyze Experiment 2, preregistered hypothesis 2, this time including only participants who had  error rate smaller than the actual  error rate used in @toffolo2013 (number of error <19). The one-tailed t-test revealed no significant differences between the groups,`r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide_exc_19, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Here too, a numeric interaction in the expected direction was driven by a descriptive difference in the timing of target-present responses, rather than by target-absent responses.  
 
 
 
