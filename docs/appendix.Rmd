@@ -245,6 +245,7 @@ H9.model_acc_table$formula <- c(m2_formula, m3_formula)
 
  		In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) incorporating the full spectrum of OC scores (raw OCI total scores). We employed a mixed-effects regression model, which was analogous to M2 from Hypothesis 6, but with the key difference of employing the complete range of total OCI scores, as opposed to focusing solely on the top and bottom quartiles. As this revised model included all participants, not just those with high and low OC scores, it was fitted on a different dataset than M2 in Hypothesis 6. Due to this fundamental difference in the underlying data, a direct comparison of these models would not be appropriate. Consequently, our focus was on the interaction term involving the full range of OCI scores. The interaction between search type and total OCI score was found to be non-significant (`r apa_print(m3)$full_result$oci_overall_target_presentTRUE`).
  	
+ 	
 
 ```{r table_A2, echo=FALSE, results='asis'}
 
