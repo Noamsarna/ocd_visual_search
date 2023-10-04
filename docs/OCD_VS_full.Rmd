@@ -8,19 +8,21 @@ author:
     corresponding : yes    # Define only one corresponding author
     address       : "Tel Aviv, Israel 69978"
     email         : "noamsarna@mail.tau.ac.il"
+    
+ - name          : "Matan Mazor"
+    affiliation   : "2"
 
   - name          : "Ruvi Dar"
     affiliation   : "1"
 
-  - name          : "Matan Mazor"
-    affiliation   : "2"
+
 
 
 affiliation:
   - id            : "1"
     institution   : "School of Psychological Sciences, Tel Aviv University"
   - id            : "2"
-    institution   : "Department of Psychological Sciences, Birkbeck, University of London, UK"
+    institution   : "Department of Experimental Psychology, University of Oxford"
 
 abstract: |
  In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search task. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1004, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
@@ -43,20 +45,21 @@ appendix          : appendix.rmd
 
 ```{r setup, include = FALSE, warning=FALSE}
 
-library(groundhog)
+library('groundhog')
 groundhog.library(c(
-  "tidyverse",
+  "tidyverse", 
   "broom",
-  "nlme",
-  "lme4",
+  "nlme", #this package is for ...
+  "lme4", #this package is used in ...
   "lmerTest",
   "ggpubr",
   "cowplot",
   "caret",
   "papaja",
   "patchwork",
+  "wesanderson",
   "reshape2"
-),"2023-01-01")
+),"2022-12-01")
 # library(broom)
 # library(nlme)
 # library(lme4)
