@@ -43,19 +43,32 @@ appendix          : appendix.rmd
 
 ```{r setup, include = FALSE, warning=FALSE}
 
-library(tidyverse)
-library(broom)
-library(nlme)
-library(lme4)
-library(lmerTest)
-library(ggpubr)
-library(cowplot)
-library(caret)
-library(papaja)
-library(lvmisc)
-library(wesanderson)
-library(patchwork)
-library(reshape2)
+library(groundhog)
+groundhog.library(c(
+  "tidyverse",
+  "broom",
+  "nlme",
+  "lme4",
+  "lmerTest",
+  "ggpubr",
+  "cowplot",
+  "caret",
+  "papaja",
+  "patchwork",
+  "reshape2"
+),"2023-01-01")
+# library(broom)
+# library(nlme)
+# library(lme4)
+# library(lmerTest)
+# library(ggpubr)
+# library(cowplot)
+# library(caret)
+# library(papaja)
+# library(lvmisc)
+# library(wesanderson)
+# library(patchwork)
+# library(reshape2)
 
 ```
 
