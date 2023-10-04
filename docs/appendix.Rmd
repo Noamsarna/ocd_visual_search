@@ -9,7 +9,7 @@
 
   After the visual search task, participants were asked to rate the difficulty of detecting a specific target, or inferring its absence, among various distractors. Each question referred to a picture of a trial with a red square around the target if it was present, or no marking at all if the target was absent (so that participants were not actively searching for the target in the difficulty estimation part). Participants then rated the perceived difficulty on a continues scale, dragging the curser from left to right (see figure 2; search estimation). They rated four different trial types: detecting the presence of one closed square among many open squares, detecting the presence of one closed square among few open, detecting the absence of one open square among many closed squares and detecting the absence of one open square few closed squares. We focused on these four trials as this was our most intriguing hypothesis, comparing easy target-absent trials to more challenging target-present trials.
 
-## Supplementary results of Experiment 1
+# Supplementary results of Experiment 1
 
   In this section we present the results for all of our preregistered hypotheses.  A detailed preregistration document including all our original hypotheses for Experiment 1 at osf.io/yxqu9. 
   For all of our hypotheses regarding search time provided in this section, we used search slopes as our dependent measure. Subject-wise search slopes were extracted for each combination of search type (easy/hard search) and presence of the target (present/absent), resulting in four search slopes estimates for each participant – easy-present; hard-present; easy-absent; hard-absent. These slopes were computed by fitting a linear regression model to predict reaction time as a function of set size, with one intercept and one set-size term. 
@@ -38,7 +38,7 @@ H2.desc <- H2.df %>%
 
   The initial two control comparisons served to validate that we successfully designed a target-absent condition that was easier than a target-present condition, thereby experimentally decoupling decision certainty from target presence, and enabling to measure their independent effects on search time as a function of obsessive-compulsive tendencies.
 
-Hypothesis 3 – Direct replication. See main text.
+*Hypothesis 3 – Direct replication* See main text.
 
 
 ```{r h4_anova, echo=FALSE, cache=TRUE}
@@ -223,39 +223,13 @@ m3 <-
             (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
                data = search_slopes_df)
 
-#create models table (table 2)
-H9.model_acc_table <-as.data.frame(compare_accuracy(m2, m3))  %>% 
-  select(Model, AIC) 
-
-#scale AIC values to zero 
-scaled_AIC_m2_h9 =H9.model_acc_table$AIC[1] - H9.model_acc_table$AIC[1]
-scaled_AIC_m3    =H9.model_acc_table$AIC[2] - H9.model_acc_table$AIC[1]
-
-
-H9.model_acc_table$scaled_AIC <- c(scaled_AIC_m2_h9, scaled_AIC_m3 )
-
-
-#extract model formula 
-m3_formula <- paste(deparse(formula(m3, fixed.only = T), width.cutoff = 500), collapse = " ")
-
-H9.model_acc_table$formula <- c(m2_formula, m3_formula)
 ```
 
 *Hypothesis 9: Correlations between OC tendencies and search slopes.* 
 
- 		In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) incorporating the full spectrum of OC scores (raw OCI total scores). We employed a mixed-effects regression model, which was analogous to M2 from Hypothesis 6, but with the key difference of employing the complete range of total OCI scores, as opposed to focusing solely on the top and bottom quartiles. As this revised model included all participants, not just those with high and low OC scores, it was fitted on a different dataset than M2 in Hypothesis 6. Due to this fundamental difference in the underlying data, a direct comparison of these models would not be appropriate. Consequently, our focus was on the interaction term involving the full range of OCI scores. The interaction between search type and total OCI score was found to be non-significant (`r apa_print(m3)$full_result$oci_overall_target_presentTRUE`).
+  In order to strengthen the validity of our results, we reanalyzed our main hypothesis (H6, M2) incorporating the full spectrum of OC scores (raw OCI total scores). We employed a mixed-effects regression model, which was analogous to M2 from Hypothesis 6, but with the key difference of employing the complete range of total OCI scores, as opposed to focusing solely on the top and bottom quartiles. As this revised model included all participants, not just those with high and low OC scores, it was fitted on a different dataset than M2 in Hypothesis 6. Due to this fundamental difference in the underlying data, a direct comparison of these models would not be appropriate. Consequently, our focus was on the interaction term involving the full range of OCI scores. The interaction between search type and total OCI score was found to be non-significant (`r apa_print(m3)$full_result$oci_overall_target_presentTRUE`).
  	
  	
-
-```{r table_A2, echo=FALSE, results='asis'}
-
-apa_table(H9.model_acc_table,
-          caption = 'Table A2 – Model comparison table',
-          note = 'Same conventions as table A1 '
-          )
-
-```
-
 
 ```{r DASS_mediation, cache=TRUE, include=FALSE}
 
