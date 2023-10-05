@@ -47,10 +47,8 @@ appendix          : appendix.rmd
 
 library('groundhog')
 groundhog.library(c(
-  "tidyverse", 
+  "tidyverse",
   "broom",
-  "nlme", #this package is for ...
-  "lme4", #this package is used in ...
   "lmerTest",
   "ggpubr",
   "cowplot",
@@ -58,27 +56,18 @@ groundhog.library(c(
   "papaja",
   "patchwork",
   "wesanderson",
-  "reshape2"
-),"2022-12-01")
-# library(broom)
-# library(nlme)
-# library(lme4)
-# library(lmerTest)
-# library(ggpubr)
-# library(cowplot)
-# library(caret)
-# library(papaja)
-# library(lvmisc)
-# library(wesanderson)
-# library(patchwork)
-# library(reshape2)
+  "reshape2", 
+  "rlang",
+  "Matrix"
+),"2023-09-01", tolerate.R.version = '4.1.2', ignore.deps = c('knitr', 'xfun'), 
+force.install=TRUE)
 
 ```
 
 ```{r analysis-preferences}
-# Seed for random number generation
-set.seed(42)
-knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+ # Seed for random number generation
+ set.seed(42)
+ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 <!-- # Introduction  -->
