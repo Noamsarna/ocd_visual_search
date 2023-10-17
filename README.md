@@ -19,7 +19,9 @@ To ensure preregistration time-locking (in other words, that preregistration pre
 [protocol folder](https://github.com/Noamsarna/ocd_visual_search/blob/main/experiments/Experiment1/protocolFolder.zip)
 
 **protocol sum**:
-f57b521e9203c84f0edf016bc8c87a953c9d2b7a795f17be40c058ed379a5b6c 
+f57b521e9203c84f0edf016bc8c87a953c9d2b7a795f17be40c058ed379a5b6c
+
+[**Preregistration document from the protocol folder**](https://github.com/Noamsarna/ocd_visual_search/blob/main/experiments/Experiment1/OCD_VS_PR_OSF.docx) 
 
 ## Exp. 2
 
@@ -27,3 +29,6 @@ f57b521e9203c84f0edf016bc8c87a953c9d2b7a795f17be40c058ed379a5b6c
 
 **protocol sum**:
 228116017b7c37c092a878c5f8f5a5f19a4a9ceecfe61497a59cfe2cdcbcfcae
+
+[**Preregistration document from the protocol folder**](https://github.com/Noamsarna/ocd_visual_search/blob/main/experiments/Experiment2/OSF_PR.docx) 
+
