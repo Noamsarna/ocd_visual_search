@@ -59,9 +59,9 @@ groundhog.library(c(
   "reshape2", 
   "rlang",
   "Matrix"
-),"2023-09-01", tolerate.R.version = '4.1.2', ignore.deps = c('knitr', 'xfun'), 
+),"2023-09-01", ignore.deps = c('knitr', 'xfun'), 
 force.install=TRUE)
-
+#tolerate.R.version = '4.1.2'
 ```
 
 ```{r analysis-preferences}
