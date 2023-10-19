@@ -1,47 +1,45 @@
 ---
-title             : "Obsessive Compulsive visual search: a reexamination of presence-absence asymmetries"
-shorttitle        : "Obsessive Compulsive visual search: a reexamination of presence-absence asymmetries"
+title: "Obsessive Compulsive visual search: a reexamination of presence-absence asymmetries"
+shorttitle: "Obsessive Compulsive visual search: a reexamination of presence-absence asymmetries"
 
 author: 
-  - name          : "Noam Sarna"
-    affiliation   : "1"
-    corresponding : yes    # Define only one corresponding author
-    address       : "Tel Aviv, Israel 69978"
-    email         : "noamsarna@mail.tau.ac.il"
+  - name: "Noam Sarna"
+    affiliation: "1"
+    corresponding: yes    # Define only one corresponding author
+    address: "Tel Aviv, Israel 69978"
+    email: "noamsarna@mail.tau.ac.il"
     
- - name          : "Matan Mazor"
-    affiliation   : "2"
+  - name: "Matan Mazor"
+    affiliation: "2"
 
-  - name          : "Ruvi Dar"
-    affiliation   : "1"
-
-
-
+  - name: "Ruvi Dar"
+    affiliation: "1"
 
 affiliation:
-  - id            : "1"
-    institution   : "School of Psychological Sciences, Tel Aviv University"
-  - id            : "2"
-    institution   : "Department of Experimental Psychology, University of Oxford"
+  - id: "1"
+    institution: "School of Psychological Sciences, Tel Aviv University"
+  - id: "2"
+    institution: "Department of Experimental Psychology, University of Oxford"
 
 abstract: |
- In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search task. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1004, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
+  In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search task. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1004, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
   
-bibliography      : "r-references.bib"
+bibliography: "r-references.bib"
 
-floatsintext      : no
-linenumbers       : yes
-draft             : no
-mask              : no
+floatsintext: no
+linenumbers: yes
+draft: no
+mask: no
 
-figurelist        : no
-tablelist         : no
-footnotelist      : no
+figurelist: no
+tablelist: no
+footnotelist: no
 
-classoption       : "man"
-output            : papaja::apa6_word
-appendix          : appendix.rmd
+classoption: "man"
+output: papaja::apa6_word
+appendix: appendix.rmd
 ---
+
 
 ```{r setup, include = FALSE, warning=FALSE}
 
@@ -58,7 +56,8 @@ groundhog.library(c(
   "wesanderson",
   "reshape2", 
   "rlang",
-  "Matrix"
+  "Matrix",
+  "lvmisc"
 ),"2023-09-01", ignore.deps = c('knitr', 'xfun'), 
 force.install=TRUE)
 #tolerate.R.version = '4.1.2'
@@ -232,7 +231,11 @@ df.N_total <- search_df$subj_id %>% unique() %>% length()
 ## Measures
 
 # Visual search task
-  The visual search task described in this study was adapted from @mazorEfficientSearch2022, with stimuli intended to replicate the ones used in @toffolo2013. The task consisted of four blocks, each containing 24 trials of searching for either a closed or an open square. The search items were white on a dark grey background. To ensure that participants understood the task, the experiment began with a practice phase consisting of one block with six trials. Each display was presented for a maximum of 10 seconds or until a response was received. If no response was given within 10 seconds, the next trial immediately appeared. During the practice phase, feedback about accuracy was given after each trial: If the response was correct, the word “Correct!” appeared on the screen for one second; If the response was wrong, the word “wrong!” appeared on the screen for 5 seconds. The extended duration of the word “wrong” was intended to be aversive, to ensure that participants were paying full attention and motivated to provide accurate responses. In the main part of the experiment, no feedback was given, as was the case in the original paradigm [@toffolo2013]. After completing the practice, participants looked for either a closed square among rotated open squares (‘hard search’; Fig. 1, right panel), or for a rotated open square among closed squares (‘easy search’; Fig. 1, left panel). The difference in difficulty between these two search types is due to a search asymmetry for open edges [@treisman1988]. We further manipulated target presence and set size, resulting in a 2X2X2 design (search type: 'easy-search' or 'hard-search'; Target: present/absent; set size: 9 or 25). Block order was counterbalanced between participants: for half of the participants, it was two blocks of 'easy-search' followed by two blocks of 'hard-search'; for the other half, the order was reversed. For all participants, a change in the target was highlighted between the second and third blocks. A message in large font reading "Target changed" was displayed on the screen, followed by a verbal instruction to pay attention to the new target. The trial order within individual blocks was fully randomized (figure 2). 
+  The visual search task described in this study was adapted from @mazorEfficientSearch2022, with stimuli intended to replicate the ones used in @toffolo2013. The task consisted of four blocks, each containing 24 trials of searching for either a closed or an open square. The search items were white on a dark grey background. To ensure that participants understood the task, the experiment began with a practice phase consisting of one block with six trials. Each display was presented for a maximum of 10 seconds or until a response was received. If no response was given within 10 seconds, the next trial immediately appeared. During the practice phase, feedback about accuracy was given after each trial: If the response was correct, the word “Correct!” appeared on the screen for one second; If the response was wrong, the word “wrong!” appeared on the screen for 5 seconds. The extended duration of the word “wrong” was intended to be aversive, to ensure that participants were paying full attention and motivated to provide accurate responses. In the main part of the experiment, no feedback was given, as was the case in the original paradigm [@toffolo2013]. After completing the practice, participants looked for either a closed square among rotated open squares (‘hard search’; Fig. 1, main part, right panel), or for a rotated open square among closed squares (‘easy search’; Fig. 1, main part, left panel). The difference in difficulty between these two search types is due to a search asymmetry for open edges [@treisman1988]. We further manipulated target presence and set size, resulting in a 2X2X2 design (search type: 'easy-search' or 'hard-search'; Target: present/absent; set size: 9 or 25). Block order was counterbalanced between participants: for half of the participants, it was two blocks of 'easy-search' followed by two blocks of 'hard-search'; for the other half, the order was reversed. For all participants, a change in the target was highlighted between the second and third blocks. A message in large font reading "Target changed" was displayed on the screen, followed by a verbal instruction to pay attention to the new target. The trial order within individual blocks was fully randomized (figure 1). 
+  
+``` {r figure_1, fig.cap="Figure 1 - Overview of experimental Design. Top panel: each visual search trial started with a centered white fixation cross. Middle panel (Practice block): After reading the instructions, participants completed practice trials, searching for a rotated T among rotated L's in 6-trial blocks until they achieved a minimum accuracy of 0.83 (no more than one error). Middle panel (Main part): The primary experiment comprised 96 trials in four blocks, with the target identity changing after two blocks. Each 24-trial block followed a 2x2 design, manipulating set size (9 or 25) and target presence (present/absent). Bottom panel: Search difficulty estimation: participants used their mouse to rate search difficulty on a continuous scale. In questions about target-present searches, the target was marked with a red square."}
+knitr::include_graphics("figures/figure_1.png")
+```
   
 # Obsessive–Compulsive Inventory-Revised (OCI-R; Foa et al., 2002). 
 The OCI-R is an 18-item self-report measure of OCD symptom severity. Responders are asked to rate their level of distress pertaining to 18 statements in the past month on a five-point scale ranging from 0 (Not at all) to 4 (Extremely). The OCI-R has been shown to have good validity, test-retest reliability and internal consistency in both clinical [@foa2002] and non-clinical samples [@hajcak2004]. 
@@ -245,10 +248,6 @@ The DASS-21 is a 21- item self-report questionnaire that is divided into three s
 Experiment Structure. A static version of Experiment 1 can be accessed at: https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp1/.
 
   Participants were first instructed about the experiment's structure, which comprised three parts: the visual search task, questions about the visual search task, and the two inventories: OCI-R and DASS-21. Then, they received written instructions about the visual search task. Specifically, they were asked to report, as accurately and quickly as possible, whether a target stimulus was present or absent by pressing the J and F keys, respectively. To familiarize participants with the task structure and response keys, they were first presented with six practice trials, in which the target stimulus was a rotated T, and distractors were rotated Ls. Practice trials were delivered in one block of six trials, and the main part of the experiment started only once participants responded correctly on at least five trials. 
-  
-``` {r figure 1} 
-knitr::include_graphics("figures/figure_1.png")
-```
   
   After completing two of the four visual search blocks, participants were encouraged to take a short break. The main part of the experiment was followed by questions designed to evaluate the subjective difficulty of this part of the task. Participants were asked to rate the difficulty of noticing the presence or absence of a certain target among different distractors (more information about this in the appendix). Following the difficulty estimation, participants completed the OCI-R  and DASS-21. We included two attention check questions among the OCI-R items, asking participants to select a certain answer (‘If you read this question, check the option ‘Not at all’).
   
@@ -268,10 +267,6 @@ knitr::include_graphics("figures/figure_1.png")
 
 We used `r cite_r("r-references.bib")` for all our analyses.A detailed preregistration document for Experiment 1 can be accessed at osf.io/yxqu9. All analysis scripts and anonymized data are available at github.com/Noamsarna/ocd_visual_search.
 
-``` {r figure 2} 
-knitr::include_graphics("figures/figure_2.png")
-```
-  
 # Results
 
 ```{r analyze_data, cache=TRUE, include=FALSE}
@@ -398,7 +393,7 @@ H3.df <- toffolo_data %>%
 
 ```
 # Replication of group differences in target-absent RT
-  To directly replicate group differences in target-absent RTs (Toffolo et al., 2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, followed by a pattern wherein the mean RT difference between the OC+ and OC- groups would be significantly more pronounced in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present` (figure 3, Exp1; preregistered hypothesis 3).
+  To directly replicate group differences in target-absent RTs (Toffolo et al., 2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, followed by a pattern wherein the mean RT difference between the OC+ and OC- groups would be significantly more pronounced in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present` (figure 2, Exp1; preregistered hypothesis 3).
 
   Similarly, when we used our entire sample (the four quartiles), and replaced the group variable (OC+; OC-) with the complete OCI-R scale, we found no interaction between OCI-R score and the presence of the target (preregistered hypothesis 9; β̂=-0.07, 95% CI [-2.48,2.35], t(941.54)=-0.05, p=.957). No significant group differences were observed when accounting for anxiety and depression either (preregistered hypothesis 10; β̂=8.62, 95% CI [-21.50,38.74], t(463.53)=0.56, p=.575). There were also no significant RT differences between groups during the task’s initial trials, prior to the accumulation of any experience (preregistered hypothesis 8; F(1,360)=0.93, p=.336). Lastly, we observed no significant differences between the groups in their self-reported measures of task difficulty. Detailed calculations and results for all these hypotheses are provided in the Appendix for further reference.
 
@@ -620,10 +615,10 @@ To validate our paradigm and demonstrate that target-absent searches are more di
 
 *Direct replication*
 
-  The primary aim of Experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). Following the analysis performed in Toffolo et al., (2013), we conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable.  In contrast to Toffolo et al. (2013), where presence-absence differences in reaction time were more pronounced among OC+ participants, in our replication sample the one-tailed t-test revealed no significant differences between the groups, `r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Notably, the numeric trend of the interaction in our sample was driven by OC+ shorter response time than OC- in target-present trials, rather than by longer response time for target-absent responses (Figure 3, Exp2). This pattern is different from that reported by Toffolo et al. (2013), where OC+ participants were slower in both search types, but particularly in target-absent searches (Figure 3, Toffolo et al., 2013). 
+  The primary aim of Experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). Following the analysis performed in Toffolo et al., (2013), we conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable.  In contrast to Toffolo et al. (2013), where presence-absence differences in reaction time were more pronounced among OC+ participants, in our replication sample the one-tailed t-test revealed no significant differences between the groups, `r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Notably, the numeric trend of the interaction in our sample was driven by OC+ shorter response time than OC- in target-present trials, rather than by longer response time for target-absent responses (Figure 2, Exp2). This pattern is different from that reported by Toffolo et al. (2013), where OC+ participants were slower in both search types, but particularly in target-absent searches (Figure 2, Toffolo et al., 2013). 
 
-``` {r figure 3} 
-knitr::include_graphics("figures/figure_3.png")
+``` {r figure_2, fig.cap="Figure 2 - Results from Experiment 1 (preregistered H3), Experiment 2 (preregistered H2) and Toffolo et al., 2013, 2014. Mean reaction times for target-absent and target-present trials (X-axis). Error bars represent the standard error of the mean. Shapes represent the OC groups: Circle for OC+; Triangle for OC-."}
+knitr::include_graphics("figures/figure_2.png")
 ```
 
 # Discussion
