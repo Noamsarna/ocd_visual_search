@@ -265,7 +265,7 @@ Experiment Structure. A static version of Experiment 1 can be accessed at: https
 
 # Transparency and openness 
 
-We used `r cite_r("r-references.bib")` for all our analyses.A detailed preregistration document for Experiment 1 can be accessed at osf.io/yxqu9. All analysis scripts and anonymized data are available at github.com/Noamsarna/ocd_visual_search.
+We used `r cite_r("r-references.bib")` for all our analyses. A detailed preregistration document for Experiment 1 can be accessed at osf.io/yxqu9. All analysis scripts and anonymized data are available at github.com/Noamsarna/ocd_visual_search.
 
 # Results
 
@@ -543,7 +543,7 @@ exp2.checking_task <-exp2.checking_task %>%
 ```{r Exp2_analyze_data, warning=FALSE, cache=TRUE, include=FALSE}
 
 #plot figure of mean RT for each group  
-
+exp_2_results<-
 checking_by_sub %>% 
 select(subj_id, target_present, oci_type, mean_RT)  %>%
   ggplot(aes(x = target_present, y = mean_RT,  group = oci_type, shape = oci_type)) +
