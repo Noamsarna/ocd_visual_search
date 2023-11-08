@@ -188,6 +188,9 @@ search_df$RT <- as.numeric(search_df$RT)
 search_df$correct <- as.numeric(as.logical(search_df$correct))
 search_df$set_size <- as.factor(search_df$set_size)
  
+#N total before3 exclusion 
+df.N_before_exclusion <- search_df$subj_id %>% unique() %>% length()
+
 
 # Rejecting participants with more than 15% error trials -----------------------
 
@@ -197,7 +200,7 @@ rejection_df <- search_df %>%
             mean_error=1-accuracy) %>% 
   mutate(reject = accuracy<0.85)
 
-rejected_num <- sum(rejection_df$reject=='TRUE')
+#rejected_num <- sum(rejection_df$reject=='TRUE')
 
 
 # flag bad trails
@@ -214,7 +217,7 @@ search_df <- left_join(search_df,
   
 
 #total n after participants removal 
-df.N_total <- search_df$subj_id %>% unique() %>% length()
+df.N_after_exclusion <- search_df$subj_id %>% unique() %>% length()
 
 #total n in each quartile 
 #search_df %>% select(subj_id, OCI_quantile) %>% unique() %>% select(OCI_quantile) %>% table()
