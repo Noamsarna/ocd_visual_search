@@ -59,8 +59,7 @@ groundhog.library(c(
   "Matrix",
   "lvmisc"
 ),"2023-09-01", ignore.deps = c('knitr', 'xfun'), 
-force.install=TRUE)
-#tolerate.R.version = '4.1.2'
+force.install=TRUE, tolerate.R.version = '4.1.2')
 ```
 
 ```{r analysis-preferences}
@@ -200,24 +199,28 @@ rejection_df <- search_df %>%
             mean_error=1-accuracy) %>% 
   mutate(reject = accuracy<0.85)
 
-#rejected_num <- sum(rejection_df$reject=='TRUE')
-
-
-# flag bad trails
+# flag bad trails (shorter than 100ms)
 search_df <- search_df %>% rowwise() %>% 
   mutate(under_100 = as.numeric(RT <= 100)) 
 
+# count if there are participants with more than 25% of trials below 100 ms. 
+participant_short_trials<-
+search_df %>% 
+  group_by(subj_id) %>%
+  summarize(count_under_100 = sum(under_100 == 1))
+
+#No participants with more than 25% error trials. 
 
 #filter out participants for accuracy and attention check 
 search_df <- left_join(search_df, 
                        rejection_df %>% select(subj_id, reject), 'subj_id') %>%
-  # filter(reject=='FALSE' | failed_attention_OCI == 1)
   filter(reject=='FALSE' & failed_attention_OCI == 0) %>%
   filter(under_100 == 0)  #filter our trials 
   
 
 #total n after participants removal 
 df.N_after_exclusion <- search_df$subj_id %>% unique() %>% length()
+total_excluded <- df.N_before_exclusion - df.N_after_exclusion
 
 #total n in each quartile 
 #search_df %>% select(subj_id, OCI_quantile) %>% unique() %>% select(OCI_quantile) %>% table()
@@ -260,7 +263,7 @@ Experiment Structure. A static version of Experiment 1 can be accessed at: https
 ## Data Analysis
 # Exclusion Criteria  
 
-  Participants were excluded if they made more than 15% errors in the main part of the experiment or for having extremely fast or slow reaction times (below 100 milliseconds or above 5 seconds) in more than 25% of the trials. Participants were also excluded from the analysis if they failed one or more of the attention checks. In total, 106 out of 1004 participants were excluded from the analysis. For the remaining participants, error trials and trials with response times below 100 milliseconds or above 5 seconds were excluded from the response-time analysis.
+  Participants were excluded if they made more than 15% errors in the main part of the experiment or for having extremely fast  (below 100 milliseconds) in more than 25% of the trials. Participants were also excluded from the analysis if they failed one or more of the attention checks. In total, 109 out of 1007 participants were excluded from the analysis. For the remaining participants, error trials and trials with response times below 100 milliseconds were excluded from the response-time analysis.
 
 # Hypotheses and analysis plan 
   
@@ -354,6 +357,34 @@ slopes_table <-search_slopes_df %>%
 
 ```
 
+```{r demographics, echo=FALSE, cache=TRUE}
+
+# create function to calculate percentages for column in demographic
+
+calculate_percentage <- function(data, column_name) {
+  counts <- data %>%
+    filter(!!sym(column_name) != "DATA_EXPIRED") %>%
+    count(!!sym(column_name)) %>%
+    rename(Category = !!sym(column_name), Count = n)
+
+  total_count <- sum(counts$Count)
+
+  counts %>%
+    mutate(Percentage = round((Count / total_count) * 100, 2))
+}
+
+# Calculate percentages for Ethnicity, Sex, Nationality, and Employment Status
+ethnicity_percentage <- calculate_percentage(demo_prolific, "Ethnicity.simplified")
+sex_percentage <- calculate_percentage(demo_prolific, "Sex")
+nationality_percentage <- calculate_percentage(demo_prolific, "Nationality")
+employment_percentage <- calculate_percentage(demo_prolific, "Employment.status")
+
+#  mean and standard deviation of Age
+age_stats <- demo_prolific %>%
+  summarise(Mean_Age = round(mean(as.numeric(Age), na.rm = TRUE), 2),
+            SD_Age = round(sd(as.numeric(Age), na.rm = TRUE), 2))
+
+```
 
 ```{r DR_h3, echo=FALSE, cache=TRUE}
   
@@ -421,6 +452,10 @@ failed_practice <- exp2.jatos_df %>%
 
 exp2.jatos_df <- left_join(exp2.jatos_df, failed_practice)
 
+#remove participants who failed practice 
+ failed_practice$subj_id <- as.factor(failed_practice$subj_id)
+ exp2.jatos_df<- exp2.jatos_df %>% filter(failed_practice=='FALSE') 
+
 n_failed_practice <- failed_practice %>% pull(failed_practice) %>% sum()
 
 total_valid_n <- exp2.jatos_df %>%
@@ -432,6 +467,12 @@ total_valid_n <- exp2.jatos_df %>%
 exp2.demo_prolific<-read.csv("../data/Ex2_anon_demo_prolific.csv")
 exp2.demo_prolific$subj_id <- as.factor(exp2.demo_prolific$subj_id)
 
+#keep only participants who didn't failed practice 
+exp2.demo_prolific <- exp2.demo_prolific %>% left_join(., failed_practice %>% select(subj_id, failed_practice),
+                                                       by='subj_id')
+
+exp2.demo_prolific <- exp2.demo_prolific %>%  filter(failed_practice== FALSE)
+
 #merge df
 exp2.jatos_df$subj_id <- as.factor(exp2.jatos_df$subj_id)
 exp2.jatos_df <- left_join(exp2.jatos_df, exp2.demo_prolific, by='subj_id')
@@ -439,7 +480,6 @@ exp2.jatos_df <- left_join(exp2.jatos_df, exp2.demo_prolific, by='subj_id')
 
 #parse oci data from df 
 exp2.OCI_df <- exp2.jatos_df %>%
-  filter(failed_practice=='FALSE') %>% 
   filter(grepl('oci', Identifier)) %>% 
   select(subj_id, question, answer_oci) %>% 
   mutate(attention_check = question %in% c("OCI-Attention_check_1","OCI-Attention_check_2")) %>%
