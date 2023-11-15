@@ -22,7 +22,7 @@ affiliation:
     institution: "Department of Experimental Psychology, University of Oxford"
 
 abstract: |
-  In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search task. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1004, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
+  In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search task. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1007, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
   
 bibliography: "r-references.bib"
 
@@ -59,7 +59,8 @@ groundhog.library(c(
   "Matrix",
   "lvmisc"
 ),"2023-09-01", ignore.deps = c('knitr', 'xfun'), 
-force.install=TRUE, tolerate.R.version = '4.1.2')
+force.install=TRUE)
+#, tolerate.R.version = '4.1.2')
 ```
 
 ```{r analysis-preferences}
@@ -187,7 +188,7 @@ search_df$RT <- as.numeric(search_df$RT)
 search_df$correct <- as.numeric(as.logical(search_df$correct))
 search_df$set_size <- as.factor(search_df$set_size)
  
-#N total before3 exclusion 
+#N total before exclusion 
 df.N_before_exclusion <- search_df$subj_id %>% unique() %>% length()
 
 
@@ -232,7 +233,7 @@ total_excluded <- df.N_before_exclusion - df.N_after_exclusion
 
 # Participants
 
-  The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and four participants were recruited via Prolific (https://prolific.co/) and selected based on their acceptance rate (>95%) and for being native English speakers, located in the UK. The entire experiment took 14 minutes to complete (median completion time: 14 min.). Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were assigned into OC+ group if they were in the highest quartile in the OCI-R scores distribution, and to the OC- group if they were in the lowest quartile of this distribution. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants. The details of our preregistered analysis can be accessed at osf.io/yxqu9.
+  The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (https://prolific.co/) and selected based on their acceptance rate (>95%) and for being native English speakers, located in the UK. The entire experiment took 14 minutes to complete (median completion time: 14 min.). Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were assigned into OC+ group if they were in the highest quartile in the OCI-R scores distribution, and to the OC- group if they were in the lowest quartile of this distribution. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants. The details of our preregistered analysis can be accessed at osf.io/yxqu9.
 
 ## Measures
 
@@ -359,7 +360,7 @@ slopes_table <-search_slopes_df %>%
 
 ```{r demographics, echo=FALSE, cache=TRUE}
 
-# create function to calculate percentages for column in demographic
+# create function to calculate percentages for a given column in demographic
 
 calculate_percentage <- function(data, column_name) {
   counts <- data %>%
@@ -379,7 +380,7 @@ sex_percentage <- calculate_percentage(demo_prolific, "Sex")
 nationality_percentage <- calculate_percentage(demo_prolific, "Nationality")
 employment_percentage <- calculate_percentage(demo_prolific, "Employment.status")
 
-#  mean and standard deviation of Age
+#  mean and sd of age
 age_stats <- demo_prolific %>%
   summarise(Mean_Age = round(mean(as.numeric(Age), na.rm = TRUE), 2),
             SD_Age = round(sd(as.numeric(Age), na.rm = TRUE), 2))
