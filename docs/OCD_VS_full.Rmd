@@ -50,7 +50,6 @@ groundhog.library(c(
   "lmerTest",
   "ggpubr",
   "cowplot",
-  "caret",
   "papaja",
   "patchwork",
   "wesanderson",
@@ -130,7 +129,7 @@ OCI_df <- df %>%
 # create DASS data ---------------------------------------------------------
 
 #create vectors for DASS subscales. 
-DASS_anxiety <- c("DASS-4","DASS-7", "DASS-9", "DASS-15", "DASS-19", "DASS-20")
+DASS_anxiety <- c("DASS-2", "DASS-4","DASS-7", "DASS-9", "DASS-15", "DASS-19", "DASS-20")
 DASS_depression <- c("DASS-3","DASS-5", "DASS-10", "DASS-13", "DASS-16", "DASS-17","DASS-21")
 
 #parse DASS data from df
