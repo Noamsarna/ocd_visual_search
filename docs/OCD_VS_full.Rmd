@@ -22,7 +22,7 @@ affiliation:
     institution: "Department of Experimental Psychology, University of Oxford"
 
 abstract: |
-  In previous research, obsessive-compulsive (OC) tendencies were associated with longer search times in a visual search task. These findings, which were replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on search times when a target was present in the display. Initially, this selectivity was interpreted as indicative of checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OC tendencies (OC+) suffer from a more specific difficulty with inferences about absence. In two large-scale pre-registered online experiments (conceptual replication N = 1007, direct replication N = 226), we sought to replicate the original finding and shed further light on its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence.  In both experiments, we find no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our findings provide no support for the previously observed higher search times of OC+ participants in target-absent trials. We discuss potential differences relative to previous findings and implications for cognitive and metacognitive theories of OCD.
+  In previous research, obsessive-compulsive (OCD) tendencies were associated with longer search times in visual search task. These findings, replicated and extended to a clinical sample, were specific to target-absent trials, with no effect on target-present trials. This selectivity was interpreted as checking behavior in response to mild uncertainty. However, an alternative interpretation is that individuals with high OCD tendencies (OC+) have a specific difficulty with inference about absence. In two large-scale pre-registered online experiments (conceptual replication N= 1007; direct replication N= 226), we sought to replicate the original finding and elucidate its underlying cause: an increased sensitivity to mild uncertainty, or a selective deficiency in inference about absence. Both experiments showed no evidence of prolonged search times in target-absent trials for OC+ individuals. Taken together, our results do not support the notion that inducing mild uncertainty in the form of target absence leads to excessive checking among OC+ individuals.
   
 bibliography: "r-references.bib"
 
@@ -72,24 +72,24 @@ force.install=TRUE)
  knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
-<!-- # Introduction  -->
+# Introduction
 
-Theories on obsessive-compulsive disorder (OCD) emphasize the pivotal role of pathological doubt in the disorder's phenomenology [@dar2004; @darSeekingProxies2021; @rasmussen1989; @reed1985; @shapiro1965] . This persistent doubt is reflected in lowered confidence in memory, decision making, perception and other cognitive functions, which give rise to repetitive checking rituals that, paradoxically, only serve to intensify the doubt [@vandenhout2003]. In the lab, doubt and checking behavior are commonly manifested in slow reaction times. For instance, in a study by @sarig2012, participants with high and low obsessive-compulsive tendencies (OC+; OC- respectively) were asked to judge the exact midpoint on a continuum of colors. In another study by @rotge2008, patients with OCD had to compare two images and determine whether they were identical or different. In both studies, obsessive-compulsive tendencies were associated with slower reaction times, presumably driven by the need to check. Such findings have been interpreted as indicating that OC+ participants require more evidence when faced with uncertainty in perceptual decision-making tasks [@banca2015; @hauser2017].
+  Theories on obsessive-compulsive disorder (OCD) emphasize the pivotal role of pathological doubt in the disorder’s phenomenology [@dar2004; @darSeekingProxies2021; @rasmussen1989; @reed1985] This persistent doubt is reflected in lowered confidence in memory, decision-making, perception and other cognitive functions, which give rise to repetitive checking rituals that, paradoxically, only serve to intensify the doubt [@vandenhout2003]. In the lab, doubt and checking behavior are commonly manifested in slow reaction times (e.g., @sarig2012; @banca2015; @hauser2017.
 
-  The present study focused on the finding that OC+ participants took more time than OC- participants to identify when a target was absent from a visual search array, whereas no such difference was observed when the target was present [@toffolo2013]. These findings have been replicated [@toffolo2014] and extended to a clinical sample, where they were found to be specific to patients with OCD and absent in those suffering from anxiety [@toffolo2016].  In these experiments, checking behavior was operationalized as search time, and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Relatively longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking behavior under mild uncertainty. 
+  The present study focused on the finding that participants with high OCD tendencies (OC+) took more time than those with low OCD tendencies (OC-) to identify when a target was absent from a visual search array, whereas no such difference was observed when the target was present [@toffolo2013]. These findings have been replicated [@toffolo2014] and extended to a clinical sample, where they were found to be specific to patients with OCD and absent in those suffering from anxiety [@toffolo2016].  In these experiments, checking behavior was operationalized as search time, and high and low uncertainty were operationalized by means of contrasting target-present and target-absent trials. Relatively longer search times for the OC+ group in target-absent trials were interpreted as perseverative checking behavior under mild uncertainty. However, while deciding that a target is absenct is indeed commonly accompanied by lower levels of subjective confidence compared to deciding that a target is present [@mazorDistinctNeuralContributions2020; @mazorRegisteredReport2021], these type of decisions about absence, are also qualitatively different from decisions about presence, as they cannot be based on direct perceptual evidence. To determine that a target is absent, one must believe that if the target were present, they would have been able to perceive it: a form of inference that requires counterfactual thinking and reliance on self-knowledge [@mazorInferenceAbsence2021]. Therefore, an alternative mechanism behind the longer search times in target-absent trials among OC+ participants could be a specific difficulty with inference about absence, rather than simply heightened sensitivity to uncertainty. 
   
-  While decisions about absence are indeed commonly accompanied by lower levels of subjective confidence compared to decisions about presence [@mazorDistinctNeuralContributions2020; @mazorRegisteredReport2021], they are also qualitatively different from decisions about presence, as they cannot be based on direct perceptual evidence. To determine that a target is absent, one must believe that if the target were present, they would have been able to perceive it: a form of inference that requires counterfactual thinking and reliance on self-knowledge [@mazorInferenceAbsence2021]. Therefore, an alternative mechanism behind the longer search times in target-absent trials among OC+ participants could be a specific difficulty with inference about absence, rather than simply heightened sensitivity to uncertainty. 
+  Clinical observations provide some support for the idea that people with OCD struggle with inferences about absence. One example is "Hit-and-run OCD", in which individuals feel compelled to mentally or physically retrace their driving route to ensure that they did not kill or injure someone while driving [@hyman2010]. This phenomenon manifests key properties of inference about absence: To conclude that an accident has not happened, a person needs to rely on the belief that if it did happen, they would have noticed it. 
   
-  To illustrate the differences between inference about presence and inference about absence, consider an example. Imagine you are going to a party and have planned to meet your friend there. You arrive at a big house with several floors and many rooms, but unfortunately, your phone battery dies so you can’t contact your friend. In the “target-present” scenario, you run into your friend and can conclude with confidence that he is present. However, how does the situation unfold in the “target-absent” scenario, where your friend has not in fact arrived at the party? You navigate the space searching for your friend without success. At what point during this process would you conclude that your friend is absent, that is, that if they were there you would have found them by now? As this example shows, the "target-absent" situation not only introduces a heightened level of uncertainty, but also involves a decision-making process that is fundamentally different in nature than in the target-present scenario.
-  
-  Clinical observations provide some support for the idea that people with OCD struggle with inferences about absence. One example is "Hit-and-run OCD", in which individuals feel compelled to mentally or physically retrace their driving route to ensure that they did not kill or injure someone while driving [@hyman2010]. This phenomenon exhibits the classic structure of an OCD symptom, involving an obsessional doubt about potential harm ("Did I run someone over?") and the compulsion to reduce the doubt by checking [@DiagnosticStatisticalManual2013]. It also manifests key properties of inference about absence: To conclude that an accident has not happened, a person needs to rely on the belief that if it did happen, they would have noticed it. Other clinical examples include situations in which people are obsessed with the idea that they may have posted something offensive online without realizing it, and are compelled to check their entire browsing history. 
-  
-  These clinical examples hint at the possibility that the increased search time for target-absent trials may be due to a specific difficulty in inferring absence rather than a general intolerance of uncertainty. Disentangling which of these two factors contributes to obsessive compulsive phenomenology is a challenging task due to the robust increase in subjective uncertainty in decisions about absence. Nevertheless, certain judgments about absence can be made with relative certainty, such as deciding that there is no red dot in an array of blue dots (“absence pop-out”; @mazorEfficientSearch2022. Here we made use of this fact to distinguish absence-specific versus generic uncertainty effects in the visual search behavior of OC+ individuals. 
-  
-  In two pre-registered online studies, we conducted a conceptual replication and a direct replication of the visual search study by @toffolo2013. High and low OC participants were presented with visual search displays and asked to decide whether a target was absent or present. Experiment 1 aimed to elucidate whether the increased search times in target-absent trials for OC+ individuals are attributable to a specific difficulty with inference about absence or a general difficulty with handling uncertainty. Following our failure to replicate the original findings in this first experiment, Experiment 2 was designed as a more direct replication of @toffolo2013, using the exact same stimuli and instructions. 
+  This clinical examples raise the possibility that the increased search time for target-absent trials may be due to a specific difficulty in inferring absence rather than a general intolerance of uncertainty. To test this idea, in two pre-registered online studies, we conducted a conceptual replication and a direct replication of the visual search study by @toffolo2013. Participants high and low in OCD tendencies were presented with visual search displays and asked to decide whether a target was absent or present. Experiment 1 aimed to elucidate whether the increased search times in target-absent trials for OC+ individuals are attributable to a specific difficulty with inference about absence or a general difficulty with handling uncertainty. Following our failure to replicate the original findings in this first experiment, Experiment 2 was designed as a more direct replication of @toffolo2013, using the exact same stimuli and instructions. 
   
 ## Experiment 1 
-  In Experiment 1, we sought to replicate the previously reported differences in target-absent search times between OC- and OC+ individuals, and to decouple absence- from uncertainty- related effects. By introducing an easy target-absent condition, we intended to dissociate specific difficulties with inference about absence from more general difficulties with uncertainty. To our surprise, we observed no group differences in target-absent search times, even for search displays that elicit high levels of uncertainty. We therefore focus our report here on this replication failure, aiming our efforts towards reproducing the original observation of OC+ participants showing longer search times than OC- participants in target-absent trials, but not in target-present ones. Interested readers can find a detailed preregistration document including all our original hypotheses for Experiment 1 at osf.io/yxqu9, and all the additional analysis for our preregistered hypotheses can be found in the appendix of this paper.  
+
+In Experiment 1, we sought to dissociate specific difficulties with inference about absence from more general difficulties with uncertainty by introducing an easy target-absent condition. To our surprise, we observed no group differences in target-absent search times, even for search displays that elicit high levels of uncertainty. We therefore focus our report here on this replication failure. 
+
+## Transparency and openness
+  We report how we determined our sample size, all data exclusions, all manipulations, and all measures in the study. All analysis scripts and anonymized data are available at github.com/Noamsarna/ocd_visual_search. The order and timing of experimental events were determined pseudo-randomly by the Mersenne Twister pseudorandom number generator, initialized to ensure registration time-locking (Mazor et al., 2019). A detailed preregistration document for Experiment 1 can be accessed at github.com/Noamsarna/ocd_visual_search/tree/main/experiments/Experiment1
+
+
 	
 ```{r load_data, warning=FALSE, cache=TRUE, include=FALSE}
 
@@ -152,7 +152,8 @@ questionnaires_df <- left_join(OCI_df, DASS_df,by = "subj_id")
 # plot OCI histogram  -----------------------------------------------------
 
 #png("../ocd_visual_search/docs/figures/OCI_R_histogram.png", width = 1200, height = 800, res = 300)
-hist(OCI_df$oci_overall, breaks = 'FD', xlab = "OCI-R total score", main = "OCI-R histogram", cex.main = 1.25)
+hist(OCI_df$oci_overall, breaks = 'FD', xlab = "OCI-R total score", main = "OCI-R histogram", cex.main = 0.9,
+     cex.lab = 0.75,)
 #dev.off()
 
 OCI_R_skewness <-skewness(OCI_df$oci_overall)
@@ -182,12 +183,14 @@ cronbach.alpha(OCI_raw_items)
 #DASS histogram 
 #anxiety 
 #png("../ocd_visual_search/docs/figures/DASS_anx_hist.png", width = 1200, height = 800, res = 300)
-hist(DASS_df$DASS_anxiety, breaks = 20, xlab = "DASS anxiety total score", main = "DASS anxiety histogram", cex.main = 1.25, xlim = c(0, 20))
+hist(DASS_df$DASS_anxiety, breaks = 20, xlab = "DASS anxiety total score", main = "DASS anxiety histogram", cex.main = 0.9,
+     cex.lab = 0.75, xlim = c(0, 20))
 #dev.off()
 
 #depression
 #png("../ocd_visual_search/docs/figures/DASS_dep_hist.png", width = 1200, height = 800, res = 300)
-hist(DASS_df$DASS_depression, breaks = 20, xlab = "DASS depression total score", main = "DASS depression histogram", cex.main = 1.25, xlim = c(0, 20))
+hist(DASS_df$DASS_depression, breaks = 20, xlab = "DASS depression total score", main = "DASS depression histogram", cex.main = 0.9,
+     cex.lab = 0.75, xlim = c(0, 20))
 #dev.off()
 
 #pull DASS items for internal consistency analysis 
@@ -304,13 +307,15 @@ exp1_acc_df <-
 search_df %>% 
   group_by(subj_id, OCI_quantile, target_present) %>% 
   summarise(accuracy = mean(correct))
-            
+
+exp1_acc_stats<-            
 exp1_acc_df %>% filter(OCI_quantile==1 | OCI_quantile==4) %>%
-  group_by(OCI_quantile, target_present) %>% 
+  group_by(OCI_quantile) %>% 
   summarise(mean_acc = mean(accuracy))
 
 #t.test comapre groups acc 
-exp1_acc_df %>% filter(OCI_quantile==1 | OCI_quantile==4) %>% group_by(subj_id, OCI_quantile) %>% summarise(mean_acc=mean(accuracy)) %>% 
+exp1_acc_t_test<-
+exp1_acc_df %>% filter(OCI_quantile==1 | OCI_quantile==4) %>% group_by(subj_id, OCI_quantile) %>% summarise(mean_acc=mean(accuracy)) %>%
   ungroup() %>% 
   t.test(mean_acc~OCI_quantile, data=., alternative="two.sided")
 
@@ -346,50 +351,34 @@ age_stats <- demo_prolific %>%
 
 # Participants
 
-  The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (https://prolific.co/) and selected based on their acceptance rate (>95%) and for being native English speakers, located in the UK. The entire experiment took 14 minutes to complete (median completion time: 14 min.). Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were divided into OC+ and OC- groups based on their scores in the OCI-R (Foa et al., 2002; see below), with the OC+ group consisting of those in the highest quartile of the OCI-R scores distribution and the OC- group comprising those in the lowest quartile of this distribution. The entire sample (n=1007) completed the visual search task. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants. The details of our preregistered analysis can be accessed at osf.io/yxqu9.
+  The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (https://prolific.co/) and selected based on their acceptance rate (>95%) and for being native English speakers, located in the UK. The median completion time for the entire experiment was 14 minutes.  Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were divided into high (OC+) and low (OC-) OCD tendencies groups based on their scores in the OCI-R (Foa et al., 2002; see below), with the OC+ group consisting of those in the highest quartile of the OCI-R scores distribution and the OC- group comprising those in the lowest quartile of this distribution. The entire sample (n=1007) completed the visual search task. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants. 
   
   The average age of the total sample was `r printnum(age_stats$Mean_Age)` years (SD = `r printnum(age_stats$SD_Age)`). Half of the sample identified as female. In terms of ethnicity, the majority (`r printnum(round(max(ethnicity_percentage$Percentage,0)))`) identified as White, followed by Asian (7%), Black (4%), and Mixed/Other (5%). The predominant nationality was UK (93%). Employment status was predominantly full-time (62%), followed by part-time (16%).
 
-## Measures
-
 # Visual search task
-  The visual search task described in this study was adapted from @mazorEfficientSearch2022, with stimuli intended to replicate the ones used in @toffolo2013. The task consisted of four blocks, each containing 24 trials of searching for either a closed or an open square. The search items were white on a dark grey background. To ensure that participants understood the task, the experiment began with a practice phase consisting of one block with six trials. Each display was presented for a maximum of 10 seconds or until a response was received. If no response was given within 10 seconds, the next trial immediately appeared. During the practice phase, feedback about accuracy was given after each trial: If the response was correct, the word “Correct!” appeared on the screen for one second; If the response was wrong, the word “Wrong!” appeared on the screen for 5 seconds. The extended duration of the word “Wrong” was intended to be aversive, to ensure that participants were paying full attention and motivated to provide accurate responses. In the main part of the experiment, no feedback was given, as was the case in the original paradigm [@toffolo2013]. After completing the practice, participants looked for either a closed square among rotated open squares (‘hard search’; Fig. 1, main part, right panel), or for a rotated open square among closed squares (‘easy search’; Fig. 1, main part, left panel). The difference in difficulty between these two search types is due to a search asymmetry for open edges [@treisman1988]. We further manipulated target presence and set size, resulting in a 2X2X2 design (Search type: 'easy-search' or 'hard-search'; Target: present/absent; set size: 9 or 25). Block order was counterbalanced between participants: for half of the participants, it was two blocks of 'easy-search' followed by two blocks of 'hard-search'; for the other half, the order was reversed. For all participants, a change in the target was highlighted between the second and third blocks. A message in large font reading "Target changed" was displayed on the screen, followed by a verbal instruction to pay attention to the new target. The trial order within individual blocks was fully randomized (figure 1). 
-  
-``` {r figure_1, fig.cap="Figure 1 - Overview of experimental Design. Top panel: each visual search trial started with a centered black fixation cross. Middle panel (Practice): After reading the instructions, participants completed practice trials, searching for a rotated T among rotated L's in 6-trial blocks until they achieved a minimum accuracy of 0.83 (no more than one error). Middle panel (Main part): The primary experiment comprised 96 trials in four blocks, with the target identity changing after two blocks. Each 24-trial block followed a 2x2 design, manipulating set size (9 or 25) and target presence (present/absent). Bottom panel: Search difficulty estimation: participants used their mouse to rate search difficulty on a continuous scale. In questions about target-present searches, the target was marked with a red square."}
-knitr::include_graphics("figures/figure_1.png")
-```
-  
+
+The visual search task consisted of four blocks, each containing 24 trials of searching for either a closed or an open square. The task began with a practice phase consisting of one block with six trials. Each display was presented for a maximum of 10 seconds or until a response was received. During the practice phase, feedback about accuracy was given after each trial: If the response was correct, the word “Correct!” appeared on the screen for one second; If the response was wrong, the word “Wrong” appeared on the screen for 5 seconds. In the main part of the experiment, no feedback was given, as was the case in the original paradigm [@toffolo2013]. After completing the practice, participants looked for either a closed square among rotated open squares (‘hard search’; Fig. 1, main part, right panel), or for a rotated open square among closed squares (‘easy search’; Fig. 1, main part, left panel). The difference in difficulty between these two search types is due to a search asymmetry for open/closed edges  [@treisman1988]. We further manipulated target presence and set size, resulting in a 2X2X2 design (Search type: ‘easy-search’ or ‘hard-search’; Target: present/absent; Set size: 9 or 25). Block order was counterbalanced between participants, and trial order within individual blocks was fully randomized (figure 1).
+
+# Measures
+
 # Obsessive–Compulsive Inventory-Revised (OCI-R; Foa et al., 2002). 
-The OCI-R is an 18-item self-report measure of OCD symptom severity. Responders are asked to rate their level of distress pertaining to 18 statements in the past month on a five-point scale ranging from 0 (Not at all) to 4 (Extremely). The OCI-R has been shown to have good validity, test-retest reliability and internal consistency in both clinical [@foa2002] and non-clinical samples [@hajcak2004]. 
+  The OCI-R is an 18-item self-report measure of OCD symptom severity. Responders are asked to rate their level of distress pertaining to 18 statements in the past month on a five-point scale ranging from 0 (Not at all) to 4 (Extremely). The OCI-R has been shown to have good validity, test-retest reliability and internal consistency in both clinical [@foa2002] and non-clinical samples [@hajcak2004]. 
 
 # Depression, Anxiety and Stress Scales-21 (DASS-21; Lovibond & Lovibond, 1995).
-The DASS-21 is a 21- item self-report questionnaire that is divided into three seven-item subscales to measure dimensional components of depression, anxiety, and stress. Each individual item is evaluated on a four-point scale, ranging from 0 (‘the item does not apply to me at all’) to 3 (‘the item applies to me very much or most of the time’). Respondents are asked to reflect upon the relevance of each statement to their experiences over the past week. The DASS-21 has shown high reliability, validity, and internal consistency within both clinical groups and community sample [@lovibond1995; @antonyPsychometricProperties42Item; @henry2005] In this study only the depression and anxiety scales were used.
+  The DASS-21 is a 21- item self-report questionnaire that is divided into three seven-item subscales to measure dimensional components of depression, anxiety, and stress. ). Each individual item refers to the respondent's experiences over the past week and is evaluated on a four-point scale, ranging from 0 (‘the item does not apply to me at all’) to 3 (‘the item applies to me very much or most of the time’). The DASS-21 has shown high reliability, validity, and internal consistency within both clinical groups and community sample [@lovibond1995; @antonyPsychometricProperties42Item; @henry2005]. In this study only the depression and anxiety scales were used. We used the depression and anxiety sub-scales to control for non-specific effects associated with OCD tendencies.
 
 ## Procedure
 
-Experiment Structure. A static version of Experiment 1 can be accessed at: https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp1/.
+A static version of Experiment 1 can be accessed at: https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp1/. Participants were first instructed about the experiment's structure, which comprised three parts: a visual search task, questions about the visual search, and the two inventories: OCI-R and DASS-21. Then, they received written instructions about the visual search task. After completing the visual search task, participants were asked to rate the difficulty of noticing the presence or absence of a certain target among different distractors (more information about this in the appendix). Following the difficulty estimation, participants completed the OCI-R and DASS-21. We included two attention check questions among the OCI-R items, asking participants to select a certain answer (‘If you read this question, check the option ‘Not at all’).
 
-  Participants were first instructed about the experiment's structure, which comprised three parts: the visual search task, questions about the visual search task, and the two inventories: OCI-R and DASS-21. Then, they received written instructions about the visual search task. Specifically, they were asked to report, as accurately and quickly as possible, whether a target stimulus was present or absent by pressing the J and F keys, respectively. To familiarize participants with the task structure and response keys, they were first presented with six practice trials, in which the target stimulus was a rotated T, and distractors were rotated Ls. Practice trials were delivered in one block of six trials, and the main part of the experiment started only once participants responded correctly on at least five trials. 
-  
-  After completing two of the four visual search blocks, participants were encouraged to take a short break. The main part of the experiment was followed by questions designed to evaluate the subjective difficulty of this part of the task. Participants were asked to rate the difficulty of noticing the presence or absence of a certain target among different distractors (more information about this in the appendix). Following the difficulty estimation, participants completed the OCI-R  and DASS-21. We included two attention check questions among the OCI-R items, asking participants to select a certain answer (‘If you read this question, check the option ‘Not at all’).
-  
-  The order and timing of experimental events were determined pseudo-randomly by the Mersenne Twister pseudorandom number generator, initialized to ensure registration time-locking [@mazorNovelToolTimelocking2019]. 
-
+``` {r figure_1, fig.cap="Figure 1 - Overview of experimental Design. Top panel: each visual search trial started with a centered black fixation cross. Middle panel (Practice): After reading the instructions, participants completed practice trials, searching for a rotated T among rotated L's in 6-trial blocks until they achieved a minimum accuracy of 0.83 (no more than one error). Middle panel (Main part): The primary experiment comprised 96 trials in four blocks, with the target identity changing after two blocks. Each 24-trial block followed a 2x2 design, manipulating set size (9 or 25) and target presence (present/absent). Bottom panel: Search difficulty estimation: participants used their mouse to rate search difficulty on a continuous scale. In questions about target-present searches, the target was marked with a red square."}
+knitr::include_graphics("figures/figure_1.png")
+```
 
 ## Data Analysis
 # Exclusion Criteria  
 
-  Participants were excluded if they made more than 15% errors in the main part of the experiment or for having extremely fast  (below 100 milliseconds) in more than 25% of the trials. Participants were also excluded from the analysis if they failed one or more of the attention checks. In total, 109 out of 1007 participants were excluded from the analysis. For the remaining participants, error trials and trials with response times below 100 milliseconds were excluded from the response-time analysis.
-
-# Hypotheses and analysis plan 
-  
-  As detailed above, Experiment 1 was initially designed to test several hypotheses about the behavior of individuals high on obsessive-compulsive tendencies (OC+) in a visual search paradigm. Specifically, Experiment 1 aimed to distinguish between general difficulties with uncertainty and specific issues related to making inferences about absence in OC+ individuals. In the following analysis we focus only on our attempt to replicate the results of Toffolo and colleagues (2013). Results related to our preregistered hypotheses can be found in the appendix.   
-
-# Transparency and openness 
-
-We used `r cite_r("r-references.bib")` for all our analyses. A detailed preregistration document for Experiment 1 can be accessed at osf.io/yxqu9. All analysis scripts and anonymized data are available at github.com/Noamsarna/ocd_visual_search.
-
-# Results
+  Participants were excluded from the analysis if they made more than 15% errors in the main part of the experiment or for having extremely fast or slow reaction times (below 100 milliseconds) in more than 25% of the trials. Participants were also excluded if they failed one or more of the attention checks. In total, 109 out of 1007 participants were excluded from the analysis. For the remaining participants, error trials and trials with response times below 100 milliseconds were excluded from the response-time analysis.
 
 ```{r analyze_data, cache=TRUE, include=FALSE}
 
@@ -473,7 +462,7 @@ slopes_table <-search_slopes_df %>%
 
 ```
 
-```{r DR_h3, echo=FALSE, cache=TRUE}
+```{r DR_h3, cache=TRUE, include=FALSE}
   
   # Toffolo replication plots -----------------------------------------------------
 
@@ -525,8 +514,6 @@ H3.df_mean_diff <-
   summarise(diff_mean_RT = mean(mean_RT[target_present == "FALSE"]) - mean(mean_RT[target_present == "TRUE"])) %>%
   ungroup() 
 
-#regualr t-test for sanity check 
-t.test(diff_mean_RT~OCI_quantile, data=H3.df_mean_diff, alternative="two.sided")
 #Bayesien t-test 
 
 Exp1.bayes_t_test <-
@@ -537,10 +524,470 @@ exp_1_H3_cohenD<-
 H3.df_mean_diff %>% cohens_d(diff_mean_RT~OCI_quantile, var.equal = TRUE)
 
 ```
-# Replication of group differences in target-absent RT
-  To directly replicate group differences in target-absent RTs (Toffolo et al., 2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, followed by a pattern wherein the mean RT difference between the OC+ and OC- groups would be significantly more pronounced in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present` (figure 2, Exp1; preregistered hypothesis 3). A null result was also obtained in a correlation analysis, pooling data from all participants and treating OCI scores as a continuous variable (see Supplementary materials, pre-registered hypothesis 9.)”
 
-  Similarly, when we used our entire sample (the four quartiles), and replaced the group variable (OC+; OC-) with the complete OCI-R scale, we found no interaction between OCI-R score and the presence of the target (preregistered hypothesis 9; β̂=-0.07, 95% CI [-2.48,2.35], t(941.54)=-0.05, p=.957). No significant group differences were observed when accounting for anxiety and depression either (preregistered hypothesis 10; β̂=8.62, 95% CI [-21.50,38.74], t(463.53)=0.56, p=.575). There were also no significant RT differences between groups during the task’s initial trials, prior to the accumulation of any experience (preregistered hypothesis 8; F(1,360)=0.93, p=.336). Lastly, we observed no significant differences between the groups in their self-reported measures of task difficulty. Detailed calculations and results for all these hypotheses are provided in the Appendix for further reference.
+```{r h1_h2_t-test, echo=FALSE, cache=TRUE}
+#creating a df for second hypothesis testing 
+
+H1.desc <- search_slopes_df %>% group_by(search_type) %>%  
+  summarise(mean_slope = mean(estimate),
+            ms_item = mean_slope/(25-9))
+
+H2.df<- search_slopes_df %>% 
+  filter(target_present==TRUE & search_type=='OinC' |target_present==FALSE & search_type=='CinO')  %>% 
+  mutate(group = case_when(search_type == 'OinC' ~ 'hard_present',
+                           search_type == 'CinO' ~ 'easy_absent'));
+                          
+H2.desc <- H2.df %>% 
+  group_by(group) %>% 
+  summarise(mean_slope=mean(estimate),
+            ms_item = mean_slope/(25-9))
+
+```
+
+```{r h4_anova, echo=FALSE, cache=TRUE}
+
+H4.df<- search_slopes_df %>% 
+  filter(OCI_quantile==1 | OCI_quantile==4) %>% 
+  filter(search_type=='OinC')
+                          
+H4.desc <- H4.df %>% group_by(OCI_quantile, target_present) %>% summarise(mean_slope = mean(estimate))
+
+```
+
+```{r h5_anova, echo=FALSE, cache=TRUE}
+H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filter(search_type=='CinO')
+
+```
+
+```{r model_comparison, echo=FALSE, cache=TRUE}
+
+#We didn't use LOOCV since we included random terms in our model. So instead we compared models by their AIC and BIC values.  
+
+m1 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +search_type *OCI_group+
+         (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+        data =.)
+
+#examine model parameters 
+#parameters::model_parameters(m1, ci_method= 's')
+
+
+
+m2 <- 
+  search_slopes_df%>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  mutate(OCI_group = recode(OCI_quantile, '1'='low', '4'='high')) %>% 
+  
+  lmer(estimate ~ 1+OCI_group+ search_type * target_present +target_present *OCI_group+
+         (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+        data = .)
+
+#examine model parameters 
+#parameters::model_parameters(m2, ci_method= 's')
+
+#create models table (table 1)
+H6.model_acc_table <-as.data.frame(compare_accuracy(m1, m2))  %>% 
+  dplyr::select(Model, AIC) 
+
+#scale AIC values to zero 
+
+scaled_AIC_m1 =H6.model_acc_table$AIC[1] - H6.model_acc_table$AIC[1] 
+scaled_AIC_m2 =H6.model_acc_table$AIC[2] - H6.model_acc_table$AIC[1]
+
+H6.model_acc_table$scaled_AIC <- c(scaled_AIC_m1, scaled_AIC_m2)
+
+
+#extract model formula 
+m1_formula <- paste(deparse(formula(m1, fixed.only = T), width.cutoff = 500), collapse = " ")
+m2_formula <- paste(deparse(formula(m2, fixed.only = T), width.cutoff = 500), collapse = " ")
+
+H6.model_acc_table$formula <- c(m1_formula, m2_formula)
+
+```
+
+
+```{r first_trials, cache=TRUE, include=FALSE}
+# correct trial order effects
+
+first_trials_df <- search_df %>%
+  filter(test_part=='first_two_trials' & correct) %>%
+  group_by(subj_id) %>%
+  filter(n()==4) %>% #include only subjects who have a valid 4 first trials
+  arrange(trial_index) %>%
+  mutate(trial_index = seq(n()), #standardizing trial order across participants
+  mean_subj_RT = mean(RT)) %>%
+  group_by(trial_index) %>%
+  mutate(mean_position_RT = mean(RT)) %>%
+  ungroup() %>%
+  mutate(corrected_RT = RT-mean_position_RT+mean_subj_RT)
+
+  first_trials_df %>% 
+  group_by(search_type, set_size) %>% 
+  summarise(median_RT =median(corrected_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=median_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  #ylim(900, 2000)+
+  scale_x_discrete(limits = c("9", "25")) +
+  labs(title="First trials full sample", y='median RT', x='set size') +
+  geom_label(aes(label=round(median_RT,2)), color='white')
+
+
+search_slopes_df_first_t <- first_trials_df %>%
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id,search_type,target_present, test_part,OCI_quantile) %>%
+  nest() %>%
+  mutate(model = map(data, ~ lm(corrected_RT ~ set_size, data =.)),
+         tidy = map(model, ~ tidy(.x))) %>%
+  unnest(tidy) %>%
+  filter(term=='set_size25') %>% 
+  filter(test_part=='first_two_trials')
+
+
+search_slopes_first_trials_desc <- search_slopes_df_first_t %>% 
+  group_by(search_type) %>% 
+  summarise(mean_slope=mean(estimate),
+            sd_slope = sd(estimate),
+            ms_item = mean_slope/(25-9))
+
+#figure
+
+First_trials_OC_groups<-
+  search_df %>% 
+  filter(test_part=='first_two_trials') %>% 
+  filter(OCI_quantile==1|OCI_quantile==4) %>% 
+  group_by(subj_id, search_type, set_size, OCI_quantile) %>% 
+  summarise(mean_RT =mean(RT)) %>% 
+    group_by(search_type, set_size, OCI_quantile) %>% 
+    summarise(mean_RT =mean(mean_RT)) %>% 
+  ggplot(data=. , 
+       aes(x=set_size, y=mean_RT, color=search_type, fill=search_type, linetype=search_type)) +
+  geom_line(aes(group = search_type), size=1) +
+  geom_point(aes(shape = search_type), size=4, color="black",stroke=1.5, alpha=0.8) +
+  facet_wrap(~OCI_quantile)+
+  scale_shape_manual(values=c(4,22))+
+  scale_fill_manual(values = c('black',"#e41a1c"))+
+  scale_color_manual(values = c('black',"#e41a1c"))+
+  scale_linetype_manual(values=c("21", "solid","21"))+
+  scale_x_discrete(limits = c("9", "25"))+labs(title="First trials full sample")+geom_label(aes(label=round(mean_RT,2)), color='white')
+
+
+```
+
+```{r H9_full_range, include=FALSE}
+
+m3 <-
+  lmer(estimate ~ 1+oci_overall+ search_type * target_present +target_present *oci_overall+ 
+            (search_type+target_present|subj_id), #random slope for search type and target present for each participant 
+               data = search_slopes_df)
+
+```
+
+```{r DASS_mediation, cache=TRUE, include=FALSE}
+
+m4 <-lmer(estimate ~ 1+search_type * target_present +target_present *OCI_quantile+
+               DASS_anxiety+DASS_depression+
+              (search_type+target_present|subj_id),#random slope for search type and target present for each participant 
+               data = search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4))
+
+```
+
+```{r explicit_dif, cache=TRUE, include=FALSE}
+
+#create a df in the same format as the difficulty df, so include only 4 searches of difficulty estimation:
+#hard present and easy absent with both set sizes. 
+
+search_correlation <- search_summary %>% 
+  filter(search_type=='CinO' & set_size=='9' & target_present=='FALSE'| #easy absent small set size
+           search_type=='CinO' & set_size=='25' & target_present=='FALSE'| #easy absent big set size 
+           search_type=='OinC' & set_size=='9' & target_present=='TRUE'| #hard present small set size
+           search_type=='OinC' & set_size=='25' & target_present=='TRUE') %>% #hard present big set size 
+  mutate(target_present =case_when(target_present=='TRUE' ~ 'TP', #change names 
+                                   target_present=='FALSE' ~ 'TA')) %>% 
+  unite('difficulty_rating', c(search_type, set_size, target_present), remove = F) #create names like in the difficulty df 
+
+#combine with the difficulty df 
+search_correlation<- left_join(search_correlation, difficulty_rating %>% dplyr::select(-OCI_quantile))
+
+search_correlation_wide <- search_correlation %>%
+  dplyr::select(subj_id, set_size, search_type, target_present, OCI_quantile, mean_rt, response) %>% 
+  pivot_wider(
+    names_from = c(search_type, target_present, set_size),
+    values_from = c(mean_rt, response))
+
+search_correlation_wide <- search_correlation_wide %>% 
+  mutate(slope_easy_absent = mean_rt_CinO_TA_25 - mean_rt_CinO_TA_9,
+         slope_hard_present = mean_rt_OinC_TP_25- mean_rt_OinC_TP_9) 
+
+search_correlation_wide %>% 
+  dplyr::select(slope_easy_absent, slope_hard_present) %>% 
+  summarise(mean_slope_easy_absent = mean(slope_easy_absent),
+            mean_slope_hard_present = mean(slope_hard_present))
+
+
+#plot for the entire sample 
+
+p1<-
+search_correlation %>% 
+ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Reaction times', 
+       subtitle = 'Entire sample')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+   coord_cartesian(ylim = c(1400,2800))
+
+
+#plot for the OC- group  
+
+p2<-
+  search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Reaction times', 
+       subtitle = 'OC+')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(1400,2800))
+
+
+#plot for the OC+ group  
+
+p3<-
+  search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = mean_rt, fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'RT ms', 
+       title = 'Reaction times', 
+       subtitle = 'OC-')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(1400,2800))
+
+
+#difficulty figures p4-p6 
+p4 <- 
+  search_correlation %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'Response', 
+       title = 'Difficulty rating', 
+       subtitle = 'Entire sample')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(30,80))
+
+p5 <- 
+  search_correlation %>% 
+  filter(OCI_quantile==4) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'Response', 
+       title = 'Difficulty rating', 
+       subtitle = 'OC+')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(30,80))
+
+p6 <- 
+  search_correlation %>% 
+  filter(OCI_quantile==1) %>% 
+  ggplot(aes(x = set_size, y = as.double(response), fill = target_present, shape = target_present)) +
+  stat_summary(fun = mean, 
+               geom = 'point',
+               position = position_dodge(0.9),
+               size = 5,
+               alpha = 0.6) +
+  stat_summary(fun.data = mean_se,
+               geom = 'errorbar',
+               position = position_dodge(0.9), 
+               width = 0.4) +
+  stat_summary(fun = mean,
+               geom = 'line', 
+               aes(group = target_present),
+               position = position_dodge(0.9),
+               alpha = 0.6) +
+  labs(x = 'Set Size', 
+       y = 'Response', 
+       title = 'Difficulty rating', 
+       subtitle = 'OC-')+
+  guides(fill = FALSE,
+         shape = guide_legend(title = "Trial type")) +
+  scale_fill_manual(labels = c('Easy target-absent', 'Hard target-present'),values = wes_palette("Royal1")) +
+  scale_shape_manual(values = c(21, 24), 
+                     labels = c('Easy target-absent', 'Hard target-present')) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))+
+  coord_cartesian(ylim = c(30,80))
+
+
+
+
+# plot together  ------------------------------------------------------------
+# Define color and shape vectors for convenience
+my_colors <- wes_palette("Royal1")[1:2]
+my_shapes <- c(21, 24)
+
+# Remove the legend from each plot and add y-axis label for the first plot of each row
+p1 <- p1 + theme(legend.position = "none") + ylab("RT ms")
+p2 <- p2 + theme(legend.position = "none")
+p3 <- p3 + theme(legend.position = "none")
+p4 <- p4 + theme(legend.position = "none") + ylab("Response")
+p5 <- p5 + theme(legend.position = "none")
+
+# Ensure that colors and shapes are correctly set in p6
+p6 <- p6 + 
+  scale_fill_manual(values = my_colors, labels = c('Easy target-absent', 'Hard target-present'), name = NULL) +
+  scale_shape_manual(values = my_shapes, labels = c('Easy target-absent', 'Hard target-present'), name = NULL) +
+  guides(fill = guide_legend(override.aes = list(fill = my_colors)),
+         shape = guide_legend(override.aes = list(shape = my_shapes))) +
+  theme(legend.position = "bottom", legend.text = element_text(size = 12))
+
+#remove the white background from the legend 
+p6 <- p6 + theme(legend.background = element_blank(),
+                 legend.box.background = element_blank(),
+                 legend.box.margin = margin(0, 0, 0, 0),
+                 legend.key = element_blank())
+
+# Extract the legend
+common_legend <- cowplot::get_legend(p6)
+
+# Remove the legend from p6
+p6 <- p6 + theme(legend.position = "none")
+
+# Arrange the plots with the common legend at the bottom
+combined_plot <- cowplot::plot_grid(
+  cowplot::plot_grid(p1, p2, p3, ncol = 3),
+  cowplot::plot_grid(p4, p5, p6, ncol = 3),
+  common_legend,
+  ncol = 1,
+  rel_heights = c(1, 1, 0.1)  # Relative heights of rows (adjust as needed)
+)
+
+#ggsave(filename = "RT_and_estimation.png",width = 8, height = 6, dpi = 1000, path="./figures")  
+
+
+```
+
+# Results
+  We focus our report here on our failure to replicate a group difference in target-absent search times, even for search displays that elicit high levels of uncertainty. All additional analysis from our preregistered hypotheses can be found in the appendix of this paper. 
+  
+# Replication of group differences in target-absent RT
+  To directly replicate group differences in target-absent response time (RT) (Toffolo et al., 2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we examined the interaction effect testing the hypothesis that the mean RT difference between the OC+ and OC- groups would be significantly more pronounced in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present`, Cohen's *d*= `r print_num(exp_1_H3_cohenD$effsize)` (figure 2, Exp1). A null result was also obtained in a correlation analysis, pooling data from all participants and treating OCI scores as a continuous variable (see Supplementary materials, pre-registered hypothesis 9). To quantify the evidence for the null we conducted a Bayesian t-test setting the scale at the averaged effect size found in Toffolo et al., (2013, 2014) reflecting a belief that if present, group differences should be negative and moderate in size [@rouderBayesian]. A one-sided Bayesian independent samples t-test produced a Bayes Factor of `r apa_print(Exp1.bayes_t_test, scientific_threshold = c(min = 1e-10, max = 1e10))$statistic$interval`, providing strong evidence for the null hypothesis of no group differences. 
+  
+  We conducted several additional analyses that examine the interaction between the OC groups and the presence of the target. First, at the group level, we performed multi-level regression, accounting for anxiety and depression. We found no interaction between the OC groups and the presence of the target (preregistered hypothesis 10; `r apa_print(m4)$full_result$target_presentTRUE_OCI_quantile`). Similarly, when we focused on the initial trials of the task, prior to any accumulated experience (preregistered hypothesis 8), we found no interaction between group and target presence in a mixed-effects ANOVA (`r apa_print(afex::aov_ez("subj_id", "estimate", search_slopes_df_first_t, between = "OCI_quantile", within = "search_type"))$statistic$OCI_quantile_search_type`). Furthermore, at the group level, we observed no significant differences between the groups in their self-reported measures of task difficulty. A group difference in accuracy did reach significance, such that the OC+ group (*M*=`r print_num(exp1_acc_stats$mean_acc[exp1_acc_stats$OCI_quantile=='4'])`) was overall less accurate than the OC- group (*M*=`r print_num(exp1_acc_stats$mean_acc[exp1_acc_stats$OCI_quantile=='1'])`; `r apa_print(exp1_acc_t_test)$statistic`). Importantly, this difference did not replicate in Experiment 2. To extend our analysis to the entire sample, encompassing the four OCI-R quartiles, we replaced the group variable (OC+; OC-) with the full range of OCI-R scores. In this analysis, we still found no interaction between OCI-R scores and the presence of the target (preregistered hypothesis 9; `r apa_print(m3)$full_result$oci_overall_target_presentTRUE`. Detailed calculations and results for all these hypotheses are provided in the Appendix for further reference.
 
 ## Experiment 2 
   In Experiment 1, target-absent search times were not significantly slower in OC+ compared to OC- individuals. While this stands in contrast to previous reports (Toffolo et al., 2013, 2014, 2016), our results differed from those of the original study in other respects as well. Most notably, search times in this study (~4.5s for target-absent and ~2.6s for target-present) were overall shorter compared to those in Toffolo et al. (2013) (~5.5 for target-absent and ~3.5s for target-present). We therefore considered the possibility that the task used in Experiment 1 may have been less challenging and potentially insufficient to elicit doubt and trigger checking behavior. To test this, Experiment 2 employed the original stimuli from Toffolo et al. (2013). The preregistered analysis plan can be accessed at the following link: https://github.com/Noamsarna/ocd_visual_search/tree/main/experiments/Experiment2. In Experiment 2, we conducted a further power analysis mirroring the methods of Toffolo et al. (2013), utilizing their data and adopting a bootstrap approach to determine an adequately powered sample size, as detailed in the preregistration document for Experiment 2. We employed the Mersenne Twister pseudorandom number generator to ensure that our preregistration preceded data collection (Mazor et al., 2019).
@@ -638,36 +1085,34 @@ exp2.checking_task <- exp2.checking_task %>% group_by(subj_id) %>%
   mutate(mean_acc = mean(correct)) #calculate mean accuracy per subject 
 
 #create accuracy df with acc score and OCI group per subject 
-acc_data_frame <- exp2.checking_task %>% 
+exp2.acc_df <- exp2.checking_task %>% 
   group_by(subj_id) %>% dplyr::select(subj_id, mean_acc, OCI_quantile) %>% slice(1)
 
 #Create variables of accuracy in standard deviation units to exclude participants 
-acc_data_frame$Zscore <-scale(acc_data_frame$mean_acc)[,1]
-
-#take a look on overall accuracy scores 
-acc_data_frame %>% 
-  group_by(OCI_quantile) %>% 
-  summarise(mean_acc=mean(mean_acc))
+exp2.acc_df$Zscore <-scale(exp2.acc_df$mean_acc)[,1]
 
 #Sanity check - standardized values should have: mean=0 and SD=1.  
-round(mean(acc_data_frame$Zscore), 2)
-round(sd(acc_data_frame$Zscore), 2)
+round(mean(exp2.acc_df$Zscore), 2)
+round(sd(exp2.acc_df$Zscore), 2)
 
 #mark participant who had error greater than Z>-2.5
-acc_data_frame$remove <-acc_data_frame$Zscore<(-2.5)
+exp2.acc_df$remove <-exp2.acc_df$Zscore<(-2.5)
 
-acc_data_frame %>% 
+exp2.acc_desc<-
+exp2.acc_df %>% 
   filter(remove==F) %>% 
   group_by(OCI_quantile) %>% 
   summarise(mean_acc=mean(mean_acc))
 
-acc_data_frame %>% 
+exp2.acc_t_test<-
+exp2.acc_df %>% 
   filter(remove==F) %>% 
   filter(OCI_quantile=='high' | OCI_quantile=='low') %>% 
 t.test(mean_acc~OCI_quantile, data=., alternative="two.sided")
 
+
 #merge acc df with the checking df 
-exp2.checking_task <- left_join(exp2.checking_task, acc_data_frame)
+exp2.checking_task <- left_join(exp2.checking_task, exp2.acc_df)
 
 #remove participants who had more than Z>-2.5 errors. Three participants are removed. 
 exp2.checking_task <-exp2.checking_task %>%
@@ -685,25 +1130,31 @@ exp2.checking_task <-exp2.checking_task %>%
   mutate(oci_type = ifelse(.$OCI_quantile == 'high', "High OC (OC+)", "Low OC (OC-)")) %>% 
   mutate(target_present = ifelse(.$condition=='ABS', "Absent", "Present"))
 
+#test re-test OCI-R
 
+OCI_R_exp1_exp2_cor_anon<- read_csv('../data/OCI_R_exp1_exp2_cor_anon.csv')
+ 
+oci_r_correlation <- 
+  cor.test(OCI_R_exp1_exp2_cor_anon$oci_total_exp1, 
+                   OCI_R_exp1_exp2_cor_anon$oci_total_exp2, 
+                   method = "pearson")
 ```
 
 
 ## Method 
 # Participants
-  Two hundred twenty-six participants were recruited via Prolific. To maximize statistical power for a group comparison, we invited former participants whose OCI-R scores were in the top or bottom quartile in Exp. 1. In line with our preregistered stopping rule, we kept data collection until we had invited all participants in the first and fourth quartiles from our previous experiment (n=220; n=213, respectively). Participants completed the OCI-R questionnaire again in the present study (the test-retest reliability for the OCI-R yielded a Pearson's correlation coefficient of r = .87, p < 0.001), and were assigned to the OC+/OC- groups based on the cut-off scores from Toffolo et al., 2013 (OCI-R total score ≥ 17 for the OC+ group; OCI-R total score ≤ 5 for the OC- group). Our final sample consisted of 110 OC+ participants and 68 OC- participants. The entire experiment took 12 minutes to complete, and participants were paid £1.8 for their participation, equivalent to an hourly wage of £9.
-
-## Material
-# Visual search task
-  We used the original stimuli from Toffolo et al. (2013), which were kindly provided to us by Marieke Toffolo. The visual search task consisted of one block of 50 individual search displays, each containing 25 elements. Half of the search displays were target-absent trials, in which 25 squares with a gap in one of the four edges were presented, and the other half were target-present trials, in which 24 open squares were presented along with one closed square: the target. As in Experiment 1, the experiment began with a practice phase consisting of four search displays (two target-absent and two target-present). In the practice phase, participants received feedback on their response accuracy and could move to the next part of the experiment only after successfully completing all four trials. The practice phase was repeated until the participant’s performance was perfect or until it was repeated more than three times, at which point the experiment terminated. In the practice and test phase each trial lasted for a maximum of 10 seconds or until a response was received. If no response was given within 10 seconds, the next trial was presented. In the main part of the experiment, no feedback was given.
+  Two hundred twenty-six participants were recruited via Prolific. To maximize statistical power for a group comparison, we invited former participants whose OCI-R scores were in the top or bottom quartile in Exp. 1. In line with our preregistered stopping rule, we kept data collection until we had invited all participants in the first and fourth quartiles from our previous experiment (n=220; n=213, respectively). Participants completed the OCI-R questionnaire again in the present study (the test-retest reliability for the OCI-R yielded a Pearson's correlation coefficient of `r apa_print(oci_r_correlation)$full_result`), and were assigned to the OC+/OC- groups based on the original cut-off scores from Toffolo et al., 2013 (OCI-R total score ≥ 17 for the OC+ group; OCI-R total score ≤ 5 for the OC- group). Our final sample consisted of 110 OC+ participants and 68 OC- participants. The entire experiment took 12 minutes to complete, and participants were paid £1.8 for their participation, equivalent to an hourly wage of £9.
 
 ## Procedure
-  A static version of Experiment 2 can be accessed here: https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp2/  Experiment 2 was similar to Experiment 1 with the following exceptions. First, the search task was more challenging due to a larger search grid, which meant larger distances between stimuli, as well as reduced stimulus size. Second, Experiment 2 did not contain an assessment of perceived difficulty, comprising only a visual search followed by the same questionnaires as in Experiment 1. Third, to make it identical to Toffolo et al. (2013), practice trials in Experiment 2 involved the same stimuli as the main blocks. Fourth, participants were instructed to press the spacebar to move to the search display screen, at which point the search display appeared immediately . Finally, the visual search part of the experiment included only the hard search type: detecting a closed square among open squares. 
+  A static version of Experiment 2 can be accessed here: https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp2/
+   Experiment 2 was similar to Experiment 1 with the following exceptions. First, we used the original stimuli from Toffolo et al. (2013). The visual search task consisted of one block of 50 individual search displays, each containing 25 elements. The search task was more challenging due to a larger search grid, which meant larger distances between stimuli, as well as reduced stimulus size. Second, Experiment 2 did not include an assessment of perceived difficulty, comprising only the visual search followed by the same questionnaires as in Experiment 1. Third, to make it identical to Toffolo et al. (2013), practice trials in Experiment 2 (four per block) involved the same stimuli as the main blocks. Fourth, participants were instructed to press the spacebar to move from the fixation cross screen to the search display screen, at which point the search display appeared immediately. Finally, the visual search part of the experiment included only the hard search type: detecting a closed square among open squares.
   
-  The preregistered analysis plan can be accessed at the following link: https://osf.io/8a5mr. As in Experiment 1, we employed the Mersenne Twister pseudorandom number generator to ensure that our preregistration preceded data collection (Mazor et al., 2019). Since Experiment 2 served as a direct replication, we adopted the same rejection criteria as Toffolo et al. (2013), so that participants were excluded if their error count exceeded 2.5 standard deviations from the mean error rate of the entire sample. As in Experiment 1, participants were also excluded from the analysis if they failed to answer correctly one or more attention-check questions. 
+## Data Analysis 
 
+*Exclusion Criteria*  
 
-# Results
+  Since Experiment 2 served as a direct replication, we adopted the same rejection criteria as Toffolo et al. (2013), so that participants were excluded if their error count exceeded 2.5 standard deviations from the mean error rate of the entire sample. As in Experiment 1, participants were also excluded from the analysis if they failed to answer correctly one or more attention-check questions.
+
 ```{r Exp2_analyze_data, warning=FALSE, cache=TRUE, include=FALSE}
 
 #plot figure of mean RT for each group  
@@ -779,60 +1230,35 @@ exp2_H1_cohenD <-
 planned_wide %>% cohens_d(RT_diff~OCI_quantile, var.equal = TRUE)
 
 ```
-
-*Task validation*  
-
-To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference, whereby the mean response time for target-absent responses (M=`r printnum(Exp2_H1_desc[1 ,2], digits=0)` ms, SD=`r printnum(Exp2_H1_desc[1 ,3], digits=0)` ms) was significantly longer than the mean response time for target present responses (M= `r printnum(Exp2_H1_desc[2 ,2], digits=0)` ms, SD= `r printnum(Exp2_H1_desc[2 ,3], digits=0)` ms, `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic`) 
+# Results
 
 *Direct replication*
 
-  The primary aim of Experiment 2 was to examine the interaction between group (OC+ vs. OC-) and condition (target-absent vs. target-present). Following the analysis performed in Toffolo et al., (2013), we conducted a one-tailed t-test using the difference in search times (mean RT absent - mean RT present) as the dependent variable and group (OC+ vs. OC-) as the independent variable.  In contrast to Toffolo et al. (2013), where presence-absence differences in reaction time were more pronounced among OC+ participants, in our replication sample the one-tailed t-test revealed no significant differences between the groups, `r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Notably, the numeric trend of the interaction in our sample was driven by OC+ shorter response time than OC- in target-present trials, rather than by longer response time for target-absent responses (Figure 2, Exp2). This pattern is different from that reported by Toffolo et al. (2013), where OC+ participants were slower in both search types, but particularly in target-absent searches (Figure 2, Toffolo et al., 2013). 
+In contrast to Toffolo et al. (2013), where presence-absence differences in reaction time were more pronounced among OC+ participants, in our replication sample the one-tailed t-test of the interaction contrast (using the difference in search times as a DV), was not significant,  `r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, Cohen's *d*=`r print_num(exp2_H1_cohenD$effsize)` providing no evidence for the expected interaction. Notably, the numeric trend of the interaction in our sample was driven by shorter RT in the OC+ as compared to the OC- in target-present trials, rather than by longer RT for target-absent responses (Figure 2, Exp2). This pattern is different from that reported by Toffolo et al. (2013), where OC+ participants were slower in both search types, but particularly in target-absent searches (Figure 2, Toffolo et al., 2013). Unlike in Experiment 1, we observed no differences in accuracy between the groups (OC+: *M*=`r print_num(exp2.acc_desc$mean_acc[exp2.acc_desc$OCI_quantile=='high'])`, OC-: *M*=`r print_num(exp2.acc_desc$mean_acc[exp2.acc_desc$OCI_quantile=='low'])`; `r apa_print(exp2.acc_t_test)$statistic`). Finally, a one-sided Bayesian independent samples t-test produced a Bayes Factor of `r apa_print(bayes_t_test_exp2,scientific_threshold = c(min = 1e-10, max = 1e10))$statistic$interval`, providing moderate evidence for the null hypothesis of no group differences. 
 
-``` {r figure_2, fig.cap="Figure 2 - Results from Experiment 1 (preregistered H3), Experiment 2 (preregistered H2) and Toffolo et al., 2013, 2014. Mean reaction times for target-absent and target-present trials (X-axis). Error bars represent the standard error of the mean. Shapes represent the OC groups: Circle for OC+; Triangle for OC-."}
+``` {r figure_2, fig.cap="Figure 2 - Results from Experiment 1, Experiment 2 and Toffolo et al., 2013, 2014. Mean reaction times for target-absent and target-present trials (X-axis). Error bars represent the standard error of the mean. Shapes represent the OC groups: Circle for OC+; Triangle for OC-."}
 knitr::include_graphics("figures/figure_2.png")
 ```
 
 # Discussion
 
-In two preregistered, large-sample studies, we found no evidence of prolonged search time among OC+ participants in target-absent trials. Experiment 1 was a conceptual replication, ensuring that the basic structure of the task remained consistent with Toffolo et al., (2013), while varying the uncertainty level and manipulating stimulus set size. No significant differences emerged between the search times of OC+ and OC- participants across any conditions. Subsequently, in Experiment 2, we meticulously replicated the original study methodology and design, employing identical stimuli, task structure, and instructions. Nevertheless, Experiment 2 yielded no evidence of group differences in search times. Collectively, these null results are in disagreement with the previous findings by Toffolo and colleagues (2013, 2014, 2016). In discussing these results below, we examine in detail all the potential disparities between our studies and the original studies we sought to replicate. 
+  In two preregistered, large-sample studies, we found no evidence of prolonged search time among OC+ participants in target-absent trials, contrary to previous findings by Toffolo and colleagues (2013, 2014, 2016). 
 
-# Differences between the two studies
-  Experiment 1 was a conceptual replication attempt. Our main objective was to disentangle whether the prolonged search time of OC+ participants observed in target-absent trials was primarily due to a general sensitivity to uncertainty [@tolin2003] or alternatively reflected a more specific difficulty with inference about absence (Mazor, 2021). However, no group differences materialized in any of the tested conditions, and consequently there were no differential patterns to account for. 
-  We considered the possibility that search difficulty in Experiment 1 might have been insufficient to elicit doubt and trigger repetitive checking (reflected in longer RT). In comparison to Toffolo et al., (2013), in Experiment 1 we used a smaller and denser search grid, with thicker stimulus outlines, resulting in an overall easier task. Indeed, mean search times in Experiment 1 were faster by about one second relative to those in Toffolo et al. (2013). In addition, the grid in Experiment 1 was small and organized enough to theoretically allow sequential search (going over the grid line by line, which could also reduce the level of uncertainty). With these differences in mind, we designed Experiment 2, in which we aimed to replicate the original study design as close as possible. 
-  In Experiment 2 we used the same stimuli, task structure and instructions as in Toffolo et al., (2013). In accordance with Experiment 1, however, we again found no group differences between OC+ and OC- participants in search time. In this experiment, the overall (collapsing over groups) mean search time was slower than both Toffolo et al., (2013) and Toffolo et al., (2014), and more similar to the mean search time in the clinical OCD sample in Toffolo et al., (2016), ruling out the possibility that insufficient task difficulty might explain the lack of differences between the groups (see Fig. 2).
-
-*Online vs. in person design*
-
-  The most notable difference between our experiments and those conducted by Toffolo et al., (2013, 2014, 2016) lies in our use of an online setting versus their use of in-person data collection. Completing tasks online, as opposed to in a laboratory setting, generates more technical noise: unexplained variance driven by technical variation. This technical noise can be categorized into two main types: noise stemming from disparities in software and technology and noise resulting from technical and situational heterogeneity, such as variable computers, monitors, or distances from the screen [@hilbig2016]. In the following paragraphs, we consider the potential impact of these two factors on the different results observed. 
+The most notable difference between our experiments and those conducted by Toffolo and colleagues (2013, 2014, 2016) lies in our use of an online setting versus their use of in-person lab experiments. Completing tasks online as opposed to a laboratory setting generates more "technical noise", that is, unexplained variance driven by technical variation. However, previous studies suggest that such noise has minimal impact on RT differences in perceptual tasks. In a study comparing RT distributions from a lab-based Matlab and an online JavaScript experiment, the results revealed near-identical RTs between the two setups [@deleeuwPsychophysics2016]. The JavaScript experiment showed a consistent delay of around 25 milliseconds, which had minimal impact on the sensitivity to RT changes due to experimental manipulations.
   
-  First, differences in technical noise can be instigated by differences in software: Matlab in previous studies of visual search in OCD, versus JavaScript in ours. In an effort to shed light on this specific matter, @deleeuwPsychophysics2016 carried out a study comparing the response time distributions derived from a lab-based psychophysics toolbox (Matlab) and an online experiment powered by JavaScript. The results revealed near-identical response times between the JavaScript and Matlab experiments, with a negligible and constant delay for the JavaScript engine of approximately 25 milliseconds. Therefore, @deleeuwPsychophysics2016 concluded that the two setups demonstrated equal sensitivity to response time alterations resulting from experimental manipulations.
+  Furthermore, in our study, participants completed the visual search task using a range of computers and displays, rather than in a controlled lab environment with a fixed screen as in Toffolo et al. (2013, 2014, 2016). Yet, simulation studies have demonstrated minimal impact of technical variance on statistical power and the precision of effect size estimates [@brand2012]. Key behavioral findings in psychology, including those observed in the Stroop and flanker tasks, as well as effects reliant on much smaller time constants, like attentional blink and subliminal priming, have been successfully replicated in web-based studies [@crump2013]. Specifically, a recent online visual search study reported significant RT variations between experimental conditions, with a focus on smaller time constants than those anticipated in our paradigm [@mazorEfficientSearch2022]. Particularly strong evidence for the comparability of lab-based vs. web-based findings comes from a study which utilized a fully randomized design for reaction time effects [@hilbig2016]. The results showed that a word frequency effect (manifested in different RT) was comparable in magnitude across all three conditions. Taken together, these studies show that whereas some variations between settings in RT exist, they are minor, especially when the outcome measure is RT alterations due to experimental manipulations. 
+
+  Additional differences between our research and Toffolo’s studies, which could interact with OCD tendencies, are anonymity and demographic variations. It is plausible that the anonymity afforded by online studies could lead to participants feeling less responsible for study outcomes than identifiable psychology students who meet experimenters in person. Moreover, participants in Toffolo's studies were monitored by an eye-tracker camera, a factor that has been suggested to reduce reliance on internal cues such as metacognitive experiences  [@noahWhenBothOriginal2018].  Given the sensitivity of OC+ individuals to personal responsibility [@salkovskis1985], and the heightened sense of anonymity in online studies, the transition to an online setting may have attenuated group differences in checking behavior. 
+
+  Our failure to find an association between obsessive-compulsive tendencies and inference about absence may appear inconsistent with well-known clinical manifestations of OCD, such as those observed in “Hit-and-Run OCD”. However, our experimental operationalization of inference about absence differed from these clinical manifestations in two important ways. First, we did not manipulate perceived responsibility, a key feature of “Hit-and-Run OCD” and one that is posited to play a key role in OCD more generally [@salkovskis1985]. Second, in the clinical example of “Hit-and-Run OCD”, the compulsion is associated more with a recollection of an event rather than its direct experience. Indeed, most findings related to reduced confidence in individuals with OCD have been observed in relation to memory rather than perception (for review see @dar2022. More research is needed to elucidate the interaction of these two features with inference about absence in OCD.
   
-  Second, participants in our sample completed the visual search task in their own homes, using a range of computers, displays, and keyboards, rather than in a controlled lab environment with a fixed screen as in Toffolo et al. (2013, 2014, 2016). Importantly, a consistent finding across research on online studies is that technical variation does not pose a significant issue [@hilbig2016]. Simulation studies have demonstrated minimal impact of technical variance on statistical power and the precision of effect size estimates [@brand2012]. Key behavioral findings in psychology, including those observed in the Stroop and flanker tasks, as well as effects reliant on much smaller time constants, like attentional blink and subliminal priming, have been successfully replicated in web-based studies [@crump2013]. 
-  
-  Particularly strong evidence for the comparability of lab-based vs. web-based findings comes from a study which utilized a fully randomized design for reaction time effects [@hilbig2016]. Participants were randomly assigned to complete a lexical decision task either in a lab setting with standard software for psychological experiment, in a lab using a browser version, or on the web using their own computer and space. The results showed that the words frequency effect (manifested in different RT) was comparable in magnitude across all three conditions. Taken together, these studies show that whereas some variations between settings in RT exist, they are minor, especially when the outcome measure is RT alterations resulting from experimental manipulations. Even if we consider the constant delay of JavaScript compared to Matlab tasks (~25ms, @deleeuwPsychophysics2016), and add to it to the difference between a lab setting with E-prime and a web setting with a browser (34 ms, Table 2 in @hilbig2016) we get a difference of ~60 ms, an order of magnitude smaller than the difference between OC+ and OC- participant in target-absent searches reported by Toffolo et al., (2013), which was ~600 ms. 
+  Finally, this replication attempt puts into action several key features of replicable science [@tackett2017]. Our study included detailed preregistration with hypotheses, power analysis, analysis plan and exclusion criteria. We used the preregistration time-locking tool [@mazorNovelToolTimelocking2019], thereby guaranteeing that our registration preceded the data collection process. Furthermore, our study represents the first independent replication attempt. Lastly, we have made our raw data, analysis scripts, and task codes publicly available. Beyond a contribution to the experimental literature on OCD, we hope this report may serve as a helpful reference for reproducible and open clinical psychological science.
 
-*Comparison of accuracy*
-
-  One discrepancy between our dataset and the one reported by Toffolo et al., (2013) is worth highlighting. The mean error rate across all trials in Toffolo et al. (2013) (M=5.87, SD=5.96) was lower than in our Experiment 2 (M=`r printnum(exp_2_mean_error_rate)`, SD=`r printnum (exp_2_SD_error)`). To examine whether less accurate or possibly less engaged participants could have skewed our results, we reevaluated the data from Experiment 2, this time including only participants whose error rate fell below the raw error rate exclusion criterion (19 errors out of 50 trials) employed by Toffolo et al. (2013). Despite applying this strict exclusion criterion, the crucial interaction between group and condition did not reach statistical significance, as elaborated in the supplementary results. 
-
-*Feeling observed*
-
-  An interesting perspective on our failure to replicate a well-documented psychological finding comes from a recent paper discussing the failed attempts to replicate the widely recognized facial-feedback hypothesis [@noahWhenBothOriginal2018]. According to this paper, both the original study and its replication failures were valid, with the difference between the two outcomes attributed to the presence of a camera. The theory proposed to elucidate this disparity suggests that individuals alter their behavior when they perceive themselves to be observed by others. The theory posits that individuals, feeling watched, adopt an external perspective on themselves, thus shifting their reliance from solely internal information to information perceivable by potential observers. In a series of studies supporting this theory, the researchers showed that when people are in an ‘objective state’, where they think of themselves from the perspective of an external observer, they are less influenced by subjective experiences such as metacognitive experiences [@noahThinkingOneselfObject2018]. This hypothesis introduces the possibility that the eye tracker used in Toffolo’s experiments, while clearly different from a conventional camera, may have created a sense of being observed, leading participants to lessen their reliance on internal cues. 
-  
-  As previously noted, the psychological processes required for making target-present and target-absent decisions are distinct, with interesting links to the dichotomy of feeling observed versus not. Decisions regarding target presence can be readily justified to an outsider ("Look at the second row, the third item on the left; there it is!") in a way that is not true of decisions about target absence ("Look at the grid; do you see how the target isn't there?"). Therefore, if individuals indeed adopt an external perspective of themselves when feeling observed, this may impact their decision-making to different extents as a function of target presence or absence. We leave it for future studies to explore this hypothetical link and its potential interaction with obsessive-compulsive tendencies. 
-
-
-*Inference about absence in the clinic and in the lab* 
-
-  Having analyzed the disparities between our experiments and those we attempted to replicate, we turn to revisit the earlier discussion on clinical manifestation of inference about absence in OCD. Despite a promising theoretical relationship and a cluster of related clinical manifestations (‘hit and run OCD’), we found no effect of obsessive-compulsive tendencies on inference about absence. This failure may be rooted in the notion of perceived responsibility. @salkovskis1985 posits that individuals with OCD frequently demonstrate an inflated sense of responsibility, perceiving themselves as key players in harm prevention. This heightened sense of responsibility gives rise to compulsive behavior directed at mitigating potential threats [@salkovskis1985]. In 'hit and run OCD' behavior, the compulsion does not directly aim to prevent future harm but rather to verify that it has not occurred and possibly avoid secondary damage. Importantly, responsibility was not manipulated in the visual search task utilized in our study, as missing the target had virtually no adverse effects.
-  
-  Furthermore, in the clinical example of “hit and run”, the compulsion is associated more with a recollection of an event rather than its direct experience. For example, an individual may obsess over the possibility that they may have run someone over without realizing, which primarily involves their memory of the event. Indeed, most findings related to reduced confidence in individuals with OCD have been observed in relation to memory rather than perception (for review see @dar2022). This implies that cognitive biases and distortions in OCD could predominantly affect memory functions, more than perception. Future research exploring inference issues about absence in OCD may consider focusing on memory and incorporate a condition that involves personal responsibility. 
-  
-  Before concluding, we wish to examine our study through the lens of replicability. In an influential publication, @tackett2017 strongly advocated for broadening the discussion on replicability in psychology, emphasizing the need for clinical psychologists to rigorously implement replicability practices. Our attempt at replication embedded several of the pivotal elements underscored by @tackett2017. Firstly, prior to data collection, we documented our hypotheses, analysis plan, and criteria for data exclusion, ensuring these decisions were established prior to the collection and review of data. Furthermore, we utilized the preregistration time-locking tool as detailed by @mazorNovelToolTimelocking2019, thereby guaranteeing that our registration indeed preceded the data collection process. Secondly, while the effect of prolonged search time for OC+ has been replicated twice by Toffolo and her colleague (2014, 2016), our study represents the first independent replication attempt. Thirdly, in both experiments, we conducted a power analysis to determine our sample size, and in Experiment 2, adhered to the same criteria for determining OC+ and OC- used by Toffolo et al., (2013) to minimize population deviations. Lastly, in the interest of promoting research transparency and reproducibility, we have made our raw data, analysis scripts, and task codes publicly available. By incorporating these practices, we have strived to enhance the robustness of our study, hoping it may serve as a helpful reference for future research into visual search patterns in OCD.
 
 ## Conclusion 
 
-  The presented findings diverge from those of previous studies, as we were unable to replicate the effect of prolonged search time for high OC participants in target-absent trials. To the very least, this replication failure indicates that the original effect may be constrained to a specific setting, thus limiting its generalizability to other contexts. More broadly, this study serves to advocate for the application of open science practices in clinical psychology research, consistent with those widely utilized within the realms of social and cognitive psychology, in order to foster methodological integrity and ensure the reliability of findings.	
+  The presented findings diverge from those of previous studies by Toffolo and her colleagues (2013, 2014, 2016), as we were unable to replicate the effect of prolonged search time for OC+ participants in target-absent trials. To the very least, this replication failure indicates that the original effect may be constrained to a specific setting, thus limiting its generalizability to other contexts. More broadly, our results advocate for the application of open science practices in clinical psychology research, to foster methodological integrity and ensure the reliability of findings.
+
 
 
 \newpage
