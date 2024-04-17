@@ -56,7 +56,11 @@ groundhog.library(c(
   "reshape2", 
   "rlang",
   "Matrix",
-  "lvmisc"
+  "lvmisc",
+  "rstatix", #for Cohen's d 
+  "BayesFactor",
+  "moments", #compute skewness and Kurtosis 
+  "ltm" #compute alpha cronbach 
 ),"2023-09-01", ignore.deps = c('knitr', 'xfun'), 
 force.install=TRUE)
 #, tolerate.R.version = '4.1.2')
@@ -87,7 +91,7 @@ Theories on obsessive-compulsive disorder (OCD) emphasize the pivotal role of pa
 ## Experiment 1 
   In Experiment 1, we sought to replicate the previously reported differences in target-absent search times between OC- and OC+ individuals, and to decouple absence- from uncertainty- related effects. By introducing an easy target-absent condition, we intended to dissociate specific difficulties with inference about absence from more general difficulties with uncertainty. To our surprise, we observed no group differences in target-absent search times, even for search displays that elicit high levels of uncertainty. We therefore focus our report here on this replication failure, aiming our efforts towards reproducing the original observation of OC+ participants showing longer search times than OC- participants in target-absent trials, but not in target-present ones. Interested readers can find a detailed preregistration document including all our original hypotheses for Experiment 1 at osf.io/yxqu9, and all the additional analysis for our preregistered hypotheses can be found in the appendix of this paper.  
 	
-```{r load_data, echo=FALSE, warning=FALSE, cache=TRUE}
+```{r load_data, warning=FALSE, cache=TRUE, include=FALSE}
 
 #load anon jatos data 
 df<- read_csv('../data/anon_jatos_results_p1.csv')
@@ -105,7 +109,7 @@ demo_prolific <- read.csv('../data/anon_demo_prolific.csv')
 #parse oci data from df 
 OCI_df <- df %>%
   filter(grepl('oci', Identifier)) %>% 
-  select(subj_id, question, answer_oci) %>% 
+  dplyr::select(subj_id, question, answer_oci) %>% 
   mutate(attention_check = question %in% c("OCI-Attention_check_1","OCI-Attention_check_2")) %>%
   arrange(subj_id, question)%>%
   #arrange it in a long format df 
@@ -135,7 +139,7 @@ DASS_depression <- c("DASS-3","DASS-5", "DASS-10", "DASS-13", "DASS-16", "DASS-1
 #parse DASS data from df
 DASS_df <- df %>%
   filter(grepl('DASS', Identifier)) %>% 
-  select(subj_id, question, answer_dass) %>% 
+  dplyr::select(subj_id, question, answer_dass) %>% 
   arrange(subj_id, question) %>%
   #arrange in a new df 
   group_by(subj_id)%>%
@@ -145,25 +149,94 @@ DASS_df <- df %>%
 # unite dass and oci
 questionnaires_df <- left_join(OCI_df, DASS_df,by = "subj_id")
 
+# plot OCI histogram  -----------------------------------------------------
+
+#png("../ocd_visual_search/docs/figures/OCI_R_histogram.png", width = 1200, height = 800, res = 300)
+hist(OCI_df$oci_overall, breaks = 'FD', xlab = "OCI-R total score", main = "OCI-R histogram", cex.main = 1.25)
+#dev.off()
+
+OCI_R_skewness <-skewness(OCI_df$oci_overall)
+OCI_R_kurtosis <-kurtosis(OCI_df$oci_overall)
+
+#pull quartile cutoff scores
+oci_raw_quartiles <- OCI_df %>%
+  filter(!failed_attention_OCI) %>%
+  pull(oci_overall) %>%
+  quantile(probs = seq(0, 1, 0.25), na.rm = TRUE, type = 9)
+
+#pull OCI-R all items for computing alpha cronbach 
+OCI_raw_items <-
+  df %>%
+  filter(grepl('oci', Identifier)) %>% 
+  dplyr::select(subj_id, question, answer_oci) %>% 
+  filter(!question %in% c('OCI-Attention_check_1', 'OCI-Attention_check_2','OCI-Absent')) %>% 
+  pivot_wider(names_from = question, values_from = answer_oci)
+
+#leave only quest items for internal consistency analysis 
+OCI_raw_items <- OCI_raw_items %>% dplyr::select(-subj_id) 
+
+#compute alpha cronbach for the OCI-R
+OCI_alpha_cronbach<-
+cronbach.alpha(OCI_raw_items)
+
+#DASS histogram 
+#anxiety 
+#png("../ocd_visual_search/docs/figures/DASS_anx_hist.png", width = 1200, height = 800, res = 300)
+hist(DASS_df$DASS_anxiety, breaks = 20, xlab = "DASS anxiety total score", main = "DASS anxiety histogram", cex.main = 1.25, xlim = c(0, 20))
+#dev.off()
+
+#depression
+#png("../ocd_visual_search/docs/figures/DASS_dep_hist.png", width = 1200, height = 800, res = 300)
+hist(DASS_df$DASS_depression, breaks = 20, xlab = "DASS depression total score", main = "DASS depression histogram", cex.main = 1.25, xlim = c(0, 20))
+#dev.off()
+
+#pull DASS items for internal consistency analysis 
+DASS_raw_items <-
+  df %>%
+  filter(grepl('DASS', Identifier)) %>% 
+  dplyr::select(subj_id, question, answer_dass) %>% 
+  arrange(subj_id, question) %>% 
+  pivot_wider(names_from = question, values_from = answer_dass)
+
+#seperate into two df 
+DASS_anx_df <- DASS_raw_items %>%
+  dplyr::select(subj_id, all_of(DASS_anxiety)) %>% 
+  dplyr::select(-subj_id)
+  
+DASS_dep_df <- DASS_raw_items %>%
+  dplyr::select(subj_id, all_of(DASS_depression))%>% 
+  dplyr::select(-subj_id)
+
+#compute alpha cronback for dass anxiety sub scale 
+DASS_anx_alpha_cronbach<-
+  cronbach.alpha(DASS_anx_df)
+
+DASS_anx_alpha_cronbach$alpha
+
+#compute alpha cronback for dass depression sub scale
+DASS_dep_alpha_cronbach<-
+  cronbach.alpha(DASS_dep_df)
+
+DASS_dep_alpha_cronbach$alpha
 
 # df of explicit difficulty rating---------------------------------------------------
 
 #get data from df 
 difficulty_rating <- df %>% 
   filter(trial_type == "html-slider-response") %>% 
-  select(subj_id,test_part,response) %>%
+  dplyr::select(subj_id,test_part,response) %>%
   #retrieve variable names. 
   mutate(difficulty_rating = case_when(str_detect(test_part,"PresentOinC25") ~ "OinC_25_TP",
                                        str_detect(test_part,"Absent09") ~ "CinO_9_TA",
                                        str_detect(test_part,"PresentOinC09") ~ "OinC_9_TP",
                                        str_detect(test_part,"Absent25") ~ "CinO_25_TA")) %>% 
-  select(-test_part) %>% 
+  dplyr::select(-test_part) %>% 
   
   #adding OCI quantile to difficulty df 
   left_join(questionnaires_df %>% 
               group_by(subj_id) %>%
               summarise(OCI_quantile=first(OCI_quantile)) %>% 
-              select(subj_id, OCI_quantile), 
+              dplyr::select(subj_id, OCI_quantile), 
             difficulty_rating,
             by = "subj_id")
 
@@ -171,7 +244,7 @@ difficulty_rating <- df %>%
 
 search_df <- df %>% 
   filter(trial_type == "p5vs_yn_small_grid") %>%
-  select(trial_type,trial_index,subj_id,sequence,target_position,
+  dplyr::select(trial_type,trial_index,subj_id,sequence,target_position,
           subj_id,set_size,target_present,
          RT,test_part,correct,search_type) %>% 
 # unite search and questionnaire dfs together 
@@ -194,7 +267,7 @@ df.N_before_exclusion <- search_df$subj_id %>% unique() %>% length()
 # Rejecting participants with more than 15% error trials -----------------------
 
 rejection_df <- search_df %>% 
-  group_by(subj_id) %>% 
+  group_by(subj_id, OCI_quantile) %>% 
   summarise(accuracy = mean(correct),
             mean_error=1-accuracy) %>% 
   mutate(reject = accuracy<0.85)
@@ -213,7 +286,7 @@ search_df %>%
 
 #filter out participants for accuracy and attention check 
 search_df <- left_join(search_df, 
-                       rejection_df %>% select(subj_id, reject), 'subj_id') %>%
+                       rejection_df %>% dplyr::select(subj_id, reject), 'subj_id') %>%
   filter(reject=='FALSE' & failed_attention_OCI == 0) %>%
   filter(under_100 == 0)  #filter our trials 
   
@@ -225,6 +298,47 @@ total_excluded <- df.N_before_exclusion - df.N_after_exclusion
 #total n in each quartile 
 #search_df %>% select(subj_id, OCI_quantile) %>% unique() %>% select(OCI_quantile) %>% table()
 
+# Accuracy comparison  ----------------------------------------------------
+#descriptive 
+exp1_acc_df <-
+search_df %>% 
+  group_by(subj_id, OCI_quantile, target_present) %>% 
+  summarise(accuracy = mean(correct))
+            
+exp1_acc_df %>% filter(OCI_quantile==1 | OCI_quantile==4) %>%
+  group_by(OCI_quantile, target_present) %>% 
+  summarise(mean_acc = mean(accuracy))
+
+#t.test comapre groups acc 
+exp1_acc_df %>% filter(OCI_quantile==1 | OCI_quantile==4) %>% group_by(subj_id, OCI_quantile) %>% summarise(mean_acc=mean(accuracy)) %>% 
+  ungroup() %>% 
+  t.test(mean_acc~OCI_quantile, data=., alternative="two.sided")
+
+#descriptive stats 
+# create function to calculate percentages for a given column in demographic
+
+calculate_percentage <- function(data, column_name) {
+  counts <- data %>%
+    filter(!!sym(column_name) != "DATA_EXPIRED") %>%
+    count(!!sym(column_name)) %>%
+    rename(Category = !!sym(column_name), Count = n)
+
+  total_count <- sum(counts$Count)
+
+  counts %>%
+    mutate(Percentage = round((Count / total_count) * 100, 2))
+}
+
+# Calculate percentages for Ethnicity, Sex, Nationality, and Employment Status
+ethnicity_percentage <- calculate_percentage(demo_prolific, "Ethnicity.simplified")
+sex_percentage <- calculate_percentage(demo_prolific, "Sex")
+nationality_percentage <- calculate_percentage(demo_prolific, "Nationality")
+employment_percentage <- calculate_percentage(demo_prolific, "Employment.status")
+
+#  mean and sd of age
+age_stats <- demo_prolific %>%
+  summarise(Mean_Age = round(mean(as.numeric(Age), na.rm = TRUE), 2),
+            SD_Age = round(sd(as.numeric(Age), na.rm = TRUE), 2))
 
 ```
 
@@ -232,7 +346,9 @@ total_excluded <- df.N_before_exclusion - df.N_after_exclusion
 
 # Participants
 
-  The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (https://prolific.co/) and selected based on their acceptance rate (>95%) and for being native English speakers, located in the UK. The entire experiment took 14 minutes to complete (median completion time: 14 min.). Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were assigned into OC+ group if they were in the highest quartile in the OCI-R scores distribution, and to the OC- group if they were in the lowest quartile of this distribution. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants. The details of our preregistered analysis can be accessed at osf.io/yxqu9.
+  The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (https://prolific.co/) and selected based on their acceptance rate (>95%) and for being native English speakers, located in the UK. The entire experiment took 14 minutes to complete (median completion time: 14 min.). Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were divided into OC+ and OC- groups based on their scores in the OCI-R (Foa et al., 2002; see below), with the OC+ group consisting of those in the highest quartile of the OCI-R scores distribution and the OC- group comprising those in the lowest quartile of this distribution. The entire sample (n=1007) completed the visual search task. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants. The details of our preregistered analysis can be accessed at osf.io/yxqu9.
+  
+  The average age of the total sample was `r printnum(age_stats$Mean_Age)` years (SD = `r printnum(age_stats$SD_Age)`). Half of the sample identified as female. In terms of ethnicity, the majority (`r printnum(round(max(ethnicity_percentage$Percentage,0)))`) identified as White, followed by Asian (7%), Black (4%), and Mixed/Other (5%). The predominant nationality was UK (93%). Employment status was predominantly full-time (62%), followed by part-time (16%).
 
 ## Measures
 
@@ -344,7 +460,7 @@ search_slopes_df <- search_df %>%
   filter(term=='set_size25')
 
 search_slopes_df<- left_join(search_slopes_df, questionnaires_df %>% 
-                               select(subj_id, OCI_quantile, oci_overall, DASS_depression, DASS_anxiety),
+                               dplyr::select(subj_id, OCI_quantile, oci_overall, DASS_depression, DASS_anxiety),
                              by='subj_id') 
 
 
@@ -357,35 +473,6 @@ slopes_table <-search_slopes_df %>%
 
 ```
 
-```{r demographics, echo=FALSE, cache=TRUE}
-
-# create function to calculate percentages for a given column in demographic
-
-calculate_percentage <- function(data, column_name) {
-  counts <- data %>%
-    filter(!!sym(column_name) != "DATA_EXPIRED") %>%
-    count(!!sym(column_name)) %>%
-    rename(Category = !!sym(column_name), Count = n)
-
-  total_count <- sum(counts$Count)
-
-  counts %>%
-    mutate(Percentage = round((Count / total_count) * 100, 2))
-}
-
-# Calculate percentages for Ethnicity, Sex, Nationality, and Employment Status
-ethnicity_percentage <- calculate_percentage(demo_prolific, "Ethnicity.simplified")
-sex_percentage <- calculate_percentage(demo_prolific, "Sex")
-nationality_percentage <- calculate_percentage(demo_prolific, "Nationality")
-employment_percentage <- calculate_percentage(demo_prolific, "Employment.status")
-
-#  mean and sd of age
-age_stats <- demo_prolific %>%
-  summarise(Mean_Age = round(mean(as.numeric(Age), na.rm = TRUE), 2),
-            SD_Age = round(sd(as.numeric(Age), na.rm = TRUE), 2))
-
-```
-
 ```{r DR_h3, echo=FALSE, cache=TRUE}
   
   # Toffolo replication plots -----------------------------------------------------
@@ -393,7 +480,7 @@ age_stats <- demo_prolific %>%
 exp1_mean_RT_fig <- by_sub_toffolo%>% 
     filter(OCI_quantile == 1 | OCI_quantile == 4) %>% 
     mutate(oci_type = ifelse(.$OCI_quantile == 1, "Low OC (OC-)", "High OC (OC+)")) %>% 
-    select(subj_id, target_present, oci_type, mean_RT)  %>%
+    dplyr::select(subj_id, target_present, oci_type, mean_RT)  %>%
     ggplot(aes(x = target_present, y = mean_RT,  group = oci_type, shape = oci_type)) +
     stat_summary(fun = mean,
                  geom = "point",
@@ -425,14 +512,38 @@ H3.df <- toffolo_data %>%
   summarise(mean_RT=mean(RT)) %>% 
   ungroup()
 
+#Bayes factor analysis 
+# Convert independent variables to factors
+H3.df$OCI_quantile <- factor(H3.df$OCI_quantile)
+H3.df$target_present <- factor(H3.df$target_present)
+H3.df$subj_id <- factor(H3.df$subj_id)
+
+#Create a new df for the T test of difference Bayesian analysis 
+H3.df_mean_diff <- 
+  H3.df%>%
+  group_by(subj_id, OCI_quantile) %>%
+  summarise(diff_mean_RT = mean(mean_RT[target_present == "FALSE"]) - mean(mean_RT[target_present == "TRUE"])) %>%
+  ungroup() 
+
+#regualr t-test for sanity check 
+t.test(diff_mean_RT~OCI_quantile, data=H3.df_mean_diff, alternative="two.sided")
+#Bayesien t-test 
+
+Exp1.bayes_t_test <-
+ttestBF(formula =diff_mean_RT ~ OCI_quantile, data = H3.df_mean_diff, rscale = 0.4, nullInterval = c(-Inf,0))
+
+#cohen's D
+exp_1_H3_cohenD<-
+H3.df_mean_diff %>% cohens_d(diff_mean_RT~OCI_quantile, var.equal = TRUE)
+
 ```
 # Replication of group differences in target-absent RT
-  To directly replicate group differences in target-absent RTs (Toffolo et al., 2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, followed by a pattern wherein the mean RT difference between the OC+ and OC- groups would be significantly more pronounced in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present` (figure 2, Exp1; preregistered hypothesis 3).
+  To directly replicate group differences in target-absent RTs (Toffolo et al., 2013, 2014, 2016), we focused on the difficult search with the larger set size (set size = 25). We conducted a mixed-effects ANOVA, with mean response time (RT) as the dependent variable, group (OC+ vs. OC-) as a between-subjects variable, and target presence (present vs. absent) as a within-subjects variable. Specifically, we tested for an interaction between group and target presence, followed by a pattern wherein the mean RT difference between the OC+ and OC- groups would be significantly more pronounced in target-absent trials. Contrary to our expectations, the analysis did not reveal a significant interaction between group and target presence, `r apa_print(afex::aov_ez("subj_id", "mean_RT", H3.df, between = "OCI_quantile", within = "target_present"))$statistic$OCI_quantile_target_present` (figure 2, Exp1; preregistered hypothesis 3). A null result was also obtained in a correlation analysis, pooling data from all participants and treating OCI scores as a continuous variable (see Supplementary materials, pre-registered hypothesis 9.)”
 
   Similarly, when we used our entire sample (the four quartiles), and replaced the group variable (OC+; OC-) with the complete OCI-R scale, we found no interaction between OCI-R score and the presence of the target (preregistered hypothesis 9; β̂=-0.07, 95% CI [-2.48,2.35], t(941.54)=-0.05, p=.957). No significant group differences were observed when accounting for anxiety and depression either (preregistered hypothesis 10; β̂=8.62, 95% CI [-21.50,38.74], t(463.53)=0.56, p=.575). There were also no significant RT differences between groups during the task’s initial trials, prior to the accumulation of any experience (preregistered hypothesis 8; F(1,360)=0.93, p=.336). Lastly, we observed no significant differences between the groups in their self-reported measures of task difficulty. Detailed calculations and results for all these hypotheses are provided in the Appendix for further reference.
 
 ## Experiment 2 
-  In Experiment 1, target-absent search times were not significantly slower in OC+ compared to OC- individuals. While this stands in contrast to previous reports (Toffolo et al., 2013, 2014, 2016), our experiment differed from the original study in several respects. Most notably, search times in this study (~4.5s for target-absent and ~2.6s for target-present) were overall shorter compared to those in Toffolo et al. (2013) (~5.5 for target-absent and ~3.5s for target-present). We therefore considered the possibility that the task used in Experiment 1 may have been less challenging and potentially insufficient to elicit doubt and trigger checking behavior. In order to directly investigate this hypothesis, Experiment 2 employed the original stimuli from Toffolo et al. (2013) in an online sample to ascertain whether the failure to reproduce the effect resulted from an excessively easy task. 
+  In Experiment 1, target-absent search times were not significantly slower in OC+ compared to OC- individuals. While this stands in contrast to previous reports (Toffolo et al., 2013, 2014, 2016), our results differed from those of the original study in other respects as well. Most notably, search times in this study (~4.5s for target-absent and ~2.6s for target-present) were overall shorter compared to those in Toffolo et al. (2013) (~5.5 for target-absent and ~3.5s for target-present). We therefore considered the possibility that the task used in Experiment 1 may have been less challenging and potentially insufficient to elicit doubt and trigger checking behavior. To test this, Experiment 2 employed the original stimuli from Toffolo et al. (2013). The preregistered analysis plan can be accessed at the following link: https://github.com/Noamsarna/ocd_visual_search/tree/main/experiments/Experiment2. In Experiment 2, we conducted a further power analysis mirroring the methods of Toffolo et al. (2013), utilizing their data and adopting a bootstrap approach to determine an adequately powered sample size, as detailed in the preregistration document for Experiment 2. We employed the Mersenne Twister pseudorandom number generator to ensure that our preregistration preceded data collection (Mazor et al., 2019).
 
 
 ```{r Exp2_load_data, warning=FALSE, cache=TRUE, include=FALSE}
@@ -448,7 +559,7 @@ failed_practice <- exp2.jatos_df %>%
   group_by(subj_id) %>% 
   summarise(max_trail = max(as.double(trial_index, na.rm = T)),
             failed_practice = max_trail <= 42) %>% 
-  select(subj_id, max_trail,failed_practice)  
+  dplyr::select(subj_id, max_trail,failed_practice)  
 
 exp2.jatos_df <- left_join(exp2.jatos_df, failed_practice)
 
@@ -468,7 +579,7 @@ exp2.demo_prolific<-read.csv("../data/Ex2_anon_demo_prolific.csv")
 exp2.demo_prolific$subj_id <- as.factor(exp2.demo_prolific$subj_id)
 
 #keep only participants who didn't failed practice 
-exp2.demo_prolific <- exp2.demo_prolific %>% left_join(., failed_practice %>% select(subj_id, failed_practice),
+exp2.demo_prolific <- exp2.demo_prolific %>% left_join(., failed_practice %>% dplyr::select(subj_id, failed_practice),
                                                        by='subj_id')
 
 exp2.demo_prolific <- exp2.demo_prolific %>%  filter(failed_practice== FALSE)
@@ -481,7 +592,7 @@ exp2.jatos_df <- left_join(exp2.jatos_df, exp2.demo_prolific, by='subj_id')
 #parse oci data from df 
 exp2.OCI_df <- exp2.jatos_df %>%
   filter(grepl('oci', Identifier)) %>% 
-  select(subj_id, question, answer_oci) %>% 
+  dplyr::select(subj_id, question, answer_oci) %>% 
   mutate(attention_check = question %in% c("OCI-Attention_check_1","OCI-Attention_check_2")) %>%
   arrange(subj_id, question)%>%
   #arrange it in a long format df 
@@ -502,7 +613,7 @@ exp2.OCI_df %>% group_by(OCI_quantile) %>% count()
 
 # merge data with oci 
 exp2.jatos_df <- left_join(exp2.jatos_df, 
-                      exp2.OCI_df %>% select(subj_id, oci_overall, OCI_quantile, OCI_Absent),
+                      exp2.OCI_df %>% dplyr::select(subj_id, oci_overall, OCI_quantile, OCI_Absent),
                       by='subj_id')
 
 ############ create a df for the checking task 
@@ -510,7 +621,7 @@ exp2.jatos_df <- left_join(exp2.jatos_df,
 exp2.checking_task <- exp2.jatos_df %>% 
   filter(trial_type == "image-keyboard-response") %>%
   filter(isPractice=='FALSE') %>% 
-  select(trial_type,trial_index,subj_id,condition,
+  dplyr::select(trial_type,trial_index,subj_id,condition,
          rt,correct, isPractice, OCI_quantile, oci_overall, OCI_Absent)
 
 #create a table making sure every participant have 50 trials, 25 absent and 25 present 
@@ -528,7 +639,7 @@ exp2.checking_task <- exp2.checking_task %>% group_by(subj_id) %>%
 
 #create accuracy df with acc score and OCI group per subject 
 acc_data_frame <- exp2.checking_task %>% 
-  group_by(subj_id) %>% select(subj_id, mean_acc, OCI_quantile) %>% slice(1)
+  group_by(subj_id) %>% dplyr::select(subj_id, mean_acc, OCI_quantile) %>% slice(1)
 
 #Create variables of accuracy in standard deviation units to exclude participants 
 acc_data_frame$Zscore <-scale(acc_data_frame$mean_acc)[,1]
@@ -544,6 +655,16 @@ round(sd(acc_data_frame$Zscore), 2)
 
 #mark participant who had error greater than Z>-2.5
 acc_data_frame$remove <-acc_data_frame$Zscore<(-2.5)
+
+acc_data_frame %>% 
+  filter(remove==F) %>% 
+  group_by(OCI_quantile) %>% 
+  summarise(mean_acc=mean(mean_acc))
+
+acc_data_frame %>% 
+  filter(remove==F) %>% 
+  filter(OCI_quantile=='high' | OCI_quantile=='low') %>% 
+t.test(mean_acc~OCI_quantile, data=., alternative="two.sided")
 
 #merge acc df with the checking df 
 exp2.checking_task <- left_join(exp2.checking_task, acc_data_frame)
@@ -588,7 +709,7 @@ exp2.checking_task <-exp2.checking_task %>%
 #plot figure of mean RT for each group  
 exp_2_results<-
 checking_by_sub %>% 
-select(subj_id, target_present, oci_type, mean_RT)  %>%
+dplyr::select(subj_id, target_present, oci_type, mean_RT)  %>%
   ggplot(aes(x = target_present, y = mean_RT,  group = oci_type, shape = oci_type)) +
   stat_summary(fun = mean,
                geom = "point",
@@ -649,6 +770,13 @@ exp2.checking_task <-exp2.checking_task %>%
 exp_2_mean_error_rate <- round(mean(exp2.checking_task$num_error), 2) 
 exp_2_SD_error <- round(sd(exp2.checking_task$num_error), 2)
 
+# Bayesien analysis exp2 --------------------------------------------------
+bayes_t_test_exp2 <-
+  ttestBF(formula =RT_diff~OCI_quantile, data=planned_wide, rscale = 0.4, nullInterval = c(-Inf,0))
+
+#cohen's D
+exp2_H1_cohenD <-
+planned_wide %>% cohens_d(RT_diff~OCI_quantile, var.equal = TRUE)
 
 ```
 
