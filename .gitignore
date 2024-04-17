@@ -3,3 +3,7 @@
 docs/*_cache/*
 docs/OCD_VS_full_cache/*
 *.DS_Store
+/docs/OCD_VS_full_files/figure-docx
+docs/OCD_VS_full_files/figure-docx/first_trials-1.pdf
+docs/OCD_VS_full_files/figure-docx/first_trials-1.pdf
+/docs/OCD_VS_full_files
