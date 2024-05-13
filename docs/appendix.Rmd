@@ -133,6 +133,9 @@ planned_wide_exc_19 %>%
 
 # Supplementary results, Experiment 2
 
+## Hypothesis 1 - Task validation
+To validate our paradigm and demonstrate that target-absent searches are more difficult, we tested for an effect of condition (target-absent vs. target-present) on mean search times, collapsed across both groups. Our results revealed the expected difference, whereby the mean response time for target-absent responses (M=`r printnum(Exp2_H1_desc[1 ,2], digits=0)` ms, SD=`r printnum(Exp2_H1_desc[1 ,3], digits=0)` ms) was significantly longer than the mean response time for target present responses (M= `r printnum(Exp2_H1_desc[2 ,2], digits=0)` ms, SD= `r printnum(Exp2_H1_desc[2 ,3], digits=0)` ms, `r apa_print(t.test(mean_RT~condition, data=planned_df, alternative='greater', paired=T))$statistic`) 
+
 ## Reanalysis of Experiment 2, preregistered hypothesis 2
 
   Here we reanalyze Experiment 2, preregistered hypothesis 2, this time including only participants who had error rate smaller than the actual error rate used in @toffolo2013 (number of error \<19). The one-tailed t-test revealed no significant differences between the groups, `r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide_exc_19, alternative="greater"))$statistic`, providing no evidence for the expected interaction. Here too, a numeric interaction in the expected direction was driven by a descriptive difference in the timing of target-present responses, rather than by target-absent responses.
