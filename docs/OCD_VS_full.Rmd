@@ -345,7 +345,7 @@ age_stats <- demo_prolific %>%
 
 # Participants
 
-The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (<https://prolific.co/>) and selected based on their acceptance rate (\>95%) and for being native English speakers, located in the UK. The median completion time for the entire experiment was 14 minutes. Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were divided into high (OC+) and low (OC-) OCD tendencies groups based on their scores in the OCI-R (Foa et al., 2002; see below), with the OC+ group consisting of those in the highest quartile of the OCI-R scores distribution and the OC- group comprising those in the lowest quartile of this distribution. The entire sample (n=1007) completed the visual search task. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants.
+The research was approved by the Research Ethics Committee of Tel-Aviv University (study ID number 0004169-1). One thousand and seven participants were recruited via Prolific (<https://prolific.co/>) and selected based on the following criteria: an acceptance rate above 95%, no participation in previous study pilots, use of non-Safari browsers, and being native English speakers located in the UK. The median completion time for the entire experiment was 14 minutes. Participants were paid £2 for their participation, equivalent to an hourly wage of £8.57. Participants were divided into high (OC+) and low (OC-) OCD tendencies groups based on their scores in the OCI-R (Foa et al., 2002; see below), with the OC+ group consisting of those in the highest quartile of the OCI-R scores distribution and the OC- group comprising those in the lowest quartile of this distribution. The entire sample (n=1007) completed the visual search task. Due to higher-than-expected exclusion rate, and in deviation from our pre-registered plan to collect 250 participants in each group, our final sample included 213 OC+ participants and 220 OC- participants.
 
 The average age of the total sample was `r printnum(age_stats$Mean_Age)` years (SD = `r printnum(age_stats$SD_Age)`). Half of the sample identified as female. In terms of ethnicity, the majority (`r printnum(round(max(ethnicity_percentage$Percentage,0)))`) identified as White, followed by Asian (7%), Black (4%), and Mixed/Other (5%). The predominant nationality was UK (93%). Employment status was predominantly full-time (62%), followed by part-time (16%).
 
@@ -367,9 +367,13 @@ The DASS-21 is a 21- item self-report questionnaire that is divided into three s
 
 A static version of Experiment 1 can be accessed at: <https://noamsarna.github.io/ocd_visual_search/experiments/demos/exp1/>. Participants were first instructed about the experiment's structure, which comprised three parts: a visual search task, questions about the visual search, and the two inventories: OCI-R and DASS-21. Then, they received written instructions about the visual search task. After completing the visual search task, participants were asked to rate the difficulty of noticing the presence or absence of a certain target among different distractors (more information about this in the appendix). Following the difficulty estimation, participants completed the OCI-R and DASS-21. We included two attention check questions among the OCI-R items, asking participants to select a certain answer ('If you read this question, check the option 'Not at all').
 
-```{r figure_1, fig.cap="Figure 1 - Overview of experimental Design. Top panel: each visual search trial started with a centered black fixation cross. Middle panel (Practice): After reading the instructions, participants completed practice trials, searching for a rotated T among rotated L's in 6-trial blocks until they achieved a minimum accuracy of 0.83 (no more than one error). Middle panel (Main part): The primary experiment comprised 96 trials in four blocks, with the target identity changing after two blocks. Each 24-trial block followed a 2x2 design, manipulating set size (9 or 25) and target presence (present/absent). Bottom panel: Search difficulty estimation: participants used their mouse to rate search difficulty on a continuous scale. In questions about target-present searches, the target was marked with a red square."}
+**Figure 1** *Overview of experimental Design*
+
+```{r figure_1}
 knitr::include_graphics("figures/figure_1.png")
 ```
+
+*note* Top panel: each visual search trial started with a centered black fixation cross. Middle panel (Practice): After reading the instructions, participants completed practice trials, searching for a rotated T among rotated L's in 6-trial blocks until they achieved a minimum accuracy of 0.83 (no more than one error). Middle panel (Main part): The primary experiment comprised 96 trials in four blocks, with the target identity changing after two blocks. Each 24-trial block followed a 2x2 design, manipulating set size (9 or 25) and target presence (present/absent). Bottom panel: Search difficulty estimation: participants used their mouse to rate search difficulty on a continuous scale. In questions about target-present searches, the target was marked with a red square.
 
 ## Data Analysis
 
@@ -550,8 +554,6 @@ H5.df <- search_slopes_df %>% filter(OCI_quantile==1| OCI_quantile==4) %>% filte
 ```
 
 ```{r model_comparison, echo=FALSE, cache=TRUE}
-
-#We didn't use LOOCV since we included random terms in our model. So instead we compared models by their AIC and BIC values.  
 
 m1 <- 
   search_slopes_df%>% 
@@ -1210,9 +1212,13 @@ planned_wide %>% cohens_d(RT_diff~OCI_quantile, var.equal = TRUE)
 
 In contrast to Toffolo et al. (2013), where presence-absence differences in reaction time were more pronounced among OC+ participants, in our replication sample the one-tailed t-test of the interaction contrast (using the difference in search times as a DV), was not significant, `r apa_print(t.test(RT_diff~OCI_quantile, data=planned_wide, alternative="greater"))$statistic`, Cohen's *d*=`r print_num(exp2_H1_cohenD$effsize)` providing no evidence for the expected interaction. Notably, the numeric trend of the interaction in our sample was driven by shorter RT in the OC+ as compared to the OC- in target-present trials, rather than by longer RT for target-absent responses (Figure 2, Exp2). This pattern is different from that reported by Toffolo et al. (2013), where OC+ participants were slower in both search types, but particularly in target-absent searches (Figure 2, Toffolo et al., 2013). Unlike in Experiment 1, we observed no differences in accuracy between the groups (OC+: *M*=`r print_num(exp2.acc_desc$mean_acc[exp2.acc_desc$OCI_quantile=='high'])`, OC-: *M*=`r print_num(exp2.acc_desc$mean_acc[exp2.acc_desc$OCI_quantile=='low'])`; `r apa_print(exp2.acc_t_test)$statistic`). Finally, a one-sided Bayesian independent samples t-test produced a Bayes Factor of `r apa_print(bayes_t_test_exp2,scientific_threshold = c(min = 1e-10, max = 1e10))$statistic$interval`, providing moderate evidence for the null hypothesis of no group differences.
 
-```{r figure_2, fig.cap="Figure 2 - Results from Experiment 1, Experiment 2 and Toffolo et al., 2013, 2014. Mean reaction times for target-absent and target-present trials (X-axis). Error bars represent the standard error of the mean. Shapes represent the OC groups: Circle for OC+; Triangle for OC-."}
+**Figure 2** *Results from Experiment 1, Experiment 2 and Toffolo et al., 2013, 2014*
+
+```{r figure_2}
 knitr::include_graphics("figures/figure_2.png")
 ```
+
+*note* Mean reaction times for target-absent and target-present trials (X-axis). Error bars represent the standard error of the mean. Shapes represent the OC groups: Circle for OC+; Triangle for OC-.
 
 # Discussion
 
