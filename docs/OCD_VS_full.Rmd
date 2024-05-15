@@ -982,7 +982,7 @@ In Experiment 1, target-absent search times were not significantly slower in OC+
 
 # Pre processing  ---------------------------------------------------------
 #load df from jatos 
-exp2.jatos_df <-read_csv("../data/Exp_2_anon_jatos_results.csv")
+exp2.jatos_df <-read_csv("../data/Exp2_anon_jatos_results.csv")
 
 failed_practice <- exp2.jatos_df %>% 
   filter(trial_index != "trial_index") %>%
