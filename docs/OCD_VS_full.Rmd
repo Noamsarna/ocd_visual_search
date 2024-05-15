@@ -92,14 +92,14 @@ We report how we determined our sample size, all data exclusions, all manipulati
 ```{r load_data, warning=FALSE, cache=TRUE, include=FALSE}
 
 #load anon jatos data 
-df<- read_csv('../data/anon_jatos_results_p1.csv')
-df2<- read_csv('../data/anon_jatos_results_p2.csv')
+df<- read_csv('../data/Exp1_anon_jatos_results_p1.csv')
+df2<- read_csv('../data/Exp1_anon_jatos_results_p2.csv')
 
 df <- rbind(df, df2)
 rm(df2)
 
 #load anon prolific data 
-demo_prolific <- read.csv('../data/anon_demo_prolific.csv')
+demo_prolific <- read.csv('../data/Exp1_anon_demo_prolific.csv')
 
 
 # create OCI data ---------------------------------------------------------
