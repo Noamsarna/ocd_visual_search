@@ -1,5 +1,5 @@
 # Obsessive-Compulsive Visual Search: A Reexamination of Presence–Absence Asymmetries
-## Noam Sarna, Matan Mazor, and Reuvan Dar | [Open Access at *Clinical Psychological Science*](https://journals.sagepub.com/doi/10.1177/21677026241258380)
+## Noam Sarna, Matan Mazor, and Reuven Dar | [Open Access at *Clinical Psychological Science*](https://journals.sagepub.com/doi/10.1177/21677026241258380)
 
 
 ## Data 
